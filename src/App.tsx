@@ -1,12 +1,22 @@
+// import { Button } from "./components/ui/button"
+import { Footer } from "./layout/Footer/Footer"
+import  Header  from "./layout/Header/Header"
+// import Landing from "./pages/Landing/Landing"
 
 function App() {
  
   return (
     <>
-      <h1 className=" text-green-600 text-5xl text-center"> Final Year Project</h1>
-      <h3 className=" text-red-600 text-5xl text-center"> tailwind is working here</h3>
+    <Header/>
+
+      {/* <Landing/> */}
+
+      <Footer/>
+
     </>
   )
 }
 
 export default App
+
+
