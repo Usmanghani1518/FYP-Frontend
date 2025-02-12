@@ -1,4 +1,3 @@
-import { API_BASE_URL } from "@/constants/constants";
 import { FormEvent } from "react";
 
 export async function backendRequest<SuccessResponse = { success: true }, ErrorResponse = { success: false | undefined, detail: string | object }>(
@@ -10,7 +9,7 @@ export async function backendRequest<SuccessResponse = { success: true }, ErrorR
 ): Promise<SuccessResponse | ErrorResponse> {
     const url: string = path.startsWith("http://") || path.startsWith("https://") ?
         path :
-        (API_BASE_URL + path);
+        ('/api/v1' + path);
 
     const passableBody: FormData | string = multipart && body instanceof FormData ?
         body :
