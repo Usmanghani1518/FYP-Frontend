@@ -22,6 +22,9 @@ import {
 } from "@/components/ui/form";
 import { GraduationCap } from "lucide-react";
 import { useState } from "react";
+import VerifyAccount from "./VerifyAccount";
+import { notifyResponse } from "@/Helper/notify";
+import { backendRequest } from "@/Helper/backendRequest";
 
 const formSchema = z
   .object({
@@ -50,11 +53,33 @@ export default function SignupPage() {
     },
   });
   const [loading,setLoading]=useState(false)
+  const [verified,setVerified]=useState(false)
+  const [email,setEmail]=useState("")
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     setLoading(true)
-    // Handle form submission
+     try {
+          const response = await backendRequest("POST", "/auth/signup", {
+            name:values.fullName,
+            role:"student",
+            email: values.email,
+            password: values.password,
+          });
+          console.log(response);
+          if (response.success) {
+            notifyResponse(response);
+            setEmail(values.email)
+            setVerified(true)
+          } else {
+            notifyResponse(response);
+          }
+        } catch (error) {
+          console.log("Login failed", error); 
+        }
+        finally{
+            setLoading(false);
+        }
   }
 
   return (
@@ -89,6 +114,8 @@ export default function SignupPage() {
         </div>
 
         <div className="w-full md:w-1/2 flex items-center justify-center p-4 md:p-8 lg:p-8">
+        {
+          !verified?
           <Card className="w-[350px] md:w-[450px] lg:w-[550px] md:h-auto">
             <CardHeader className="md:pt-5">
               <CardTitle className="text-2xl md:text-3xl flex justify-center font-bold text-center">
@@ -186,7 +213,9 @@ export default function SignupPage() {
                 </Link>
               </div>
             </CardFooter>
-          </Card>
+          </Card>:
+          <VerifyAccount email={email}/>
+        }
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { set, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,9 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { GraduationCap } from "lucide-react";
 import { useState } from 'react';
+import { backendRequest } from '@/Helper/backendRequest';
+import VerifyAccount from './VerifyAccount';
+import { notifyResponse } from '@/Helper/notify';
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -27,18 +30,31 @@ export default function LoginPage() {
     },
   });
   const [loading,setLoading]=useState(false)
+  const [email,setEmail]=useState('')
+  const [notVerified,setNotVerified]=useState(false)
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
-    try {
-      setLoading(true)
+     try {
+      const response = await backendRequest("POST", "/auth/login", {
+        email: values.email,
+        password: values.password,
+      });
+      console.log(response);
+      if (!response.verified) {
+        notifyResponse(response);
+        setEmail(values.email)
+        setNotVerified(true)
+      } else {
+        notifyResponse(response);
+      }
     } catch (error) {
-      console.log("error",error)  
+      console.log("Login failed", error); 
     }
     finally{
-      // setLoading(false)
+        setLoading(false);
     }
-    // Handle form submission
   }
 
   return (
@@ -70,6 +86,8 @@ export default function LoginPage() {
 
         {/* Right side - Login Form */}
         <div className="w-full md:w-1/2 flex items-center justify-center p-4 md:p-8 lg:p-12">
+         {
+          !notVerified?
           <Card className="w-full ">
             <CardHeader className="space-y-2 md:pt-8">
               <CardTitle className="text-2xl md:text-3xl font-bold text-center flex items-center justify-center"><img className='w-36' src="/imagies/Logo.png" alt="" /></CardTitle>
@@ -142,7 +160,10 @@ export default function LoginPage() {
                 </Link>
               </div>
             </CardFooter>
-          </Card>
+          </Card>:
+          <VerifyAccount email={email}/>
+         }
+
         </div>
       </div>
     </div>
