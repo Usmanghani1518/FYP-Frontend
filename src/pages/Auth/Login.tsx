@@ -8,11 +8,15 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { GraduationCap } from "lucide-react";
+import { useState } from 'react';
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   password: z.string().min(8, { message: "Password must be at least 8 characters" }),
 });
+
+
+
 
 export default function LoginPage() {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -22,9 +26,18 @@ export default function LoginPage() {
       password: "",
     },
   });
+  const [loading,setLoading]=useState(false)
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
+    try {
+      setLoading(true)
+    } catch (error) {
+      console.log("error",error)  
+    }
+    finally{
+      // setLoading(false)
+    }
     // Handle form submission
   }
 
@@ -103,6 +116,7 @@ export default function LoginPage() {
                     )}
                   />
                   <Button 
+                  loading={loading}
                     className="w-full md:text-lg md:py-6" 
                     type="submit"
                   >
@@ -114,7 +128,7 @@ export default function LoginPage() {
             <CardFooter className="flex flex-col space-y-4 md:pb-8 md:px-8">
               <Link 
                 to="/forgot-password" 
-                className="text-sm md:text-base text-primary hover:text-primary/80 hover:underline text-center w-full"
+                className="text-sm md:text-base text-custom_primary hover:text-custom_primary/80 hover:underline text-center w-full"
               >
                 Forgot your password?
               </Link>
@@ -122,7 +136,7 @@ export default function LoginPage() {
                 Don't have an account?{' '}
                 <Link 
                   to="/signup" 
-                  className="text-primary hover:text-primary/80 hover:underline font-medium"
+                  className="text-custom_primary hover:text-custom_primary/80 hover:underline font-medium"
                 >
                   Create account
                 </Link>

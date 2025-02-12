@@ -1,52 +1,343 @@
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { Link } from "react-router-dom"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { SendCodeForm } from "@/pages/Auth/SendCode.tsx"
-import { VerifyOTPForm } from "@/pages/Auth/VerifyCode.tsx"
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+// import { backendRequest } from "../Helper/BackendReques";
+import { notifyResponse } from "@/Helper/notify";
+import { FiEye, FiEyeOff } from "react-icons/fi";
+import Loader from "@/shared/Loader";
+import { Eye, EyeClosed, GraduationCap } from "lucide-react";
 
-export default function ResetPasswordPage() {
-  const navigate = useNavigate()
-  const [step, setStep] = useState<"email" | "otp">("email")
+const ResetPassword = () => {
+  const [activeStep, setActiveStep] = useState(0);
+  const [completedSteps, setCompletedSteps] = useState([true, false, false]);
+  const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  const handleSendCode = (email: string) => {
-    console.log(`Code sent to ${email}`) // Replace with actual send code logic
-    setStep("otp")
-  }
+  const steps = ["Enter Email", "Verify Code", "Set Password"];
 
-  const handleVerifyOTP = (otp: string) => {
-    const validOtp = "123456" // Replace with the actual OTP validation logic
-    if (otp === validOtp) {
-      alert("OTP Verified! Redirecting...")
-      navigate("/login") // Redirect to login
-    } else {
-      alert("Invalid OTP! Please try again.")
+  const goToStep = (stepIndex: number) => {
+    if (completedSteps[stepIndex]) {
+      setActiveStep(stepIndex);
     }
-  }
+  };
+  const navigate = useNavigate();
+
+  const validateStep = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (activeStep === 0) {
+      if (!email) newErrors.email = "Email is required";
+      else if (!email.includes("@")) newErrors.email = "Enter a valid email";
+    }
+
+    if (activeStep === 1) {
+      if (!code) newErrors.code = "Verification code is required";
+      else if (code.length < 4) newErrors.code = "Enter a valid  code";
+    }
+
+    if (activeStep === 2) {
+      if (!newPassword) newErrors.newPassword = "Password is required";
+      else if (newPassword.length < 6)
+        newErrors.newPassword = "Password must be at least 6 characters";
+
+      if (!confirmPassword) newErrors.confirmPassword = "Confirm your password";
+      else if (newPassword !== confirmPassword)
+        newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const sendResetCode = async () => {
+    if (!validateStep()) return;
+
+    console.log("Sending reset code to:", email);
+    setLoading(true);
+    setTimeout(() => {
+      setActiveStep(1);
+      setCompletedSteps([true, true, false]);
+      setLoading(false);
+    }, 2000);
+    // try {
+    //   const response = await backendRequest("POST", "/password-reset-code", {
+    //     email,
+    //   });
+    //   console.log(response);
+    //   if (response.success) {
+    //     setActiveStep(1);
+    //     setCompletedSteps([true, true, false]);
+    //     notifyResponse(response);
+    //     setErrors({});
+    //   } else {
+    //     notifyResponse(response);
+    //   }
+    // } catch (error) {}
+    // finally{
+    //     setLoading(false);
+    // }
+  };
+
+  const verifyCode = async () => {
+    if (!validateStep()) return;
+
+    console.log("Verifying code:", code);
+    setLoading(true);
+    setTimeout(() => {
+      setActiveStep(2);
+      setCompletedSteps([true, true, true]);
+      setLoading(false);
+    }, 2000);
+    // try {
+    //   const response = await backendRequest("POST", "/confirm-opt", {
+    //     email,
+    //     code,
+    //   });
+    //   console.log(response);
+    //   if (response.success) {
+    //     setActiveStep(2);
+    //     setCompletedSteps([true, true, true]);
+    //     notifyResponse(response);
+    //     setErrors({});
+    //   } else {
+    //     notifyResponse(response);
+    //   }
+    // } catch (error) {}
+    // finally{
+    //     setLoading(false);
+    // }   
+  };
+
+  const resetPassword = async () => {
+    if (!validateStep()) return;
+
+    console.log("Resetting password...");
+    setLoading(true);
+    setTimeout(() => {
+      // setActiveStep(1);
+      navigate("/login");
+    }, 2000);
+    // try {
+    //   const response = await backendRequest("POST", "/reset-password", {
+    //     email,
+    //     code,
+    //     password: newPassword,
+    //   });
+    //   console.log(response);
+    //   if (response.success) {
+    //     notifyResponse(response);
+    //     navigate("/login");
+    //     setErrors({});
+    //   } else {
+    //     notifyResponse(response);
+    //   }
+    // } catch (error) {}
+    // finally{
+    //     setLoading(false);
+    // }
+  };
 
   return (
-    <div className="bg-gray-100 min-h-screen flex items-center justify-center">
-      <Card className="w-[350px] md:w-[450px] lg:w-[550px] md:h-auto">
-        <CardHeader className="md:pt-10">
-          <CardTitle className="text-2xl md:text-3xl font-bold text-center">Reset Password</CardTitle>
-        </CardHeader>
-        <CardContent className="md:px-10">
-          {step === "email" ? (
-            <SendCodeForm onSendCode={handleSendCode} />
-          ) : (
-            <VerifyOTPForm onVerifyOTP={handleVerifyOTP} />
-          )}
-        </CardContent>
-        <CardFooter className="flex justify-between md:pb-10">
-          <Link to="/forgot-password" className="text-sm md:text-base text-blue-600 hover:underline">
-            Resend OTP
-          </Link>
-          <Link to="/login" className="text-sm md:text-base text-blue-600 hover:underline">
-            Back to Login
-          </Link>
-        </CardFooter>
-      </Card>
-    </div>
-  )
-}
+    <div className="min-h-screen bg-gray-50">
+    <div className="flex min-h-screen">
+      {/* Left side - Image (visible on md and larger screens) */}
+      <div className="hidden md:flex md:w-1/2 relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70">
+          <img
+            src="/imagies/Auth/forgot.png"
+            alt="Students studying"
+            className="w-full h-full object-cover mix-blend-overlay"
+          />
+        </div>
+        <div className="relative w-full flex flex-col justify-center px-12 text-white">
+          {/* <div className="mb-8">
+            <GraduationCap className="h-12 w-12 mb-4" />
+            <h2 className="text-4xl font-bold mb-4">Forgot Password!</h2>
+            <p className="text-lg text-white/90">
+              Continue your learning journey with access to thousands of expert-led courses.
+            </p>
+          </div> */}
+          {/* <div className="space-y-4 bg-white/10 p-6 rounded-lg backdrop-blur-sm">
+            <p className="font-medium text-lg">"Education is the passport to the future, for tomorrow belongs to those who prepare for it today."</p>
+            <p className="text-sm text-white/80">- Malcolm X</p>
+          </div> */}
+        </div>
+      </div>
+    <div className="w-full md:w-1/2 flex items-center justify-center p-4 md:p-8 lg:p-12">
+      <div className="max-w-2xl w-full mx-auto px-6 pb-6 bg-white shadow-lg rounded-xl">
+        {/* Custom Clickable Stepper */}
+        <div className="flex items-center justify-center">
+          <img src="/imagies/Logo.png" className="w-32" alt="" />
+        </div>
+        <h1 className="text-center py-2  text-2xl font-semibold pb-5">
+          Forgot Password
+        </h1>
+        <div className="flex justify-between items-center mb-6 relative">
+          {steps.map((step, index) => (
+            <div
+              key={index}
+              className="flex flex-col z-10 items-center cursor-pointer"
+              onClick={() => goToStep(index)}
+            >
+              <div
+                className={`w-8 h-8 flex items-center justify-center text-white font-semibold rounded-full transition-all 
+                  ${
+                    completedSteps[index]
+                      ? "bg-purple-600 hover:bg-purple-700"
+                      : "bg-gray-300 cursor-not-allowed"
+                  }
+                  ${activeStep === index ? "ring-2 ring-purple-400" : ""}`}
+              >
+                {index + 1}
+              </div>
+              <p className="text-xs mt-1">{step}</p>
+            </div>
+          ))}
+          <div className="absolute top-4 left-4 right-6 h-0.5 bg-gray-300 z-0"></div>
+        </div>
 
+        {/* Step 1: Enter Email */}
+        {activeStep === 0 && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className={`w-full px-3 py-2 mt-1 border-2 rounded-lg focus:ring-0 focus:ring-blue-300 ${
+                errors.email ? "border-red-500" : "border-purple-300"
+              }`}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email}</p>
+            )}
+
+            <button
+              disabled={loading}
+              onClick={sendResetCode}
+              className={`w-full mt-5  text-white p-2 rounded-lg  transition ${loading? "hover:cursor-not-allowed bg-purple-500":" hover:cursor-pointer bg-purple-600 hover:bg-purple-700"} `}
+            >
+             {loading?<Loader size="sm"/>:" Send Reset Code"}
+            </button>
+          </div>
+        )}
+
+        {/* Step 2: Enter Code */}
+        {activeStep === 1 && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Verification Code
+            </label>
+            <input
+              type="text"
+              placeholder="Enter the code"
+              className={`w-full px-3 py-2 mt-1 border-2 rounded-lg focus:ring-0 focus:ring-blue-300 ${
+                errors.code ? "border-red-500" : "border-purple-300"
+              }`}
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+            />
+            {errors.code && (
+              <p className="text-red-500 text-sm">{errors.code}</p>
+            )}
+
+            <button
+            disabled={loading}
+              onClick={verifyCode}
+              className={`w-full mt-5  text-white p-2 rounded-lg  transition ${loading? "hover:cursor-not-allowed bg-purple-500":" hover:cursor-pointer bg-purple-600 hover:bg-purple-700"} `}
+            >
+             {loading?<Loader size="sm"/>:"Verify Code"} 
+            </button>
+          </div>
+        )}
+
+        {/* Step 3: Set Password */}
+        {activeStep === 2 && (
+          <div>
+            
+            <div>
+              <label className="block text-gray-700">Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className={`w-full mt-1 p-2 border-2 rounded-lg outline-none ${
+                    errors.newPassword
+                      ? "border-red-500"
+                      : "border-gray-300 focus:ring focus:ring-purple-600"
+                  }`}
+                  placeholder="Enter your password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="absolute right-2 top-6 transform -translate-y-1/2"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <FiEyeOff className="hover:cursor-pointer" />
+                  ) : (
+                    <FiEye className="hover:cursor-pointer" />
+                  )}
+                </button>
+              </div>
+              {errors.newPassword && (
+                <p className="text-red-500 text-sm mt-1">{errors.newPassword}</p>
+              )}
+            </div>
+
+            <div>
+                <label className="block text-gray-700">Confirm Password</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    className={`w-full mt-1 p-2 border-2 rounded-lg outline-none ${
+                      errors.confirmPassword ? "border-red-500" : "border-gray-300 focus:ring focus:ring-purple-600"
+                    }`}
+                    placeholder="Enter your password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-2 top-6 transform -translate-y-1/2"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? <FiEyeOff className="hover:cursor-pointer" /> : <FiEye className="hover:cursor-pointer" />}
+                  </button>
+                </div>
+                {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
+              </div>
+
+            <button
+            disabled={loading}
+              onClick={resetPassword}
+              className={`w-full mt-5 text-white p-2 rounded-lg  transition ${loading? "hover:cursor-not-allowed bg-purple-500":" hover:cursor-pointer bg-purple-600 hover:bg-purple-700"} `}
+            >
+             {loading?<Loader size="sm"/>:"Reset Password"} 
+            </button>
+          </div>
+        )}
+
+        <p className="text-center text-gray-600 mt-4">
+          Return to{" "}
+          <Link to="/login" className="text-purple-600 hover:underline">
+            Login
+          </Link>
+        </p>
+      </div>
+    </div>
+    </div>
+    </div>
+  );
+};
+
+export default ResetPassword;
