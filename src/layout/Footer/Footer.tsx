@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+
 // import React from "react";
 
 export const  Footer =()=> {
@@ -9,9 +11,9 @@ export const  Footer =()=> {
         {/* Logo */}
         <div className="flex flex-col items-center space-y-4 md:flex-row md:justify-between md:space-y-0">
           <img
-            src="/logo.svg" // Replace with your logo path
-            alt="Udacity"
-            className="h-8"
+            src="/imagies/Logo.png" // Replace with your logo path
+            alt="EduConnect"
+            className="w-32"
           />
           <p className="text-xs text-gray-500 md:text-right">
             © 2011-2025 Udacity, Inc. "Nanodegree" is a registered trademark of
@@ -25,13 +27,13 @@ export const  Footer =()=> {
           <div>
             <h3 className="font-semibold text-gray-800">Company</h3>
             <ul className="mt-2 space-y-2">
-              <li>About Us</li>
-              <li>Why Udacity?</li>
-              <li>Blog</li>
-              <li>In the News</li>
-              <li>Jobs at Udacity</li>
-              <li>Become a Mentor</li>
-              <li>Partner with Udacity</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">About Us</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Why Udacity?</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Blog</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">In the News</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Jobs at Udacity</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Become a Mentor</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Partner with Udacity</li>
             </ul>
           </div>
 
@@ -39,15 +41,15 @@ export const  Footer =()=> {
           <div>
             <h3 className="font-semibold text-gray-800">Udacity Schools</h3>
             <ul className="mt-2 space-y-2">
-              <li>School of Artificial Intelligence</li>
-              <li>School of Autonomous Systems</li>
-              <li>School of Business</li>
-              <li>School of Cloud Computing</li>
-              <li>School of Cybersecurity</li>
-              <li>School of Data Science</li>
-              <li>School of Executive Leadership</li>
-              <li>School of Product Management</li>
-              <li>School of Programming</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">School of Artificial Intelligence</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">School of Autonomous Systems</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">School of Business</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">School of Cloud Computing</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">School of Cybersecurity</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">School of Data Science</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">School of Executive Leadership</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">School of Product Management</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">School of Programming</li>
             </ul>
           </div>
 
@@ -55,13 +57,13 @@ export const  Footer =()=> {
           <div>
             <h3 className="font-semibold text-gray-800">Featured Programs</h3>
             <ul className="mt-2 space-y-2">
-              <li>Business Analytics</li>
-              <li>SQL</li>
-              <li>AWS Cloud Architect</li>
-              <li>Data Analyst</li>
-              <li>Intro to Programming</li>
-              <li>Digital Marketing</li>
-              <li>Self-Driving Car Engineer</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Business Analytics</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">SQL</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">AWS Cloud Architect</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Data Analyst</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Intro to Programming</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Digital Marketing</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Self-Driving Car Engineer</li>
             </ul>
           </div>
 
@@ -69,13 +71,13 @@ export const  Footer =()=> {
           <div>
             <h3 className="font-semibold text-gray-800">Only at Udacity</h3>
             <ul className="mt-2 space-y-2">
-              <li>Artificial Intelligence</li>
-              <li>Deep Learning</li>
-              <li>Digital Marketing</li>
-              <li>Flying Car and Autonomous Flight Engineer</li>
-              <li>Intro to Self-Driving Cars</li>
-              <li>Machine Learning Engineer</li>
-              <li>Robotics Software Engineer</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Artificial Intelligence</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Deep Learning</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Digital Marketing</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Flying Car and Autonomous Flight Engineer</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Intro to Self-Driving Cars</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Machine Learning Engineer</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Robotics Software Engineer</li>
             </ul>
           </div>
 
@@ -83,11 +85,11 @@ export const  Footer =()=> {
           <div>
             <h3 className="font-semibold text-gray-800">Resources</h3>
             <ul className="mt-2 space-y-2">
-              <li>Catalog</li>
-              <li>Career Outcomes</li>
-              <li>Help and FAQ</li>
-              <li>Scholarships</li>
-              <li>Resource Center</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Catalog</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Career Outcomes</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Help and FAQ</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Scholarships</li>
+              <li className="hover:cursor-pointer hover:text-custom_primary">Resource Center</li>
             </ul>
           </div>
         </div>
@@ -102,9 +104,9 @@ export const  Footer =()=> {
                 placeholder="Email Address"
                 className="rounded-md border px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
               />
-              <button className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+              <Button className="rounded-md  px-4 py-2 text-white ">
                 Subscribe to Newsletter
-              </button>
+              </Button>
             </div>
           </div>
           <div className="flex space-x-6 text-gray-500">

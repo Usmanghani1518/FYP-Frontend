@@ -5,13 +5,21 @@ import App from "./App";
 import LoginPage from "./pages/Auth/Login";
 import SignupPage from "./pages/Auth/SignUp";
 import VerifyOTPPage from "./pages/Auth/Forgot";
+import Landing from "./pages/Landing/Landing";
+import Layout from "./layout/Layout";
 
 
   export const router = createBrowserRouter([
     {
       path: "/",
-      element: <App />,
+      element: <Layout />,
     //   errorElement: <ErrorPage />,
+    children: [
+        {
+          index: true,
+          element: <Landing />,
+        },
+      ],
     },
     {
       path: "/contact",
