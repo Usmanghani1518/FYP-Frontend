@@ -5,12 +5,14 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { ShoppingCart, Search, Menu, X } from "lucide-react"
 import logo from "../../../public/imagies/Logo.png"
-import {Link} from "react-router-dom"
+import {Link, useNavigate} from "react-router-dom"
 
 
 export default function Header() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isSearchActive, setIsSearchActive] = useState(false)
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (isSidebarOpen) {
@@ -107,8 +109,8 @@ export default function Header() {
           <Link to="#" className="text-xl">
             <ShoppingCart />
           </Link>
-          <Button variant="outline">Log in</Button>
-          <Button>Sign up</Button>
+          <Button onClick={()=>navigate("/login") } variant="outline">Log in</Button>
+          <Button onClick={()=>navigate("/signup") }>Sign up</Button>
         </div>
       </div>
 
@@ -152,8 +154,8 @@ export default function Header() {
                 </li>
               </ul>
             </nav>
-            <Button variant={"default"}  className="w-full bg-custom_primary_hover">Sign up</Button>
-            <Button variant="outlinee" className="w-full ">
+            <Button onClick={()=>navigate("/signup") } variant={"default"}  className="w-full bg-custom_primary_hover">Sign up</Button>
+            <Button onClick={()=>navigate("/login") } variant="outlinee" className="w-full ">
               Log in
             </Button>
           </div>

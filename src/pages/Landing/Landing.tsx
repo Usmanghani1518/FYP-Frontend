@@ -12,9 +12,63 @@
 // export default Landing
 
 
+const featuredCourses = [
+  {
+    title: "Advanced JavaScript Concepts",
+    instructor: "Jane Doe",
+    rating: 4.9,
+    reviews: 12345,
+    price: "$49.99",
+    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=600",
+    badge: "Best Seller"
+  },
+  {
+    title: "React Native for Beginners",
+    instructor: "John Smith",
+    rating: 4.8,
+    reviews: 9876,
+    price: "$39.99",
+    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=600",
+    badge: "New"
+  },
+  {
+    title: "Mastering Python",
+    instructor: "Alice Johnson",
+    rating: 4.7,
+    reviews: 5432,
+    price: "$59.99",
+    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=600",
+    badge: "Top Rated"
+  },
+  {
+    title: "Mastering Python",
+    instructor: "Alice Johnson",
+    rating: 4.7,
+    reviews: 5432,
+    price: "$59.99",
+    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=600",
+    badge: "Top Rated"
+  },
+  {
+    title: "Mastering Python",
+    instructor: "Alice Johnson",
+    rating: 4.7,
+    reviews: 5432,
+    price: "$59.99",
+    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=600",
+    badge: "Top Rated"
+  },
+];
+
+
+
+
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Search, Star, Clock, Award, TrendingUp, PlayCircle, Play, Globe } from "lucide-react";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import { Badge } from "@/components/ui/badge";
 
 function App() {
   const courses = [
@@ -55,7 +109,8 @@ function App() {
           <div className="absolute inset-0 bg-black/50" />
         </div>
         <div className="container relative z-10 mx-auto px-4">
-          <div className="max-w-2xl">
+          <div className="max-w-2xl mx-auto
+            text-center">
             <h1 className="text-5xl font-bold text-white mb-6">
               Learn without limits
             </h1>
@@ -96,7 +151,7 @@ function App() {
                 description: "Learn from industry experts who care about your success",
               },
             ].map((benefit) => (
-              <Card key={benefit.title} className="text-center">
+              <Card key={benefit.title} className="text-center hover:cursor-pointer hover:shadow-xl">
                 <CardContent className="pt-6">
                   <div className="inline-flex p-3 rounded-full bg-primary/10 mb-4">
                     {benefit.icon}
@@ -114,7 +169,7 @@ function App() {
 
       {/* Trending Courses Section */}
       <section className="py-20">
-        <div className="container mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-12">
             <div>
               <h2 className="text-3xl font-bold mb-2">Trending courses</h2>
@@ -166,7 +221,67 @@ function App() {
         </div>
       </section>
 
-
+      <section className="py-16 bg-muted/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center mb-12">
+            <h2 className="text-3xl font-bold">Featured Courses</h2>
+            <Button variant="outline">View all</Button>
+          </div>
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="w-full"
+          >
+            <CarouselContent>
+              {featuredCourses.map((course) => (
+                <CarouselItem key={course.title} className="sm:basis-1/2 lg:basis-1/3">
+                  <Card className="h-full">
+                    <CardContent className="p-0">
+                      <div className="relative">
+                        <img
+                          src={course.image}
+                          alt={course.title}
+                          className="w-full aspect-video object-cover"
+                        />
+                        {course.badge && (
+                          <Badge className="absolute top-2 left-2">{course.badge}</Badge>
+                        )}
+                      </div>
+                      <div className="p-4">
+                        <h3 className="font-bold mb-2 line-clamp-2">{course.title}</h3>
+                        <p className="text-sm text-muted-foreground mb-2">{course.instructor}</p>
+                        <div className="flex items-center gap-1 mb-2">
+                          <span className="font-bold">{course.rating}</span>
+                          <div className="flex">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`h-4 w-4 ${
+                                  i < Math.floor(course.rating)
+                                    ? "fill-yellow-400 text-yellow-400"
+                                    : "fill-muted text-muted"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-sm text-muted-foreground">
+                            ({course.reviews.toLocaleString()})
+                          </span>
+                        </div>
+                        <p className="font-bold">{course.price}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            {/* <CarouselPrevious /> */}
+            {/* <CarouselNext /> */}
+          </Carousel>
+        </div>
+      </section>
 
       <section className="py-16 bg-primary text-primary-foreground">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -208,3 +323,4 @@ function App() {
 }
 
 export default App;
+
