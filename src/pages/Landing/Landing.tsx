@@ -61,14 +61,32 @@ const featuredCourses = [
 ];
 
 
+const slides = [
+  {
+    title: "Learning that gets you",
+    description: "Skills for your present (and your future). Get started with us.",
+    image:
+      "/public/imagies/land/heroCarousel1.jpg"
+      },
+  {
+    title: "Unlock your potential",
+    description: "Learn the skills you need to succeed in your career.",
+    image:
+      "/public/imagies/land/heroCarousel2.jpg"
+      },
+]
+
+
 
 
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Search, Star, Clock, Award, TrendingUp, PlayCircle, Play, Globe } from "lucide-react";
-import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Badge } from "@/components/ui/badge";
+import { FaSmile, FaClipboard, FaUsers, FaTrophy } from "react-icons/fa";
+import { useEffect, useState } from "react";
 
 function App() {
   const courses = [
@@ -101,10 +119,72 @@ function App() {
     }
   ];
 
+  const stats = [
+    { icon: <FaSmile className="icon" />, value: "5,248", label: "HAPPY STUDENTS" },
+    { icon: <FaClipboard className="icon" />, value: "675", label: "OUR COURSES" },
+    { icon: <FaUsers className="icon" />, value: "248", label: "OUR TEACHERS" },
+    { icon: <FaTrophy className="icon" />, value: "24", label: "AWARDS WON" },
+  ];
+
+
+  const [api, setApi] = useState<any>()
+  const [current, setCurrent] = useState(0)
+
+  useEffect(() => {
+    if (!api) return
+
+    const interval = setInterval(() => {
+      api.next()
+    }, 2000)
+
+    return () => clearInterval(interval)
+  }, [api])
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative h-[600px] flex items-center">
+     
+    <div className="relative">
+
+      <Carousel
+        className="w-full max-w-7xl mx-auto"
+        setApi={setApi}
+        onSelect={(index) => setCurrent(index)}
+        opts={{
+          loop: true,
+        }}
+      >
+        <CarouselContent>
+          {slides.map((slide, index) => (
+            <CarouselItem key={index}>
+              <div className="relative h-[500px] w-full mt-5 overflow-hidden bg-gray-300 ">
+                <img
+                  src={slide.image || "/placeholder.svg"}
+                  alt={slide.title}
+                  // fill
+                  className="object-cover"
+                  // priority={index === 0}
+                />
+                <div className="absolute inset-0 ">
+                  <Card className="absolute left-8 top-1/2 w-full max-w-lg -translate-y-1/2 border-none bg-transparent shadow-none lg:left-16">
+                    <CardContent className="space-y-4 p-6">
+                      <h1 className="text-2xl font-semibold tracking-tight text-gray-900 lg:text-5xl">{slide.title}</h1>
+                      <p className="text bg-gray-300 px-3 py-2 opacity-70 rounded-sm font-semibold text-gray-900">{slide.description}</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious className="left-4 hidden sm:flex" />
+        <CarouselNext className="right-4 hidden sm:flex" />
+      </Carousel>
+
+      
+
+
+      {/* <section className="relative h-[600px] flex items-center">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80')] bg-cover bg-center">
           <div className="absolute inset-0 bg-black/50" />
         </div>
@@ -127,18 +207,20 @@ function App() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
+    <div className="relative bg-white">
 
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">Why Learn with Us</h2>
+          <h2 className="text-3xl font-bold font-josefin uppercase  ">Why Learn with Us</h2>
+          <hr className="text-custom_primary p-[1.5px] rounded-sm bg-custom_primary mt-2 mb-12 w-32" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
                 icon: <Play className="h-8 w-8" />,
                 title: "Learn at Your Own Pace",
-                description: "Enjoy lifetime access to courses on our website",
+                description: "Enjoy lifetime access to courses on our website", 
               },
               {
                 icon: <Clock className="h-8 w-8" />,
@@ -172,7 +254,7 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-12">
             <div>
-              <h2 className="text-3xl font-bold mb-2">Trending courses</h2>
+              <h2 className="text-3xl font-bold font-josefin capitalize mb-2">Trending courses</h2>
               <p className="text-muted-foreground">Most popular courses among our students</p>
             </div>
             <TrendingUp className="w-8 h-8 text-primary" />
@@ -221,10 +303,29 @@ function App() {
         </div>
       </section>
 
+      <section className="stat" style={{ backgroundColor: "#1e2540", padding: "50px 0" }}>
+      <div className="container">
+        <div className="row text-white text-center">
+          {stats.map((stat, index) => (
+            <div key={index} className="col-6 col-md-3 mb-4">
+              <div className="d-flex flex-column align-items-center">
+                {stat.icon}
+                <h1 className="mb-2" style={{ fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }}>
+                  {stat.value}
+                </h1>
+                <p>{stat.label}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+
       <section className="py-16 bg-muted/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-12">
-            <h2 className="text-3xl font-bold">Featured Courses</h2>
+            <h2 className="text-3xl font-bold font-josefin uppercase">Featured Courses</h2>
             <Button variant="outline">View all</Button>
           </div>
           <Carousel
@@ -283,11 +384,14 @@ function App() {
         </div>
       </section>
 
+      
+
+
       <section className="py-16 bg-primary text-primary-foreground">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-bold mb-6">EduConnect Business</h2>
+              <h2 className="text-3xl font-bold mb-6 font-josefin capitalize">EduConnect Business</h2>
               <p className="text-xl mb-8 opacity-90">
                 Get unlimited access to 25,000+ of our top courses for your team
               </p>
@@ -318,6 +422,11 @@ function App() {
           </div>
         </div>
       </section>
+      </div>
+    
+
+    </div>
+
     </div>
   );
 }
