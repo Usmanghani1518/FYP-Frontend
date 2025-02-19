@@ -16,6 +16,7 @@ export default {
   			background: 'hsl(var(--background))',
 			custom_primary:'#6e11b0',
 			custom_primary_hover:'#4d179a',
+			custom_red: '#dc3545',
   			foreground: 'hsl(var(--foreground))',
   			card: {
   				DEFAULT: 'hsl(var(--card))',
