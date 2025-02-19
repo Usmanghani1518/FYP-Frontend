@@ -32,7 +32,9 @@ const VerifyAccount = ({email}:{email:string}) => {
         const response = await backendRequest("POST", "/auth/activate", { code:otp,email });
         notifyResponse(response);
         setUserToken(response)
-        navigate("/files");
+        if (response.success){
+          navigate("/");
+        }
         console.log("Verification successful", response);
       } catch (error) {
         console.error("Verification failed", error);
