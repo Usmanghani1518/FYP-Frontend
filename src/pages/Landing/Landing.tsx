@@ -221,7 +221,7 @@ function App() {
   <div className="relative max-w-7xl mx-auto grid md:grid-cols-2 gap-8 items-center">
     {/* Left Content */}
     <div className="text-white">
-      <p className="uppercase tracking-wide text-purple-500 text-sm">Welcome to Skola</p>
+      <p className="uppercase tracking-wide text-purple-500 text-sm">Welcome to EduConnect</p>
       <h1 className="text-4xl md:text-5xl font-bold leading-tight mt-2">
         We are determined to <br /> achieve the highest <br /> standards
       </h1>
