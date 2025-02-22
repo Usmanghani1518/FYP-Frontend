@@ -103,7 +103,7 @@ export default function Header() {
           <Link to="#" className="text-sm hover:text-custom_primary">
             EduConnect Business
           </Link>
-          <Link to="#" className="text-sm hover:text-custom_primary">
+          <Link to="/login-teacher" className="text-sm hover:text-custom_primary">
             Teach on EduConnect
           </Link>
           <Link to="#" className="text-xl">

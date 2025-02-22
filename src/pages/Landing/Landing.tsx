@@ -160,7 +160,7 @@ function App() {
   }, [api]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen ">
       {/* Hero Section */}
 
       <div className="relative">
@@ -256,6 +256,7 @@ function App() {
 </section>
 
         <div className="relative bg-slate-100">
+          
 {/* ------------------------------why learn with us -------------------------------*/}
 
           <section className="py-16">

@@ -15,9 +15,9 @@ const Layout = () => {
       <Container/>
       <ParticlesComponent id="particles" />
         <Header />
-        {/* <div className='relative'> */}
+        <div className='relative'>
         <Outlet  />
-        {/* </div> */}
+        </div>
         <Footer  />
     </div>
   );
