@@ -16,8 +16,8 @@ export const  Footer =()=> {
             className="w-32"
           />
           <p className="text-xs text-gray-500 md:text-right">
-            © 2011-2025 Udacity, Inc. "Nanodegree" is a registered trademark of
-            Udacity.
+            © 2011-2025 EduConnect, Inc. "Nanodegree" is a registered trademark of
+            EduConnect.
           </p>
         </div>
 
@@ -28,18 +28,18 @@ export const  Footer =()=> {
             <h3 className="font-semibold text-base text-gray-200">Company</h3>
             <ul className="mt-2 space-y-2 text-gray-400 leading-7 ">
               <li className="hover:cursor-pointer hover:text-purple-500">About Us</li>
-              <li className="hover:cursor-pointer hover:text-purple-500">Why Udacity?</li>
+              <li className="hover:cursor-pointer hover:text-purple-500">Why EduConnect?</li>
               <li className="hover:cursor-pointer hover:text-purple-500">Blog</li>
               <li className="hover:cursor-pointer hover:text-purple-500">In the News</li>
-              <li className="hover:cursor-pointer hover:text-purple-500">Jobs at Udacity</li>
+              <li className="hover:cursor-pointer hover:text-purple-500">Jobs at EduConnect</li>
               <li className="hover:cursor-pointer hover:text-purple-500">Become a Mentor</li>
-              <li className="hover:cursor-pointer hover:text-purple-500">Partner with Udacity</li>
+              <li className="hover:cursor-pointer hover:text-purple-500">Partner with EduConnect</li>
             </ul>
           </div>
 
           {/* Column 2 */}
           <div>
-            <h3 className="font-semibold  text-gray-200">Udacity Schools</h3>
+            <h3 className="font-semibold  text-gray-200">EduConnect Schools</h3>
             <ul className="mt-2 space-y-2 text-gray-400 leading-7">
               <li className="hover:cursor-pointer hover:text-purple-500">School of Artificial Intelligence</li>
               <li className="hover:cursor-pointer hover:text-purple-500">School of Autonomous Systems</li>
@@ -69,7 +69,7 @@ export const  Footer =()=> {
 
           {/* Column 4 */}
           <div>
-            <h3 className="font-semibold text-base text-gray-200">Only at Udacity</h3>
+            <h3 className="font-semibold text-base text-gray-200">Only at EduConnect</h3>
             <ul className="mt-2 space-y-2 text-gray-400 leading-7 ">
               <li className="hover:cursor-pointer hover:text-purple-500">Artificial Intelligence</li>
               <li className="hover:cursor-pointer hover:text-purple-500">Deep Learning</li>

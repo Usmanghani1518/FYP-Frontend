@@ -4,10 +4,10 @@ import {
   GraduationCap,
   BookOpen,
   DollarSign,
-  TrendingUp,
+  // TrendingUp,
   Star,
-  Clock,
-  Award
+  // Clock,
+  // Award
 } from 'lucide-react';
 import {
   Chart as ChartJS,
@@ -85,12 +85,13 @@ const AdminDashboard: React.FC = () => {
       {
         data: [35, 25, 20, 15, 10, 5],
         backgroundColor: [
-          'rgba(110, 17, 176, 0.8)',
-          'rgba(77, 23, 154, 0.8)',
-          'rgba(130, 50, 196, 0.8)',
-          'rgba(150, 80, 216, 0.8)',
-          'rgba(170, 110, 236, 0.8)',
-          'rgba(190, 140, 255, 0.8)',
+          'rgba(255, 99, 132, 0.8)',   /* Soft Red */
+'rgba(54, 162, 235, 0.8)',   /* Soft Blue */
+'rgba(255, 206, 86, 0.8)',   /* Light Yellow */
+'rgba(75, 192, 192, 0.8)',   /* Mint Green */
+'rgba(153, 102, 255, 0.8)',  /* Light Purple */
+'rgba(255, 159, 64, 0.8)',   /* Peach Orange */
+
         ],
       },
     ],

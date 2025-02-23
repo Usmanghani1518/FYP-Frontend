@@ -1,6 +1,6 @@
 import {
-    createBrowserRouter,
-  } from "react-router-dom";
+  createBrowserRouter,
+} from "react-router-dom";
 import App from "./App";
 import LoginPage from "./pages/Auth/Login";
 import SignupPage from "./pages/Auth/SignUp";
@@ -12,71 +12,69 @@ import AdminDashboard from "./pages/Admin/Dashboard";
 import CreateCourse from "./pages/CreateCourse";
 import Dashboard from "./pages/Teacher/Dashboard";
 import TeacherLayout from "./pages/Teacher/Layout";
+import ErrorPage from "./pages/Error"; // Import your ErrorPage
 
-
-  export const router = createBrowserRouter([
-    {
+export const router = createBrowserRouter([
+  {
       path: "/",
       element: <Layout />,
-    //   errorElement: <ErrorPage />,
-    children: [
-        {
-          index: true,
-          element: <Landing />,
-        },
-        {
-          path:"login-teacher",
-          element: <Teacher />
-        },
-        {
-          path:"admin",
-          element: <AdminDashboard />
-        },
-        {
-          path:"create-course",
-          element: <CreateCourse />
-        },
-        {
-          path:"teacher-dashboard",
-          element: <Dashboard />
-        },
-        {
-          path:"dashboard",
-          element: <TeacherLayout />,
-          children:[
-            {
-              // path:"admin",
-              index:true,
+      errorElement: <ErrorPage />, // Show ErrorPage for invalid paths inside Layout
+      children: [
+          {
+              index: true,
+              element: <Landing />,
+          },
+          {
+              path: "login-teacher",
+              element: <Teacher />
+          },
+          {
+              path: "admin",
               element: <AdminDashboard />
-            },
-          ]
-        }
+          },
+          {
+              path: "create-course",
+              element: <CreateCourse />
+          },
+          {
+              path: "teacher-dashboard",
+              element: <Dashboard />
+          },
+          {
+              path: "dashboard",
+              element: <TeacherLayout />,
+              children: [
+                  {
+                      index: true,
+                      element: <AdminDashboard />
+                  },
+              ]
+          }
       ],
-    },
-    {
+  },
+  {
       path: "/contact",
       element: <App />,
-    //   errorElement: <ErrorPage />,
-    },
-    {
+      errorElement: <ErrorPage />,
+  },
+  {
       path: "/login",
       element: <LoginPage />,
-    //   errorElement: <ErrorPage />,
-    },
-    {
-      path: "/login-teacher",
-      element: <Teacher />,
-    //   errorElement: <ErrorPage />,
-    },
-    {
+      errorElement: <ErrorPage />,
+  },
+  {
       path: "/signup",
       element: <SignupPage />,
-    //   errorElement: <ErrorPage />,
-    },
-    {
+      errorElement: <ErrorPage />,
+  },
+  {
       path: "/forgot-password",
       element: <VerifyOTPPage />,
-    //   errorElement: <ErrorPage />,
-    },
-   
-  ]);
+      errorElement: <ErrorPage />,
+  },
+  // Catch-all route for unknown paths
+  {
+      path: "*",
+      element: <ErrorPage />,
+  }
+]);

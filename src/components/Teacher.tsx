@@ -14,7 +14,7 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
+  // FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 
@@ -73,6 +73,22 @@ const Teacher = () => {
     }
   }
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      // Reset form when modal is closed
+      form.reset({
+        name: "",
+        headline: "",
+        email: "",
+        password: "",
+        experience: "",
+      });
+      // Clear all errors
+      form.clearErrors();
+    }
+    setOpen(open);
+  };
+
   return (
     <div className="bg-slate-100 min-h-screen relative flex items-center">
       <div className="container mx-auto px-12 xl:px-20 py-12">
@@ -99,7 +115,7 @@ const Teacher = () => {
             </p>
            
 
-            <Dialog open={open} onOpenChange={setOpen}>
+            <Dialog open={open} onOpenChange={handleOpenChange}>
               <DialogTrigger asChild>
                 <Button
                   size="lg"
