@@ -30,6 +30,8 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { backendRequest } from "@/Helper/backendRequest";
+import { notifyResponse } from "@/Helper/notify";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -64,8 +66,19 @@ const Teacher = () => {
     setLoading(true);
     try {
       console.log(values);
-      // Add your API call here
-      setOpen(false);
+      const res = await backendRequest("POST", "/auth/teacher/signup", values)
+      notifyResponse(res)
+      if(res.success){
+        setOpen(false);
+        form.reset({
+          name: "",
+          headline: "",
+          email: "",
+          password: "",
+          experience: "",
+        });
+      }
+ 
     } catch (error) {
       console.error("Submission failed:", error);
     } finally {
@@ -170,7 +183,7 @@ const Teacher = () => {
                           {/* </FormLabel> */}
                           <FormControl>
                             <Input
-                              placeholder="Enter your headline"
+                              placeholder="eg. Software Engineer"
                               {...field}
                             />
                           </FormControl>

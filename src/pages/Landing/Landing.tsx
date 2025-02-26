@@ -64,19 +64,7 @@ const featuredCourses = [
   },
 ];
 
-const slides = [
-  {
-    title: "Learning that gets you",
-    description:
-      "Skills for your present (and your future). Get started with us.",
-    image: "/public/imagies/land/heroCarousel1.jpg",
-  },
-  {
-    title: "Unlock your potential",
-    description: "Learn the skills you need to succeed in your career.",
-    image: "/public/imagies/land/heroCarousel2.jpg",
-  },
-];
+
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -147,7 +135,6 @@ function App() {
   ];
 
   const [api, setApi] = useState<any>();
-  const [current, setCurrent] = useState(0);
 
   useEffect(() => {
     if (!api) return;
@@ -234,7 +221,7 @@ function App() {
     </div>
 
     <div className="relative">
-      <img src="/students-image.png" alt="Students" className="w-full h-auto object-cover" />
+      <img src="/public/imagies/Land/students.png" alt="Students" className="w-full h-96   rounded-lg object-cover" />
     </div>
   </div>
 
@@ -255,7 +242,7 @@ function App() {
   </div>
 </section>
 
-        <div className="relative bg-slate-100">
+        <div className="relative bg-purple-100">
           
 {/* ------------------------------why learn with us -------------------------------*/}
 
@@ -308,7 +295,7 @@ function App() {
           </section>
 
           {/*--------------------------- Trending Courses Section -----------------------------*/}
-          <section className="py-20">
+          <section className="py-20 bg-gray-100">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex items-center justify-between mb-12">
                 <div>
@@ -372,27 +359,7 @@ function App() {
               </div>
             </div>
           </section>
-{/* ------------------------------Stats -------------------------------*/}
 
-          <section className="bg-[#1e2540] py-12">
-            <div className="container mx-auto">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-white text-center">
-                {stats.map((stat, index) => (
-                  <div key={index} className="flex flex-col items-center">
-                    <div className="text-custom_red text-7xl mb-2">
-                      {stat.icon}
-                    </div>
-
-                    <h2 className="text-3xl font-bold mb-4">{stat.value}</h2>
-
-                    <p className="text-sm uppercase tracking-wider">
-                      {stat.label}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
 {/* ------------------------------Featured coureses -------------------------------*/}
           <section className="py-16 bg-muted/30">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -505,7 +472,27 @@ function App() {
               </div>
             </div>
           </section>
+{/* ------------------------------Stats -------------------------------*/}
 
+<section className="bg-black/90 py-12">
+            <div className="container mx-auto">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-white text-center">
+                {stats.map((stat, index) => (
+                  <div key={index} className="flex flex-col items-center">
+                    <div className="text-custom_red text-7xl mb-2">
+                      {stat.icon}
+                    </div>
+
+                    <h2 className="text-3xl font-bold mb-4">{stat.value}</h2>
+
+                    <p className="text-sm uppercase tracking-wider">
+                      {stat.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
         </div>
       </div>
     </div>
