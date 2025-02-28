@@ -40,18 +40,10 @@ export const router = createBrowserRouter([
               path: "teacher-dashboard",
               element: <Dashboard />
           },
-          {
-              path: "dashboard",
-              element: <TeacherLayout />,
-              children: [
-                  {
-                      index: true,
-                      element: <AdminDashboard />
-                  },
-              ]
-          }
+          
       ],
   },
+  
   {
       path: "/contact",
       element: <App />,
@@ -72,6 +64,17 @@ export const router = createBrowserRouter([
       element: <VerifyOTPPage />,
       errorElement: <ErrorPage />,
   },
+
+  {
+    path: "/dashboard",
+    element: <TeacherLayout />,
+    children: [
+        {
+            index: true,
+            element: <AdminDashboard />
+        },
+    ]
+},
   // Catch-all route for unknown paths
   {
       path: "*",

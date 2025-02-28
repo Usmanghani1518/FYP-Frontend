@@ -69,6 +69,7 @@ const featuredCourses = [
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, Clock, Award, TrendingUp, Play, Globe } from "lucide-react";
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   Carousel,
   CarouselContent,
@@ -79,7 +80,9 @@ import {
 import { IoTrophyOutline } from "react-icons/io5";
 import { Badge } from "@/components/ui/badge";
 import { FaRegSmile, FaUsers, FaRegClipboard } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+
 
 function App() {
   const courses = [
@@ -134,7 +137,18 @@ function App() {
     },
   ];
 
-  const [api, setApi] = useState<any>();
+  const [api, setApi] = useState(null);
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(true);
+
+  const carouselRef = useRef(null);
+
+  const handleCarouselScroll = () => {
+    if (carouselRef.current) {
+      setCanScrollPrev(carouselRef.current.canScrollPrev());
+      setCanScrollNext(carouselRef.current.canScrollNext());
+    }
+  };
 
   useEffect(() => {
     if (!api) return;
@@ -361,78 +375,197 @@ function App() {
           </section>
 
 {/* ------------------------------Featured coureses -------------------------------*/}
-          <section className="py-16 bg-muted/30">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-between items-center mb-12">
-                <h2 className="text-3xl font-bold font-josefin uppercase">
-                  Featured Courses
-                </h2>
-                <Button variant="outline">View all</Button>
-              </div>
-              <Carousel
-                opts={{
-                  align: "start",
-                  loop: true,
-                }}
-                className="w-full"
+          
+
+{/* <section className="py-16 bg-muted/30">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center mb-12">
+          <h2 className="text-3xl font-bold font-josefin uppercase">
+            Featured Courses
+          </h2>
+          <div className="flex items-center gap-4">
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={() => carouselRef.current?.scrollPrev()}
+                disabled={!canScrollPrev}
+                className={!canScrollPrev ? "cursor-not-allowed opacity-50" : ""}
               >
-                <CarouselContent>
-                  {featuredCourses.map((course) => (
-                    <CarouselItem
-                      key={course.title}
-                      className="sm:basis-1/2 lg:basis-1/3"
-                    >
-                      <Card className="h-full">
-                        <CardContent className="p-0">
-                          <div className="relative">
-                            <img
-                              src={course.image}
-                              alt={course.title}
-                              className="w-full aspect-video object-cover"
-                            />
-                            {course.badge && (
-                              <Badge className="absolute top-2 left-2">
-                                {course.badge}
-                              </Badge>
-                            )}
-                          </div>
-                          <div className="p-4">
-                            <h3 className="font-bold mb-2 line-clamp-2">
-                              {course.title}
-                            </h3>
-                            <p className="text-sm text-muted-foreground mb-2">
-                              {course.instructor}
-                            </p>
-                            <div className="flex items-center gap-1 mb-2">
-                              <span className="font-bold">{course.rating}</span>
-                              <div className="flex">
-                                {[...Array(5)].map((_, i) => (
-                                  <Star
-                                    key={i}
-                                    className={`h-4 w-4 ${
-                                      i < Math.floor(course.rating)
-                                        ? "fill-yellow-400 text-yellow-400"
-                                        : "fill-muted text-muted"
-                                    }`}
-                                  />
-                                ))}
-                              </div>
-                              <span className="text-sm text-muted-foreground">
-                                ({course.reviews.toLocaleString()})
-                              </span>
-                            </div>
-                            <p className="font-bold">{course.price}</p>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                {/* <CarouselPrevious /> */}
-                {/* <CarouselNext /> */}
-              </Carousel>
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={() => carouselRef.current?.scrollNext()}
+                disabled={!canScrollNext}
+                className={!canScrollNext ? "cursor-not-allowed opacity-50" : ""}
+              >
+                <ChevronRight className="h-5 w-5" />
+              </Button>
             </div>
-          </section>
+            <Button variant="outline">View all</Button>
+          </div>
+        </div>
+        <Carousel
+          ref={carouselRef}
+          opts={{
+            align: "start",
+            loop: true,
+          }}
+          className="w-full"
+          onScroll={handleCarouselScroll}
+        >
+          <CarouselContent>
+            {featuredCourses.map((course, index) => (
+              <CarouselItem
+                key={`${course.title}-${index}`}
+                className="sm:basis-1/2 lg:basis-1/3"
+              >
+                <Card className="h-full">
+                  <CardContent className="p-0">
+                    <div className="relative">
+                      <img
+                        src={course.image}
+                        alt={course.title}
+                        className="w-full aspect-video object-cover"
+                      />
+                      {course.badge && (
+                        <Badge className="absolute top-2 left-2">
+                          {course.badge}
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-bold mb-2 line-clamp-2">
+                        {course.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        {course.instructor}
+                      </p>
+                      <div className="flex items-center gap-1 mb-2">
+                        <span className="font-bold">{course.rating}</span>
+                        <div className="flex">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`h-4 w-4 ${
+                                i < Math.floor(course.rating)
+                                  ? "fill-yellow-400 text-yellow-400"
+                                  : "fill-muted text-muted"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm text-muted-foreground">
+                          ({course.reviews.toLocaleString()})
+                        </span>
+                      </div>
+                      <p className="font-bold">{course.price}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+      </div>
+    </section> */}
+
+<section className="py-16 bg-muted/30">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center mb-12">
+          <h2 className="text-3xl font-bold font-josefin uppercase">
+            Featured Courses
+          </h2>
+          <div className="flex items-center gap-4">
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={() => api?.scrollPrev()}
+                disabled={!canScrollPrev}
+                className={!canScrollPrev ? "cursor-not-allowed opacity-50" : ""}
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={() => api?.scrollNext()}
+                disabled={!canScrollNext}
+                className={!canScrollNext ? "cursor-not-allowed opacity-50" : ""}
+              >
+                <ChevronRight className="h-5 w-5" />
+              </Button>
+            </div>
+            <Button variant="outline">View all</Button>
+          </div>
+        </div>
+        <Carousel
+          opts={{
+            align: "start",
+            loop: true,
+          }}
+          className="w-full"
+          onApi={setApi}
+        >
+          <CarouselContent>
+            {featuredCourses.map((course, index) => (
+              <CarouselItem
+                key={`${course.title}-${index}`}
+                className="sm:basis-1/2 lg:basis-1/3"
+              >
+                <Card className="h-full">
+                  <CardContent className="p-0">
+                    <div className="relative">
+                      <img
+                        src={course.image}
+                        alt={course.title}
+                        className="w-full aspect-video object-cover"
+                      />
+                      {course.badge && (
+                        <Badge className="absolute top-2 left-2">
+                          {course.badge}
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-bold mb-2 line-clamp-2">
+                        {course.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        {course.instructor}
+                      </p>
+                      <div className="flex items-center gap-1 mb-2">
+                        <span className="font-bold">{course.rating}</span>
+                        <div className="flex">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`h-4 w-4 ${
+                                i < Math.floor(course.rating)
+                                  ? "fill-yellow-400 text-yellow-400"
+                                  : "fill-muted text-muted"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm text-muted-foreground">
+                          ({course.reviews.toLocaleString()})
+                        </span>
+                      </div>
+                      <p className="font-bold">{course.price}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+      </div>
+    </section>
+
 {/* --------------------- Educonnect business --------------------*/}
           <section className="py-16 bg-primary text-primary-foreground">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
