@@ -23,12 +23,13 @@
   height: 00%;
   min-height: 80vh;
   width: 100%;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.95)), url('/public/imagies/Land/heroCarousel1.jpg');
+  background-image: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.95)), url('/imagies/Land/heroCarousel1.jpg');
   background-position: center;
   background-size: cover;
   position: relative;
-/*   color: #777; */
+  /*   color: #777; */
 }
+
 /* Width of the scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
@@ -36,18 +37,21 @@
 
 /* Track (background of scrollbar) */
 ::-webkit-scrollbar-track {
-  background: #1e2540; /* Dark background */
+  background: #1e2540;
+  /* Dark background */
 }
 
 /* Scrollbar handle */
 ::-webkit-scrollbar-thumb {
-  background: #6e11b0; /* Red handle */
+  background: #6e11b0;
+  /* Red handle */
   transition: all 0.3s ease-in-out;
 }
 
 /* Hover effect on scrollbar */
 ::-webkit-scrollbar-thumb:hover {
-  background: #6e11b0; /* Darker red on hover */
+  background: #6e11b0;
+  /* Darker red on hover */
 }
 
 /* For horizontal scrollbar (if needed) */

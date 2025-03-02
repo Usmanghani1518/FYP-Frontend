@@ -235,7 +235,7 @@ function App() {
     </div>
 
     <div className="relative">
-      <img src="/public/imagies/Land/students.png" alt="Students" className="w-full h-96   rounded-lg object-cover" />
+      <img src="/imagies/Land/students.png" alt="Students" className="w-full h-96   rounded-lg object-cover" />
     </div>
   </div>
 

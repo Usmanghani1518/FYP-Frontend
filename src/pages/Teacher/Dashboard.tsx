@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Users, BookOpen, Star, DollarSign } from 'lucide-react';
 import {
   Chart as ChartJS,
@@ -12,6 +12,7 @@ import {
   ArcElement,
 } from 'chart.js';
 import { Line, Pie } from 'react-chartjs-2';
+import { backendRequest } from '@/Helper/backendRequest';
 
 ChartJS.register(
   CategoryScale,
@@ -108,6 +109,26 @@ const Dashboard: React.FC = () => {
       },
     },
   };
+
+  const hanldeFetchStateData = async ()=>{
+
+ try {
+     const responsne = await backendRequest('GET', '/teacher/stats');
+    console.log("State data",responsne);
+ } catch (error) {
+  console.log("error",error);
+ }
+ finally{
+  console.log("State data fetched");
+ }
+
+  }
+  
+  useEffect(() => {
+    hanldeFetchStateData();
+  }, []);
+
+
 
   return (
     <div className="space-y-6 relative">

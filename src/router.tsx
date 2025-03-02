@@ -13,6 +13,7 @@ import CreateCourse from "./pages/CreateCourse";
 import Dashboard from "./pages/Teacher/Dashboard";
 import TeacherLayout from "./pages/Teacher/Layout";
 import ErrorPage from "./pages/Error"; // Import your ErrorPage
+import AdminLayout from "./pages/Admin/AdminLayout";
 
 export const router = createBrowserRouter([
   {
@@ -28,18 +29,9 @@ export const router = createBrowserRouter([
               path: "login-teacher",
               element: <Teacher />
           },
-          {
-              path: "admin",
-              element: <AdminDashboard />
-          },
-          {
-              path: "create-course",
-              element: <CreateCourse />
-          },
-          {
-              path: "teacher-dashboard",
-              element: <Dashboard />
-          },
+         
+         
+         
           
       ],
   },
@@ -49,6 +41,20 @@ export const router = createBrowserRouter([
       element: <App />,
       errorElement: <ErrorPage />,
   },
+  {
+    path: "/teacher",
+    element: <TeacherLayout />,
+    children: [
+        {
+            index: true,
+            element: <Dashboard />
+        },
+        {
+            path: "create-course",
+            element: <CreateCourse />
+        },
+    ]
+},
   {
       path: "/login",
       element: <LoginPage />,
@@ -67,7 +73,7 @@ export const router = createBrowserRouter([
 
   {
     path: "/dashboard",
-    element: <TeacherLayout />,
+    element: <AdminLayout />,
     children: [
         {
             index: true,
