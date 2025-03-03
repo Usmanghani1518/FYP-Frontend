@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Users,
   GraduationCap,
@@ -18,6 +18,7 @@ import {
   ArcElement,
 } from 'chart.js';
 import { Line, Pie } from 'react-chartjs-2';
+import { backendRequest } from '@/Helper/backendRequest';
 
 ChartJS.register(
   CategoryScale,
@@ -30,22 +31,59 @@ ChartJS.register(
   ArcElement
 );
 
+interface DashboardData {
+  success: boolean;
+  data: {
+    teachersCount: number;
+    studentsCount: number;
+    totalEarnings: number;
+    teachers: Array<User>;
+    students: Array<User>;
+    earning: Array<Earning>;
+  };
+}
+
+interface User {
+  _id: string;
+  createdAt: string;
+}
+
+interface Earning {
+  adminProfit: number;
+  paidAt: string;
+}
+
 const AdminDashboard: React.FC = () => {
-  const stats = [
-    { icon: Users, label: 'Total Students', value: '5,234', trend: '+12%' },
-    { icon: GraduationCap, label: 'Total Teachers', value: '142', trend: '+5%' },
-    { icon: BookOpen, label: 'Total Courses', value: '328', trend: '+8%' },
-    { icon: DollarSign, label: 'Total Revenue', value: '$142,345', trend: '+15%' },
-  ];
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+
+  const fetchStatistics = async () => {
+    try {
+      const res = await backendRequest("GET", "/admin/stats");
+      setDashboardData(res);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStatistics();
+  }, []);
 
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  const stats = [
+    { icon: Users, label: 'Total Students', value: dashboardData?.data.studentsCount || 'Loading...', trend: '+12%' },
+    { icon: GraduationCap, label: 'Total Teachers', value: dashboardData?.data.teachersCount || 'Loading...', trend: '+5%' },
+    { icon: BookOpen, label: 'Total Courses', value: '328', trend: '+8%' }, // Static for now
+    { icon: DollarSign, label: 'Total Revenue', value: `$${dashboardData?.data.totalEarnings || 'Loading...'}`, trend: '+15%' },
+  ];
 
   const revenueData = {
     labels: months,
     datasets: [
       {
         label: 'Platform Revenue ($)',
-        data: [15000, 23000, 32000, 28000, 38000, 42000, 48000, 51000, 56000, 62000, 68000, 75000],
+        data: dashboardData?.data.earning.map((earning) => earning.adminProfit) || Array(12).fill(0),
         borderColor: '#6e11b0',
         backgroundColor: 'rgba(110, 17, 176, 0.3)',
         fill: true,
@@ -59,7 +97,7 @@ const AdminDashboard: React.FC = () => {
     datasets: [
       {
         label: 'Students',
-        data: [1200, 1500, 1800, 2100, 2500, 2800, 3200, 3600, 4100, 4500, 4900, 5234],
+        data: dashboardData?.data.students.map((student, index) => index * 100) || Array(12).fill(0), // Example growth data
         borderColor: '#4d179a',
         backgroundColor: 'rgba(77, 23, 154, 0.3)',
         fill: true,
@@ -67,7 +105,7 @@ const AdminDashboard: React.FC = () => {
       },
       {
         label: 'Teachers',
-        data: [1200, 1100, 1800, 2500, 20, 2800, 3000, 4000, 4100, 4900, 3000, 5234],
+        data: dashboardData?.data.teachers.map((teacher, index) => index * 50) || Array(12).fill(0), // Example growth data
         borderColor: '#9333ea',
         backgroundColor: 'rgba(147, 51, 234, 0.3)',
         fill: true,

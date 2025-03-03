@@ -12,7 +12,6 @@ import { BiLogOut } from "react-icons/bi";
 import { backendRequest } from "@/Helper/backendRequest";
 import { log } from "console";
 import { notifyResponse } from "@/Helper/notify";
-
 function AdminLayout() {
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
   const [showSidebar, setShowSidebar] = useState(window.innerWidth >= 1024);
@@ -29,15 +28,6 @@ function AdminLayout() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const fetchStatictics = async () => {
-    try {
-      const res = await backendRequest("GET", "/admin/stats")
-      notifyResponse(res)
-    } catch (error) {
-      console.log("error", error);
-      
-    }
-  }
   function logout() {
     localStorage.clear();
     navigate("/login");
