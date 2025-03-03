@@ -14,6 +14,7 @@ import Dashboard from "./pages/Teacher/Dashboard";
 import TeacherLayout from "./pages/Teacher/Layout";
 import ErrorPage from "./pages/Error"; // Import your ErrorPage
 import AdminLayout from "./pages/Admin/AdminLayout";
+import { LoginChecker } from "./components/LoginChecker";
 
 export const router = createBrowserRouter([
   {
@@ -57,7 +58,7 @@ export const router = createBrowserRouter([
 },
   {
       path: "/login",
-      element: <LoginPage />,
+      element: <LoginChecker allowedUser="not-logged-in"><LoginPage /></LoginChecker> ,
       errorElement: <ErrorPage />,
   },
   {
