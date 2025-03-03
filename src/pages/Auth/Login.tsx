@@ -1,5 +1,5 @@
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { set, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -20,6 +20,21 @@ const formSchema = z.object({
 
 
 
+interface LoginResponse{
+  success:boolean,
+  verified:boolean,
+  resUser:{
+    role:string,
+    name:string,
+    email:string,
+    profilePicture:string
+    verified:boolean
+    success:boolean
+  }
+  
+
+}
+
 
 export default function LoginPage() {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -32,21 +47,36 @@ export default function LoginPage() {
   const [loading,setLoading]=useState(false)
   const [email,setEmail]=useState('')
   const [notVerified,setNotVerified]=useState(false)
+  const navigate = useNavigate();
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
      try {
-      const response = await backendRequest("POST", "/auth/login", {
+      const response = await backendRequest<LoginResponse>("POST", "/auth/login", {
         email: values.email,
         password: values.password,
       });
       console.log(response);
-      if (!response.verified) {
+      if (response.success && !response.verified) {
         notifyResponse(response);
         setEmail(values.email)
         setNotVerified(true)
-      } else {
+      } else if (response.success && response.verified){
+
+        if(response.resUser.role === "student"){
+          navigate('/')
+        }
+        if(response.resUser.role === "teacher"){
+          navigate('/teacher')
+        }
+        if(response.resUser.role === "admin"){
+          navigate('/dashboard')
+        }
+        notifyResponse(response);
+        
+
+      }else{
         notifyResponse(response);
       }
     } catch (error) {
