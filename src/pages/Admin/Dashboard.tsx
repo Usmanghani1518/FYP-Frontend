@@ -37,6 +37,7 @@ interface DashboardData {
     teachersCount: number;
     studentsCount: number;
     totalEarnings: number;
+    totalCourses : number;
     teachers: Array<User>;
     students: Array<User>;
     earning: Array<Earning>;
@@ -72,10 +73,10 @@ const AdminDashboard: React.FC = () => {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   const stats = [
-    { icon: Users, label: 'Total Students', value: dashboardData?.data.studentsCount || 'Loading...', trend: '+12%' },
-    { icon: GraduationCap, label: 'Total Teachers', value: dashboardData?.data.teachersCount || 'Loading...', trend: '+5%' },
-    { icon: BookOpen, label: 'Total Courses', value: '328', trend: '+8%' }, // Static for now
-    { icon: DollarSign, label: 'Total Revenue', value: `$${dashboardData?.data.totalEarnings || 'Loading...'}`, trend: '+15%' },
+    { icon: Users, label: 'Total Students', value: dashboardData?.data.studentsCount || 'Loading...' },
+    { icon: GraduationCap, label: 'Total Teachers', value: dashboardData?.data.teachersCount || 'Loading...' },
+    { icon: BookOpen, label: 'Total Courses', value: `${dashboardData?.data.totalCourses}` }, // Static for now
+    { icon: DollarSign, label: 'Total Revenue', value: `$${dashboardData?.data.totalEarnings}` },
   ];
 
   const revenueData = {
