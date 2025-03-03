@@ -30,10 +30,12 @@ const VerifyAccount = ({email}:{email:string}) => {
       try {
         setLoading(true);
         const response = await backendRequest("POST", "/auth/activate", { code:otp,email });
-        notifyResponse(response);
-        setUserToken(response)
+        // setUserToken(response)
         if (response.success){
-          navigate("/");
+          notifyResponse(response);
+          navigate("/login");
+        }else{
+          notifyResponse(response);
         }
         console.log("Verification successful", response);
       } catch (error) {

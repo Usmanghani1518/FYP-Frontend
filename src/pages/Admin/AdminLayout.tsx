@@ -38,7 +38,9 @@ function AdminLayout() {
       
     }
   }
-  function logout() {
+
+  async function logout() {
+    await backendRequest("GET", "/auth/logout");
     localStorage.clear();
     navigate("/login");
   }

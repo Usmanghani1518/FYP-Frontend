@@ -15,6 +15,7 @@ import TeacherLayout from "./pages/Teacher/Layout";
 import ErrorPage from "./pages/Error"; // Import your ErrorPage
 import AdminLayout from "./pages/Admin/AdminLayout";
 import { LoginChecker } from "./components/LoginChecker";
+import { RoleChecker } from "./components/RoleChecker";
 
 export const router = createBrowserRouter([
   {
@@ -28,12 +29,9 @@ export const router = createBrowserRouter([
           },
           {
               path: "login-teacher",
-              element: <Teacher />
+              element:<RoleChecker allowedRoles={[]} allowedUser="not-logged-in"><Teacher /></RoleChecker> 
           },
          
-         
-         
-          
       ],
   },
   
@@ -44,37 +42,37 @@ export const router = createBrowserRouter([
   },
   {
     path: "/teacher",
-    element: <TeacherLayout />,
+    element: <RoleChecker allowedRoles={["teacher"]} ><TeacherLayout /></RoleChecker> ,
     children: [
         {
             index: true,
-            element: <Dashboard />
+            element:  <RoleChecker allowedRoles={["teacher"]} ><Dashboard /></RoleChecker>
         },
         {
             path: "create-course",
-            element: <CreateCourse />
+            element: <RoleChecker allowedRoles={["teacher"]} ><CreateCourse /></RoleChecker>
         },
     ]
 },
   {
       path: "/login",
-      element: <LoginChecker allowedUser="not-logged-in"><LoginPage /></LoginChecker> ,
+      element: <RoleChecker allowedRoles={[]} allowedUser="not-logged-in"><LoginPage /></RoleChecker> ,
       errorElement: <ErrorPage />,
   },
   {
       path: "/signup",
-      element: <SignupPage />,
+      element:<RoleChecker allowedRoles={[]} allowedUser="not-logged-in"><SignupPage /></RoleChecker> ,
       errorElement: <ErrorPage />,
   },
   {
       path: "/forgot-password",
-      element: <VerifyOTPPage />,
+      element: <RoleChecker allowedRoles={[]} allowedUser="not-logged-in"><VerifyOTPPage /></RoleChecker> ,
       errorElement: <ErrorPage />,
   },
 
   {
     path: "/dashboard",
-    element: <AdminLayout />,
+    element: <RoleChecker allowedRoles={["admin"]} ><AdminLayout /></RoleChecker> ,
     children: [
         {
             index: true,
