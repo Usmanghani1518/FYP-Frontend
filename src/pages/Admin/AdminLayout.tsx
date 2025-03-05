@@ -60,7 +60,7 @@ function AdminLayout() {
                 Icon: TbDashboard,
               },
               {
-                href: "/teachers",
+                href: "/dashboard/teachers",
                 label: "Teacher",
                 Icon: TbUser,
               },
@@ -78,6 +78,7 @@ function AdminLayout() {
               <NavLink
                 to={item.href}
                 key={i}
+                end={item.href === "/dashboard"}
                 className={({ isActive }) =>
                   `flex items-center py-3 px-3 rounded-md transition-all duration-200 overflow-hidden whitespace-nowrap
                   ${

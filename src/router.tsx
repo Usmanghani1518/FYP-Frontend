@@ -12,11 +12,12 @@ import AdminDashboard from "./pages/Admin/Dashboard";
 import CreateCourse from "./pages/CreateCourse";
 import Dashboard from "./pages/Teacher/Dashboard";
 import TeacherLayout from "./pages/Teacher/Layout";
-import ErrorPage from "./pages/Error"; // Import your ErrorPage
+import ErrorPage from "./pages/Error";
 import AdminLayout from "./pages/Admin/AdminLayout";
-import { LoginChecker } from "./components/LoginChecker";
 import { RoleChecker } from "./components/RoleChecker";
 import CourseDetail from "./pages/CourseDetail";
+import AllTeachers from "./components/admin/AllTeachers";
+import AllStudents from "./components/admin/AllStudents";
 
 export const router = createBrowserRouter([
   {
@@ -82,6 +83,14 @@ export const router = createBrowserRouter([
         {
             path: "course",
             element: <CourseDetail />
+        },
+        {
+            path: "teachers",
+            element: <AllTeachers />
+        },
+        {
+            path: "students",
+            element: <AllStudents />
         },
     ]
 },
