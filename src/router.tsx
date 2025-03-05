@@ -16,6 +16,7 @@ import ErrorPage from "./pages/Error"; // Import your ErrorPage
 import AdminLayout from "./pages/Admin/AdminLayout";
 import { LoginChecker } from "./components/LoginChecker";
 import { RoleChecker } from "./components/RoleChecker";
+import CourseDetail from "./pages/CourseDetail";
 
 export const router = createBrowserRouter([
   {
@@ -78,7 +79,10 @@ export const router = createBrowserRouter([
             index: true,
             element: <AdminDashboard />
         },
-        
+        {
+            path: "course",
+            element: <CourseDetail />
+        },
     ]
 },
   // Catch-all route for unknown paths
