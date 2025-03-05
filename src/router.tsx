@@ -78,6 +78,7 @@ export const router = createBrowserRouter([
             index: true,
             element: <AdminDashboard />
         },
+        
     ]
 },
   // Catch-all route for unknown paths

@@ -1,17 +1,15 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   TbDashboard,
-  TbPhoneCalling,
   TbRobot,
   TbMenu2,
   TbX,
   TbSettings,
+  TbUser,
 } from "react-icons/tb";
 import { useState, useEffect } from "react";
 import { BiLogOut } from "react-icons/bi";
-import { backendRequest } from "@/Helper/backendRequest";
-import { log } from "console";
-import { notifyResponse } from "@/Helper/notify";
+
 function AdminLayout() {
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
   const [showSidebar, setShowSidebar] = useState(window.innerWidth >= 1024);
@@ -35,7 +33,6 @@ function AdminLayout() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-900 text-white">
-      {/* Sidebar */}
       <div
         className={`fixed h-screen shadow-lg transition-all duration-300 z-20 bg-gray-800
           ${
@@ -55,7 +52,6 @@ function AdminLayout() {
             <div className="px-6 py-2t font-bold text-xl rounded-md">Admin Dashboard</div>
           </div>
 
-          {/* Navigation Links */}
           <div className="space-y-2 flex-grow">
             {[
               {
@@ -64,9 +60,9 @@ function AdminLayout() {
                 Icon: TbDashboard,
               },
               {
-                href: "/contacts",
-                label: "Contacts",
-                Icon: TbPhoneCalling,
+                href: "/teachers",
+                label: "Teacher",
+                Icon: TbUser,
               },
               {
                 href: "/assistants",
@@ -105,7 +101,6 @@ function AdminLayout() {
             ))}
           </div>
 
-          {/* Logout Button */}
           <div onClick={logout} className="mt-auto px-3 cursor-pointer mb-4">
             <div
               className="flex items-center py-3 px-3 rounded-md transition-all duration-200 text-gray-300 hover:bg-gray-700"
@@ -125,7 +120,6 @@ function AdminLayout() {
         </div>
       </div>
 
-      {/* Mobile Menu Button */}
       <button
         onClick={() => setShowSidebar(!showSidebar)}
         className="fixed top-4 left-4 z-30 p-2 rounded-full shadow-md lg:hidden bg-gray-800 text-white"
@@ -133,7 +127,6 @@ function AdminLayout() {
         {showSidebar ? <TbX size={24} /> : <TbMenu2 size={24} />}
       </button>
 
-      {/* Main Content */}
       <div
         className={`flex-1 overflow-y-auto h-screen transition-all duration-300 ${
           isLargeScreen ? "ml-[250px]" : "ml-0"
