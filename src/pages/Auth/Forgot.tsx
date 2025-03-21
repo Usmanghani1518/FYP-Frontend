@@ -5,6 +5,7 @@ import { notifyResponse } from "@/Helper/notify";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import Loader from "@/shared/Loader";
 import { Eye, EyeClosed, GraduationCap } from "lucide-react";
+import { backendRequest } from "@/Helper/backendRequest";
 
 const ResetPassword = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -59,28 +60,24 @@ const ResetPassword = () => {
 
     console.log("Sending reset code to:", email);
     setLoading(true);
-    setTimeout(() => {
-      setActiveStep(1);
-      setCompletedSteps([true, true, false]);
-      setLoading(false);
-    }, 2000);
-    // try {
-    //   const response = await backendRequest("POST", "/password-reset-code", {
-    //     email,
-    //   });
-    //   console.log(response);
-    //   if (response.success) {
-    //     setActiveStep(1);
-    //     setCompletedSteps([true, true, false]);
-    //     notifyResponse(response);
-    //     setErrors({});
-    //   } else {
-    //     notifyResponse(response);
-    //   }
-    // } catch (error) {}
-    // finally{
-    //     setLoading(false);
-    // }
+   
+    try {
+      const response = await backendRequest("POST", "/auth/password-reset-code", {
+        email,
+      });
+      console.log(response);
+      if (response.success) {
+        setActiveStep(1);
+        setCompletedSteps([true, true, false]);
+        notifyResponse(response);
+        setErrors({});
+      } else {
+        notifyResponse(response);
+      }
+    } catch (error) {}
+    finally{
+        setLoading(false);
+    }
   };
 
   const verifyCode = async () => {
@@ -88,29 +85,25 @@ const ResetPassword = () => {
 
     console.log("Verifying code:", code);
     setLoading(true);
-    setTimeout(() => {
-      setActiveStep(2);
-      setCompletedSteps([true, true, true]);
-      setLoading(false);
-    }, 2000);
-    // try {
-    //   const response = await backendRequest("POST", "/confirm-opt", {
-    //     email,
-    //     code,
-    //   });
-    //   console.log(response);
-    //   if (response.success) {
-    //     setActiveStep(2);
-    //     setCompletedSteps([true, true, true]);
-    //     notifyResponse(response);
-    //     setErrors({});
-    //   } else {
-    //     notifyResponse(response);
-    //   }
-    // } catch (error) {}
-    // finally{
-    //     setLoading(false);
-    // }   
+    
+    try {
+      const response = await backendRequest("POST", "/auth/verify-code", {
+        email,
+        code,
+      });
+      console.log(response);
+      if (response.success) {
+        setActiveStep(2);
+        setCompletedSteps([true, true, true]);
+        notifyResponse(response);
+        setErrors({});
+      } else {
+        notifyResponse(response);
+      }
+    } catch (error) {}
+    finally{
+        setLoading(false);
+    }   
   };
 
   const resetPassword = async () => {
@@ -118,28 +111,25 @@ const ResetPassword = () => {
 
     console.log("Resetting password...");
     setLoading(true);
-    setTimeout(() => {
-      // setActiveStep(1);
-      navigate("/login");
-    }, 2000);
-    // try {
-    //   const response = await backendRequest("POST", "/reset-password", {
-    //     email,
-    //     code,
-    //     password: newPassword,
-    //   });
-    //   console.log(response);
-    //   if (response.success) {
-    //     notifyResponse(response);
-    //     navigate("/login");
-    //     setErrors({});
-    //   } else {
-    //     notifyResponse(response);
-    //   }
-    // } catch (error) {}
-    // finally{
-    //     setLoading(false);
-    // }
+   
+    try {
+      const response = await backendRequest("POST", "/auth/update-password", {
+        email,
+        code,
+        password: newPassword,
+      });
+      console.log(response);
+      if (response.success) {
+        notifyResponse(response);
+        navigate("/login");
+        setErrors({});
+      } else {
+        notifyResponse(response);
+      }
+    } catch (error) {}
+    finally{
+        setLoading(false);
+    }
   };
 
   return (
@@ -298,7 +288,7 @@ const ResetPassword = () => {
                 <label className="block text-gray-700">Confirm Password</label>
                 <div className="relative">
                   <input
-                    type={showPassword ? "text" : "password"}
+                    type={confirmPassword ? "text" : "password"}
                     className={`w-full mt-1 p-2 border-2 rounded-lg outline-none ${
                       errors.confirmPassword ? "border-red-500" : "border-gray-300 focus:ring focus:ring-purple-600"
                     }`}

@@ -17,6 +17,7 @@ import AdminLayout from "./pages/Admin/AdminLayout";
 import { LoginChecker } from "./components/LoginChecker";
 import { RoleChecker } from "./components/RoleChecker";
 import CourseDetail from "./pages/CourseDetail";
+import ViewPurchaseCourse from "./pages/ViewPurchaseCourse";
 
 export const router = createBrowserRouter([
   {
@@ -61,6 +62,10 @@ export const router = createBrowserRouter([
       errorElement: <ErrorPage />,
   },
   {
+    path: "course",
+    element: <CourseDetail />
+},
+  {
       path: "/signup",
       element:<RoleChecker allowedRoles={[]} allowedUser="not-logged-in"><SignupPage /></RoleChecker> ,
       errorElement: <ErrorPage />,
@@ -82,6 +87,10 @@ export const router = createBrowserRouter([
         {
             path: "course",
             element: <CourseDetail />
+        },
+        {
+            path: "purchases",
+            element: <ViewPurchaseCourse />
         },
     ]
 },
