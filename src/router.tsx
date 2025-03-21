@@ -45,15 +45,15 @@ export const router = createBrowserRouter([
   },
   {
     path: "/teacher",
-    element: <RoleChecker allowedRoles={["teacher"]} ><TeacherLayout /></RoleChecker> ,
+    element: <RoleChecker allowedRoles={["admin","teacher","user"]} ><TeacherLayout /></RoleChecker> ,
     children: [
         {
-            index: true,
-            element:  <RoleChecker allowedRoles={["teacher"]} ><Dashboard /></RoleChecker>
+            index: true,    
+            element:  <RoleChecker allowedRoles={["admin","teacher","user"]} ><Dashboard /></RoleChecker>
         },
         {
             path: "create-course",
-            element: <RoleChecker allowedRoles={["teacher"]} ><CreateCourse /></RoleChecker>
+            element: <RoleChecker allowedRoles={["admin","teacher","user"]} ><CreateCourse /></RoleChecker>
         },
     ]
 },
@@ -79,7 +79,7 @@ export const router = createBrowserRouter([
 
   {
     path: "/dashboard",
-    element: <RoleChecker allowedRoles={["admin"]} ><AdminLayout /></RoleChecker> ,
+    element: <RoleChecker allowedRoles={["admin","teacher","user"]} ><AdminLayout /></RoleChecker> ,
     children: [
         {
             index: true,

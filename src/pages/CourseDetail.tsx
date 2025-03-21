@@ -162,7 +162,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-custom_primary to-custom_primary_hover text-white py-12">
+      <div className="bg-gradient-to-r from-custom_primary to-custom_primary_hover  py-12">
         <div className="container mx-auto px-4 lg:px-8">
           <h1 className="text-4xl font-bold mb-4">{courseData.title}</h1>
           <div className="flex flex-wrap items-center gap-6 text-sm">
@@ -203,7 +203,7 @@ function App() {
 
             {/* Course Description */}
             <div className="bg-white rounded-lg p-6 shadow-lg mb-8">
-              <h2 className="text-2xl font-bold mb-4">About This Course</h2>
+              <h2 className="text-2xl text-black font-bold mb-4">About This Course</h2>
               <p className="text-gray-700 leading-relaxed mb-6">
                 {courseData.description}
               </p>
@@ -218,8 +218,8 @@ function App() {
                   className="w-24 h-24 rounded-full object-cover"
                 />
                 <div>
-                  <h2 className="text-2xl font-bold mb-2">Meet Your Instructor</h2>
-                  <h3 className="text-xl font-semibold mb-1">{courseData.instructor.name}</h3>
+                  <h2 className="text-2xl font-bold text-black mb-2">Meet Your Instructor</h2>
+                  <h3 className="text-xl font-semibold text-black mb-1">{courseData.instructor.name}</h3>
                   <p className="text-gray-600">{courseData.instructor.title}</p>
                 </div>
               </div>
@@ -296,7 +296,7 @@ function App() {
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-8 sticky top-4">
+          <div className="bg-white text-black rounded-lg shadow-lg p-6 mb-8 sticky top-4">
               <div className="flex items-baseline mb-4">
                 <span className="text-3xl font-bold text-gray-900">${1000}</span>
                 <span className="text-xl text-gray-500 line-through ml-2">${1500}</span>
@@ -305,7 +305,8 @@ function App() {
                 </span>
               </div>
               <button
-                className="w-full bg-custom_primary text-white py-4 px-6 rounded-lg font-semibold text-lg mb-4 hover:bg-custom_primary_hover transition-colors flex items-center justify-center gap-2"
+                className="w-full text-white
+                 bg-custom_primary py-4 px-6 rounded-lg font-semibold text-lg mb-4 hover:bg-custom_primary_hover transition-colors flex items-center justify-center gap-2"
                 onClick={() => alert('Purchase functionality would go here')}
               >
                 <ShoppingCart className="w-5 h-5" />
@@ -329,7 +330,7 @@ function App() {
             {/* Desktop Curriculum */}
             <div className="hidden lg:block bg-white rounded-lg shadow-lg overflow-hidden sticky top-4">
               <div className="p-6 border-b">
-                <h3 className="text-xl font-bold mb-2">Course Curriculum</h3>
+                <h3 className="text-xl text-black font-bold mb-2">Course Curriculum</h3>
                 <div className="flex items-center text-sm text-gray-600">
                   <div className="flex-1 bg-gray-200 rounded-full h-2">
                     <div className="bg-custom_primary h-2 rounded-full" style={{ width: courseData.progress }}></div>
