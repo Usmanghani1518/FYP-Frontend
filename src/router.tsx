@@ -16,12 +16,9 @@ import ErrorPage from "./pages/Error";
 import AdminLayout from "./pages/Admin/AdminLayout";
 import { RoleChecker } from "./components/RoleChecker";
 import CourseDetail from "./pages/CourseDetail";
-<<<<<<< HEAD
 import ViewPurchaseCourse from "./pages/ViewPurchaseCourse";
-=======
-import AllTeachers from "./components/admin/AllTeachers";
-import AllStudents from "./components/admin/AllStudents";
->>>>>>> 8cf625ad120648f4beb1dca5800804bb04440104
+// import AllTeachers from "./components/admin/AllTeachers";
+// import AllStudents from "./components/admin/AllStudents";
 
 export const router = createBrowserRouter([
   {
@@ -93,17 +90,8 @@ export const router = createBrowserRouter([
             element: <CourseDetail />
         },
         {
-<<<<<<< HEAD
             path: "purchases",
             element: <ViewPurchaseCourse />
-=======
-            path: "teachers",
-            element: <AllTeachers />
-        },
-        {
-            path: "students",
-            element: <AllStudents />
->>>>>>> 8cf625ad120648f4beb1dca5800804bb04440104
         },
     ]
 },
