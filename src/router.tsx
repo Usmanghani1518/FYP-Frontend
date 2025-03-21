@@ -17,6 +17,8 @@ import AdminLayout from "./pages/Admin/AdminLayout";
 import { RoleChecker } from "./components/RoleChecker";
 import CourseDetail from "./pages/CourseDetail";
 import ViewPurchaseCourse from "./pages/ViewPurchaseCourse";
+import AllTeachers from "./components/admin/AllTeachers";
+import AllStudents from "./components/admin/AllStudents";
 // import AllTeachers from "./components/admin/AllTeachers";
 // import AllStudents from "./components/admin/AllStudents";
 
@@ -84,6 +86,14 @@ export const router = createBrowserRouter([
         {
             index: true,
             element: <AdminDashboard />
+        },
+        {
+            path: "teachers",
+            element: <AllTeachers />
+        },
+        {
+            path: "students",
+            element: <AllStudents />
         },
         {
             path: "course",

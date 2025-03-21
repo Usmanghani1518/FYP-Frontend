@@ -65,8 +65,8 @@ function AdminLayout() {
                 Icon: TbUser,
               },
               {
-                href: "/assistants",
-                label: "Assistants",
+                href: "/dashboard/students",
+                label: "Students",
                 Icon: TbRobot,
               },
               {
