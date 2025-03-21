@@ -2,6 +2,7 @@ import { backendRequest } from '@/Helper/backendRequest';
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import ErrorPage from "@/pages/Error";
+import Loader from '@/Helper/Loader';
 
 type Role = ('admin' | 'user' | 'teacher')[];
 
@@ -57,7 +58,7 @@ export const RoleChecker = ({ allowedRoles, children, allowedUser }: RoleChecker
   }, [allowedRoles]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loader />;
   }
 
   if (allowedUser === 'not-logged-in' && isAuthenticated) {

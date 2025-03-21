@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import  Loading  from "@/shared/Loader";
+import  Loading  from "@/Helper/Loader";
 import {
   Card,
   CardContent,

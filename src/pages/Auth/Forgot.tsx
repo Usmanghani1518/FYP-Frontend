@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 // import { backendRequest } from "../Helper/BackendReques";
 import { notifyResponse } from "@/Helper/notify";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import Loader from "@/shared/Loader";
+import Loader from "@/Helper/Loader";
 import { Eye, EyeClosed, GraduationCap } from "lucide-react";
 import { backendRequest } from "@/Helper/backendRequest";
 

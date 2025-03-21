@@ -37,10 +37,11 @@ interface DashboardData {
     teachersCount: number;
     studentsCount: number;
     totalEarnings: number;
-    totalCourses : number;
+    totalCourses: number;
     teachers: Array<User>;
     students: Array<User>;
     earning: Array<Earning>;
+    topCourses: Array<TopCourse>;
   };
 }
 
@@ -52,6 +53,13 @@ interface User {
 interface Earning {
   adminProfit: number;
   paidAt: string;
+}
+
+interface TopCourse {
+  _id: string;
+  title: string;
+  studentsEnrolled: Array<string>;
+  enrolledCount: number;
 }
 
 const AdminDashboard: React.FC = () => {
@@ -75,16 +83,50 @@ const AdminDashboard: React.FC = () => {
   const stats = [
     { icon: Users, label: 'Total Students', value: dashboardData?.data.studentsCount || 'Loading...' },
     { icon: GraduationCap, label: 'Total Teachers', value: dashboardData?.data.teachersCount || 'Loading...' },
-    { icon: BookOpen, label: 'Total Courses', value: `${dashboardData?.data.totalCourses}` }, // Static for now
-    { icon: DollarSign, label: 'Total Revenue', value: `$${dashboardData?.data.totalEarnings}` },
+    { icon: BookOpen, label: 'Total Courses', value: dashboardData?.data.totalCourses || 'Loading...' },
+    { icon: DollarSign, label: 'Total Revenue', value: `$${dashboardData?.data.totalEarnings || 0}` },
   ];
+
+  // Process earnings data for the revenue chart
+  const processEarningsData = () => {
+    const earningsData = Array(12).fill(0); // Initialize an array for each month
+    if (dashboardData?.data.earning) {
+      dashboardData.data.earning.forEach((earning) => {
+        const month = new Date(earning.paidAt).getMonth(); // Get the month index (0-11)
+        earningsData[month] += earning.adminProfit; // Accumulate earnings for each month
+      });
+    }
+    return earningsData;
+  };
+
+  // Process user growth data for the user growth chart
+  const processUserGrowthData = () => {
+    const studentsData = Array(12).fill(0);
+    const teachersData = Array(12).fill(0);
+
+    if (dashboardData?.data.students) {
+      dashboardData.data.students.forEach((student) => {
+        const month = new Date(student.createdAt).getMonth();
+        studentsData[month]++;
+      });
+    }
+
+    if (dashboardData?.data.teachers) {
+      dashboardData.data.teachers.forEach((teacher) => {
+        const month = new Date(teacher.createdAt).getMonth();
+        teachersData[month]++;
+      });
+    }
+
+    return { studentsData, teachersData };
+  };
 
   const revenueData = {
     labels: months,
     datasets: [
       {
         label: 'Platform Revenue ($)',
-        data: dashboardData?.data.earning.map((earning) => earning.adminProfit) || Array(12).fill(0),
+        data: processEarningsData(),
         borderColor: '#6e11b0',
         backgroundColor: 'rgba(110, 17, 176, 0.3)',
         fill: true,
@@ -93,12 +135,14 @@ const AdminDashboard: React.FC = () => {
     ],
   };
 
+  const { studentsData, teachersData } = processUserGrowthData();
+
   const userGrowthData = {
     labels: months,
     datasets: [
       {
         label: 'Students',
-        data: dashboardData?.data.students.map((student, index) => index * 100) || Array(12).fill(0), // Example growth data
+        data: studentsData,
         borderColor: '#4d179a',
         backgroundColor: 'rgba(77, 23, 154, 0.3)',
         fill: true,
@@ -106,7 +150,7 @@ const AdminDashboard: React.FC = () => {
       },
       {
         label: 'Teachers',
-        data: dashboardData?.data.teachers.map((teacher, index) => index * 50) || Array(12).fill(0), // Example growth data
+        data: teachersData,
         borderColor: '#9333ea',
         backgroundColor: 'rgba(147, 51, 234, 0.3)',
         fill: true,
@@ -206,27 +250,14 @@ const AdminDashboard: React.FC = () => {
         <div className="col-span-2 bg-gray-800 rounded-lg shadow-lg p-6">
           <h3 className="text-lg font-semibold mb-4 text-white">Top Performing Courses</h3>
           <div className="space-y-4">
-            {[
-              { title: 'Web Development Bootcamp', students: 1234, rating: 4.9, earnings: '$12,345' },
-              { title: 'Advanced Machine Learning', students: 987, rating: 4.8, earnings: '$9,876' },
-              { title: 'UI/UX Design Masterclass', students: 876, rating: 4.7, earnings: '$8,765' },
-              { title: 'Digital Marketing Pro', students: 765, rating: 4.6, earnings: '$7,654' },
-            ].map((course, index) => (
+            {dashboardData?.data.topCourses.map((course, index) => (
               <div key={index} className="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
                 <div className="flex-1">
                   <h4 className="font-medium text-white">{course.title}</h4>
                   <div className="flex items-center gap-4 mt-1 text-sm text-gray-400">
                     <div className="flex items-center gap-1">
                       <Users className="w-4 h-4" />
-                      {course.students}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 text-yellow-400" />
-                      {course.rating}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <DollarSign className="w-4 h-4 text-green-500" />
-                      {course.earnings}
+                      {course.enrolledCount}
                     </div>
                   </div>
                 </div>
