@@ -14,9 +14,9 @@ export default {
   		},
   		colors: {
   			background: 'hsl(var(--background))',
-			custom_primary:'#6e11b0',
-			custom_primary_hover:'#4d179a',
-			custom_red: '#dc3545',
+  			custom_primary: '#6e11b0',
+  			custom_primary_hover: '#4d179a',
+  			custom_red: '#dc3545',
   			foreground: 'hsl(var(--foreground))',
   			card: {
   				DEFAULT: 'hsl(var(--card))',
@@ -57,10 +57,34 @@ export default {
   				'5': 'hsl(var(--chart-5))'
   			}
   		},
-
-		fontFamily:{
-			josefin: ["'Josefin Sans'", "sans-serif"],
-		}
+  		fontFamily: {
+  			josefin: [
+  				'Josefin Sans',
+  				'sans-serif'
+  			]
+  		},
+  		keyframes: {
+  			'accordion-down': {
+  				from: {
+  					height: '0'
+  				},
+  				to: {
+  					height: 'var(--radix-accordion-content-height)'
+  				}
+  			},
+  			'accordion-up': {
+  				from: {
+  					height: 'var(--radix-accordion-content-height)'
+  				},
+  				to: {
+  					height: '0'
+  				}
+  			}
+  		},
+  		animation: {
+  			'accordion-down': 'accordion-down 0.2s ease-out',
+  			'accordion-up': 'accordion-up 0.2s ease-out'
+  		}
   	}
   },
   plugins: [require("tailwindcss-animate")],

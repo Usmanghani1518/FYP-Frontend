@@ -19,6 +19,9 @@ import CourseDetail from "./pages/CourseDetail";
 import ViewPurchaseCourse from "./pages/ViewPurchaseCourse";
 import AllTeachers from "./components/admin/AllTeachers";
 import AllStudents from "./components/admin/AllStudents";
+// import CourseList from "./pages/Teacher/CourseList";
+import CourseManagement from "./pages/Teacher/CourseMangement";
+// import CourseDetailDummy from "./pages/Teacher/CourseDetail";
 // import AllTeachers from "./components/admin/AllTeachers";
 // import AllStudents from "./components/admin/AllStudents";
 
@@ -57,6 +60,14 @@ export const router = createBrowserRouter([
             path: "create-course",
             element: <RoleChecker allowedRoles={["admin","teacher","user"]} ><CreateCourse /></RoleChecker>
         },
+        {
+            path: "course-list",
+            element: <RoleChecker allowedRoles={["admin","teacher","user"]} ><CourseManagement /></RoleChecker>
+        },
+        // {
+        //     path: "course-detail",
+        //     element: <RoleChecker allowedRoles={["admin","teacher","user"]} ><CourseDetailDummy /></RoleChecker>
+        // },
     ]
 },
   {
