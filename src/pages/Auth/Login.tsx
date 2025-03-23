@@ -65,7 +65,7 @@ export default function LoginPage() {
       } else if (response.success && response.verified){
 
         if(response.resUser.role === "student"){
-          navigate('/')
+          navigate('/student')
         }
         if(response.resUser.role === "teacher"){
           navigate('/teacher')
