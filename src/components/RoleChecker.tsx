@@ -4,10 +4,10 @@ import { Navigate } from 'react-router-dom';
 import ErrorPage from "@/pages/Error";
 import Loader from '@/Helper/Loader';
 
-type Role = ('admin' | 'user' | 'teacher')[];
+type Role = ('admin' | 'student' | 'teacher')[];
 
 interface RoleCheckerProps {
-  allowedRoles: ('admin' | 'user' | 'teacher')[];  
+  allowedRoles: ('admin' | 'student' | 'teacher')[];  
   allowedUser?: 'logged-in' | 'not-logged-in';
   children: React.ReactNode; 
 }

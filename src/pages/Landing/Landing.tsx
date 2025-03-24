@@ -222,13 +222,13 @@ function App() {
   <div className="relative max-w-7xl mx-auto grid md:grid-cols-2 gap-8 items-center">
     {/* Left Content */}
     <div className="text-white">
-      <p className="uppercase tracking-wide text-purple-500 text-sm">Welcome to EduConnect</p>
-      <h1 className="text-4xl md:text-5xl font-bold leading-tight mt-2">
-        We are determined to <br /> achieve the highest <br /> standards
-      </h1>
-      <p className="text-gray-300 mt-4 max-w-lg">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-      </p>
+    <p className="uppercase tracking-wide text-purple-500 text-sm">Welcome to EduConnect</p>
+<h1 className="text-4xl md:text-5xl font-bold leading-tight mt-2">
+  Empowering Minds, <br /> Shaping the Future <br /> with Knowledge  
+</h1>
+<p className="text-gray-300 mt-4 max-w-lg">
+  Unlock your potential with world-class education and hands-on learning experiences.
+</p>
       <button className="mt-6 bg-custom_primary hover:bg-custom_primary_hover text-white font-semibold py-3 px-6 rounded-lg shadow-lg">
         Take a Tour
       </button>
@@ -241,9 +241,10 @@ function App() {
 
   <div className="relative max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 text-white border-t border-gray-600 pt-8">
     {[
-      { icon: "🎓", title: "Student", text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
-      { icon: "👨‍🏫", title: "Teachers", text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
-      { icon: "🏫", title: "Classroom", text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." }
+     { icon: "🎓", title: "Student", text: "Empowering students with quality education and resources." },
+     { icon: "👨‍🏫", title: "Teachers", text: "Providing educators with the best tools to inspire learning." },
+     { icon: "📚", title: "Courses", text: "Explore a variety of courses designed to help you succeed." }
+     
     ].map((item, index) => (
       <div key={index} className="flex items-start bg-white/10 backdrop-blur-sm px-2 py-12  rounded-md space-x-4">
         <div className="text-4xl">{item.icon}</div>
@@ -307,7 +308,25 @@ function App() {
               </div>
             </div>
           </section>
+          <section className="bg-purple-950  py-12">
+            <div className="container mx-auto">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-white text-center">
+                {stats.map((stat, index) => (
+                  <div key={index} className="flex flex-col items-center">
+                    <div className="text-custom_red text-7xl mb-2">
+                      {stat.icon}
+                    </div>
 
+                    <h2 className="text-3xl font-bold mb-4">{stat.value}</h2>
+
+                    <p className="text-sm uppercase tracking-wider">
+                      {stat.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
           {/*--------------------------- Trending Courses Section -----------------------------*/}
           <section className="py-20 bg-gray-100">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -472,7 +491,7 @@ function App() {
       </div>
     </section> */}
 
-<section className="py-16 bg-muted/30">
+{/* <section className="py-16 bg-muted/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-12">
           <h2 className="text-3xl font-bold font-josefin uppercase">
@@ -564,7 +583,7 @@ function App() {
           </CarouselContent>
         </Carousel>
       </div>
-    </section>
+    </section> */}
 
 {/* --------------------- Educonnect business --------------------*/}
           <section className="py-16 bg-primary text-primary-foreground">
@@ -607,25 +626,7 @@ function App() {
           </section>
 {/* ------------------------------Stats -------------------------------*/}
 
-<section className="bg-black/90 py-12">
-            <div className="container mx-auto">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-white text-center">
-                {stats.map((stat, index) => (
-                  <div key={index} className="flex flex-col items-center">
-                    <div className="text-custom_red text-7xl mb-2">
-                      {stat.icon}
-                    </div>
 
-                    <h2 className="text-3xl font-bold mb-4">{stat.value}</h2>
-
-                    <p className="text-sm uppercase tracking-wider">
-                      {stat.label}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
         </div>
       </div>
     </div>

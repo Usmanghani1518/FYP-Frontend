@@ -27,7 +27,7 @@ export const  Footer =()=> {
           <div>
             <h3 className="font-semibold text-base text-gray-200">Company</h3>
             <ul className="mt-2 space-y-2 text-gray-400 leading-7 ">
-              <li className="hover:cursor-pointer hover:text-purple-500">About Us</li>
+              <li className="hover:cursor-pointer hover:text-purple-500"><a href="#about"></a>About Us</li>
               <li className="hover:cursor-pointer hover:text-purple-500">Why EduConnect?</li>
               <li className="hover:cursor-pointer hover:text-purple-500">Blog</li>
               <li className="hover:cursor-pointer hover:text-purple-500">In the News</li>
