@@ -19,18 +19,30 @@ interface FormErrors {
 }
 
 interface VideoData {
-  id?: string;
+  id: string;
   title: string;
   description: string;
   file: File | null;
-  url?: string;
+  url: string;
   isNew?: boolean;
   isEdited?: boolean;
 }
 
+interface CourseFormData {
+  success?: boolean;
+  id: string;
+  title: string;
+  price: string;
+  language: string;
+  description: string;
+  level: string;
+  category: string;
+  thumbnail: string; // API response has thumbnail as a URL
+  videos: VideoData[];
+}
+
 const UpdateCourse: React.FC = () => {
-  // Original course data (to detect changes)
-  const [originalData, setOriginalData] = useState({
+  const [originalData, setOriginalData] = useState<CourseFormData>({
     id: '',
     title: '',
     price: '',
@@ -38,11 +50,10 @@ const UpdateCourse: React.FC = () => {
     description: '',
     level: 'beginner',
     category: '',
-    thumbnail: '',
-    videos: [] as VideoData[],
+    thumbnail: '', // Thumbnail is a URL in the API response
+    videos: [],
   });
-
-  // Current course data (for editing)
+  
   const [courseData, setCourseData] = useState({
     id: '',
     title: '',
@@ -51,12 +62,11 @@ const UpdateCourse: React.FC = () => {
     description: '',
     level: 'beginner',
     category: '',
-    thumbnail: null as File | null,
-    thumbnailUrl: '',
+    thumbnail: null as File | null, // Thumbnail is a File | null in the state
+    thumbnailUrl: '', // Use this to store the thumbnail URL
     videos: [] as VideoData[],
   });
 
-  // UI state
   const [errors, setErrors] = useState<FormErrors>({});
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [currentSection, setCurrentSection] = useState('info');
@@ -70,84 +80,53 @@ const UpdateCourse: React.FC = () => {
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch course data (dummy data for this example)
   useEffect(() => {
-    // Simulate API call to fetch course data
     const fetchCourseData = async () => {
       setIsLoading(true);
       try {
-        // Simulating API response
-        const dummyData = {
-          id: 'course123',
-          title: 'Advanced React Development',
-          price: '99.99',
-          language: 'English',
-          description: 'Learn advanced React concepts including hooks, context, Redux, and more. This comprehensive course covers everything you need to know to build complex React applications.',
-          level: 'advanced',
-          category: 'Web Development',
-          thumbnail: 'https://example.com/thumbnail.jpg', // This would be the URL
-          videos: [
-            {
-              id: 'video1',
-              title: 'Introduction to Advanced React',
-              description: 'An overview of what you will learn in this course and the prerequisites needed to follow along. We will discuss React fundamentals and introduce advanced concepts.',
-              url: 'https://example.com/video1.mp4',
-            },
-            {
-              id: 'video2',
-              title: 'Hooks Deep Dive',
-              description: 'A comprehensive look at React hooks including useState, useEffect, useContext, useReducer, and custom hooks. Learn how to use them effectively in your applications.',
-              url: 'https://example.com/video2.mp4',
-            },
-            {
-              id: 'video3',
-              title: 'State Management with Redux',
-              description: 'Learn how to manage global state with Redux. This lesson covers actions, reducers, the store, and connecting Redux to your React components.',
-              url: 'https://example.com/video3.mp4',
-            }
-          ]
-        };
-
-        // Set the original data for comparison
-        setOriginalData({
-          ...dummyData,
-          videos: dummyData.videos.map(v => ({
-            id: v.id,
-            title: v.title,
-            description: v.description,
-            file: null,
-            url: v.url,
-          }))
-        });
-
-        // Set current data for editing
-        setCourseData({
-          ...dummyData,
-          thumbnail: null,
-          thumbnailUrl: dummyData.thumbnail,
-          videos: dummyData.videos.map(v => ({
-            id: v.id,
-            title: v.title,
-            description: v.description,
-            file: null,
-            url: v.url,
-          }))
-        });
-
-        // Set thumbnail preview
-        setThumbnailPreview(dummyData.thumbnail);
+        const response = await backendRequest<CourseFormData>('GET', '/course/67e04bf1bf9d440ffe8de6b3');
+  
+        if (response.success) {
+          const dummyData = response;
+  
+          setOriginalData({
+            ...dummyData,
+            videos: dummyData.videos.map((v) => ({
+              id: v.id,
+              title: v.title,
+              description: v.description,
+              file: null, 
+              url: v.url,
+            })),
+          });
+  
+          setCourseData({
+            ...dummyData,
+            thumbnail: null, 
+            thumbnailUrl: dummyData.thumbnail, 
+            videos: dummyData.videos.map((v) => ({
+              id: v.id,
+              title: v.title,
+              description: v.description,
+              file: null, 
+              url: v.url,
+            })),
+          });
+  
+          setThumbnailPreview(dummyData.thumbnail); // Set the thumbnail preview URL
+        } else {
+          console.error('Error:', response.detail);
+        }
       } catch (error) {
         console.error('Error fetching course data:', error);
-        // You might want to show an error notification here
       } finally {
         setIsLoading(false);
       }
     };
-
+  
     fetchCourseData();
   }, []);
 
-  // Validate field
   const validateField = (field: string, value: any): string => {
     switch(field) {
       case 'title':
@@ -174,14 +153,12 @@ const UpdateCourse: React.FC = () => {
     }
   };
 
-  // Handler for input changes
   const handleInputChange = (field: string, value: string) => {
     setCourseData({ ...courseData, [field]: value });
     setErrors({ ...errors, [field]: validateField(field, value) });
     setUnsavedChanges(true);
   };
 
-  // Handler for thumbnail upload
   const handleThumbnailUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
 
@@ -193,13 +170,11 @@ const UpdateCourse: React.FC = () => {
     }
   };
 
-  // Remove thumbnail
   const removeThumbnail = () => {
     if (thumbnailPreview && thumbnailPreview !== courseData.thumbnailUrl) {
       URL.revokeObjectURL(thumbnailPreview);
     }
     
-    // If we had an original thumbnail, restore it
     if (courseData.thumbnailUrl) {
       setThumbnailPreview(courseData.thumbnailUrl);
       setCourseData({ ...courseData, thumbnail: null });
@@ -212,7 +187,6 @@ const UpdateCourse: React.FC = () => {
     setUnsavedChanges(true);
   };
 
-  // Handler for video upload
   const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newFiles = Array.from(e.target.files || []);
     
@@ -231,7 +205,6 @@ const UpdateCourse: React.FC = () => {
     setUnsavedChanges(true);
   };
 
-  // Update video title
   const handleVideoTitleChange = (index: number, value: string) => {
     const updatedVideos = [...courseData.videos];
     updatedVideos[index] = {
@@ -245,7 +218,6 @@ const UpdateCourse: React.FC = () => {
     setUnsavedChanges(true);
   };
 
-  // Update video description
   const handleVideoDescriptionChange = (index: number, value: string) => {
     const updatedVideos = [...courseData.videos];
     updatedVideos[index] = {
@@ -259,7 +231,6 @@ const UpdateCourse: React.FC = () => {
     setUnsavedChanges(true);
   };
 
-  // Replace video file
   const handleVideoFileReplace = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (!file) return;
@@ -275,7 +246,6 @@ const UpdateCourse: React.FC = () => {
     setUnsavedChanges(true);
   };
 
-  // Remove video
   const removeVideo = (index: number) => {
     const updatedVideos = [...courseData.videos];
     updatedVideos.splice(index, 1);
@@ -283,9 +253,7 @@ const UpdateCourse: React.FC = () => {
     setUnsavedChanges(true);
   };
 
-  // Save section changes
   const saveSection = async (section: string) => {
-    // Validate section fields
     let hasErrors = false;
     const newErrors: FormErrors = {};
 
@@ -322,10 +290,8 @@ const UpdateCourse: React.FC = () => {
     setErrors(newErrors);
     if (hasErrors) return;
 
-    // Simulate API call to update section
     setIsLoading(true);
     try {
-      // Create FormData for the specific section
       const formData = new FormData();
       formData.append('courseId', courseData.id);
 
@@ -350,13 +316,11 @@ const UpdateCourse: React.FC = () => {
       }
 
       // Simulate API request
-      // await backendRequest('PUT', `/course/update/${section}`, formData, {}, true);
+      await backendRequest('PUT', `/course/67e04bf1bf9d440ffe8de6b3`, formData, {}, true);
       
-      // Simulate successful response
       console.log(`Updated ${section} successfully`);
-      notifyResponse({ success: true, message: `${section.charAt(0).toUpperCase() + section.slice(1)} updated successfully` });
+      notifyResponse({ success: true, detail: `${section.charAt(0).toUpperCase() + section.slice(1)} updated successfully` });
       
-      // Close dialog if needed
       if (section === 'video') {
         setOpenDialog(null);
         setEditingVideoIndex(null);
@@ -364,7 +328,6 @@ const UpdateCourse: React.FC = () => {
         setEditingSection(null);
       }
       
-      // Update original data to reflect saved changes
       if (section === 'info') {
         setOriginalData({
           ...originalData,
@@ -407,13 +370,10 @@ const UpdateCourse: React.FC = () => {
     }
   };
 
-  // Save all changes at once
   const saveAllChanges = async () => {
-    // Validate all required fields
     const newErrors: FormErrors = {};
     let hasErrors = false;
 
-    // Validate basic info
     ['title', 'price', 'language', 'category', 'description'].forEach(field => {
       const error = validateField(field, courseData[field as keyof typeof courseData]);
       if (error) {
@@ -422,7 +382,6 @@ const UpdateCourse: React.FC = () => {
       }
     });
 
-    // Validate videos
     courseData.videos.forEach((video, index) => {
       const titleError = validateField('videoTitle', video.title);
       if (titleError) {
@@ -440,19 +399,29 @@ const UpdateCourse: React.FC = () => {
     setErrors(newErrors);
     if (hasErrors) return;
 
-    // Simulate API call to update everything
     setIsLoading(true);
     try {
       const formData = new FormData();
       
-      // Append basic course details
-      formData.append('id', courseData.id);
-      formData.append('title', courseData.title);
-      formData.append('price', courseData.price);
-      formData.append('language', courseData.language);
-      formData.append('description', courseData.description);
-      formData.append('level', courseData.level);
-      formData.append('category', courseData.category);
+      // Append basic course details only if they have changed
+      if (courseData.title !== originalData.title) {
+        formData.append('title', courseData.title);
+      }
+      if (courseData.price !== originalData.price) {
+        formData.append('price', courseData.price);
+      }
+      if (courseData.language !== originalData.language) {
+        formData.append('language', courseData.language);
+      }
+      if (courseData.description !== originalData.description) {
+        formData.append('description', courseData.description);
+      }
+      if (courseData.level !== originalData.level) {
+        formData.append('level', courseData.level);
+      }
+      if (courseData.category !== originalData.category) {
+        formData.append('category', courseData.category);
+      }
 
       // Append thumbnail if changed
       if (courseData.thumbnail) {
@@ -461,18 +430,34 @@ const UpdateCourse: React.FC = () => {
 
       // Append videos
       courseData.videos.forEach((video, index) => {
-        formData.append(`video[${index}].id`, video.id || '');
-        formData.append(`video[${index}].title`, video.title);
-        formData.append(`video[${index}].description`, video.description);
-        formData.append(`video[${index}].isNew`, String(!!video.isNew));
-        
-        if (video.file) {
-          formData.append(`video[${index}].file`, video.file);
+        if (video.id) {
+          // Existing video: only include updated fields
+          const originalVideo = originalData.videos.find(v => v.id === video.id);
+          if (!originalVideo) return;
+
+          if (video.title !== originalVideo.title) {
+            formData.append(`video[${index}].title`, video.title);
+          }
+          if (video.description !== originalVideo.description) {
+            formData.append(`video[${index}].description`, video.description);
+          }
+          if (video.file) {
+            formData.append(`video[${index}].file`, video.file);
+          }
+          formData.append(`video[${index}].id`, video.id);
+        } else {
+          // New video: include all fields
+          formData.append(`video[${index}].title`, video.title);
+          formData.append(`video[${index}].description`, video.description);
+          if (video.file) {
+            formData.append(`video[${index}].file`, video.file);
+          }
+          formData.append(`video[${index}].isNew`, 'true');
         }
       });
 
       // Simulate successful API request
-      // await backendRequest('PUT', `/course/update`, formData, {}, true);
+      await backendRequest('PUT', `/course/67e04bf1bf9d440ffe8de6b3`, formData, {}, true);
       
       console.log('Course updated successfully');
       notifyResponse({ success: true, message: 'Course updated successfully' });
@@ -499,7 +484,6 @@ const UpdateCourse: React.FC = () => {
     }
   };
 
-  // Truncate file name
   const truncateFileName = (fileName: string, maxLength: number = 15) => {
     if (fileName.length > maxLength) {
       return `${fileName.substring(0, maxLength)}...`;
@@ -507,7 +491,6 @@ const UpdateCourse: React.FC = () => {
     return fileName;
   };
 
-  // Video file input ref for specific video
   const videoFileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   return (
@@ -757,7 +740,6 @@ const UpdateCourse: React.FC = () => {
                         variant="outline" 
                         onClick={() => {
                           setEditingSection(null);
-                          // Restore original thumbnail if canceled
                           if (courseData.thumbnailUrl && !courseData.thumbnail) {
                             setThumbnailPreview(courseData.thumbnailUrl);
                           }
@@ -789,207 +771,207 @@ const UpdateCourse: React.FC = () => {
                 <div className="p-4">
                   <div className="flex items-center justify-center">
                     {editingSection === 'thumbnail' ? (
-                                           <div className="border-2 border-dashed rounded-lg p-6 w-full max-w-md flex flex-col items-center space-y-4">
-                                           {thumbnailPreview ? (
-                                             <div className="relative">
-                                               <img
-                                                 src={thumbnailPreview}
-                                                 alt="Course Thumbnail Preview"
-                                                 className="rounded-lg w-full h-48 object-cover"
-                                               />
-                                               <button
-                                                 type="button"
-                                                 onClick={removeThumbnail}
-                                                 className="absolute top-2 right-2 p-1 bg-red-500 rounded-full text-white hover:bg-red-600"
-                                               >
-                                                 <X className="h-4 w-4" />
-                                               </button>
-                                             </div>
-                                           ) : (
-                                             <div className="text-center space-y-2">
-                                               <Upload className="h-8 w-8 text-gray-400" />
-                                               <p className="text-sm text-gray-500">
-                                                 Upload a thumbnail image (JPEG, PNG)
-                                               </p>
-                                             </div>
-                                           )}
-                                           <input
-                                             type="file"
-                                             ref={thumbnailInputRef}
-                                             onChange={handleThumbnailUpload}
-                                             accept="image/*"
-                                             className="hidden"
-                                           />
-                                           <Button
-                                             type="button"
-                                             variant="outline"
-                                             onClick={() => thumbnailInputRef.current?.click()}
-                                             className="bg-white"
-                                           >
-                                             {thumbnailPreview ? 'Change Thumbnail' : 'Upload Thumbnail'}
-                                           </Button>
-                                         </div>
-                                       ) : (
-                                         <div className="relative">
-                                           <img
-                                             src={thumbnailPreview || courseData.thumbnailUrl}
-                                             alt="Course Thumbnail"
-                                             className="rounded-lg w-full h-48 object-cover"
-                                           />
-                                         </div>
-                                       )}
-                                     </div>
-                                   </div>
-                                 </div>
-                               </TabsContent>
-                   
-                               {/* Videos Tab */}
-                               <TabsContent value="videos" className="p-6 space-y-8 mt-0">
-                                 {/* Video List */}
-                                 <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
-                                   <div className="flex justify-between items-center p-4 bg-gray-50 border-b">
-                                     <h3 className="font-medium text-gray-800">Course Videos</h3>
-                                     <Button
-                                       size="sm"
-                                       onClick={() => videoInputRef.current?.click()}
-                                       className="bg-custom_primary hover:bg-custom_primary_hover"
-                                     >
-                                       <Upload className="h-4 w-4 mr-2" /> Upload Videos
-                                     </Button>
-                                     <input
-                                       type="file"
-                                       ref={videoInputRef}
-                                       onChange={handleVideoUpload}
-                                       accept="video/*"
-                                       multiple
-                                       className="hidden"
-                                     />
-                                   </div>
-                                   <div className="p-4">
-                                     {courseData.videos.length === 0 ? (
-                                       <div className="text-center py-8">
-                                         <FileVideo className="h-10 w-10 text-gray-400 mx-auto" />
-                                         <p className="text-sm text-gray-500 mt-2">
-                                           No videos uploaded yet. Click the button above to upload videos.
-                                         </p>
-                                       </div>
-                                     ) : (
-                                       <Accordion type="single" collapsible className="w-full">
-                                         {courseData.videos.map((video, index) => (
-                                           <AccordionItem key={index} value={`video-${index}`}>
-                                             <AccordionTrigger
-                                               onClick={() => setExpandedVideo(expandedVideo === index ? null : index)}
-                                               className="hover:no-underline"
-                                             >
-                                               <div className="flex items-center space-x-4">
-                                                 <div className="flex-1 text-left">
-                                                   <p className="font-medium">
-                                                     {video.title || `Video ${index + 1}`}
-                                                   </p>
-                                                   <p className="text-sm text-gray-500">
-                                                     {video.file ? truncateFileName(video.file.name) : video.url}
-                                                   </p>
-                                                 </div>
-                                                 {expandedVideo === index ? (
-                                                   <ChevronUp className="h-4 w-4" />
-                                                 ) : (
-                                                   <ChevronDown className="h-4 w-4" />
-                                                 )}
-                                               </div>
-                                             </AccordionTrigger>
-                                             <AccordionContent>
-                                               <div className="space-y-4">
-                                                 <div className="grid md:grid-cols-2 gap-4">
-                                                   <div className="space-y-2">
-                                                     <label className="text-sm font-medium">
-                                                       Video Title <span className="text-red-500">*</span>
-                                                     </label>
-                                                     <Input
-                                                       value={video.title}
-                                                       onChange={(e) => handleVideoTitleChange(index, e.target.value)}
-                                                       className={errors[`videoTitle${index}`] ? 'border-red-500' : ''}
-                                                     />
-                                                     {errors[`videoTitle${index}`] && (
-                                                       <div className="text-red-500 text-sm flex items-center gap-1">
-                                                         <AlertCircle className="h-3 w-3" /> {errors[`videoTitle${index}`]}
-                                                       </div>
-                                                     )}
-                                                   </div>
-                                                   <div className="space-y-2">
-                                                     <label className="text-sm font-medium">
-                                                       Video File
-                                                     </label>
-                                                     <div className="flex items-center gap-2">
-                                                       <Button
-                                                         type="button"
-                                                         variant="outline"
-                                                         onClick={() => videoFileInputRefs.current[index]?.click()}
-                                                         className="w-full"
-                                                       >
-                                                         {video.file ? 'Replace Video' : 'Upload Video'}
-                                                       </Button>
-                                                       <input
-                                                         type="file"
-                                                         ref={(el) => (videoFileInputRefs.current[index] = el)}
-                                                         onChange={(e) => handleVideoFileReplace(index, e)}
-                                                         accept="video/*"
-                                                         className="hidden"
-                                                       />
-                                                     </div>
-                                                   </div>
-                                                 </div>
-                                                 <div className="space-y-2">
-                                                   <label className="text-sm font-medium">
-                                                     Video Description <span className="text-red-500">*</span>
-                                                   </label>
-                                                   <Textarea
-                                                     value={video.description}
-                                                     onChange={(e) => handleVideoDescriptionChange(index, e.target.value)}
-                                                     className={errors[`videoDescription${index}`] ? 'border-red-500' : ''}
-                                                   />
-                                                   {errors[`videoDescription${index}`] && (
-                                                     <div className="text-red-500 text-sm flex items-center gap-1">
-                                                       <AlertCircle className="h-3 w-3" /> {errors[`videoDescription${index}`]}
-                                                     </div>
-                                                   )}
-                                                 </div>
-                                                 <div className="flex justify-end">
-                                                   <Button
-                                                     type="button"
-                                                     variant="destructive"
-                                                     onClick={() => removeVideo(index)}
-                                                     className="flex items-center gap-1"
-                                                   >
-                                                     <Trash2 className="h-4 w-4" /> Remove Video
-                                                   </Button>
-                                                 </div>
-                                               </div>
-                                             </AccordionContent>
-                                           </AccordionItem>
-                                         ))}
-                                       </Accordion>
-                                     )}
-                                   </div>
-                                 </div>
-                               </TabsContent>
-                             </Tabs>
-                           </CardContent>
-                   
-                           {/* Footer with Save All Button */}
-                           <div className="p-6 border-t bg-gray-50">
-                             <div className="flex justify-end">
-                               <Button
-                                 onClick={saveAllChanges}
-                                 disabled={isLoading || !unsavedChanges}
-                                 className="bg-custom_primary hover:bg-custom_primary_hover"
-                               >
-                                 {isLoading ? 'Saving...' : 'Save All Changes'}
-                               </Button>
-                             </div>
-                           </div>
-                         </Card>
-                       </div>
-                     );
-                   };
-                   
-                   export default UpdateCourse;
+                      <div className="border-2 border-dashed rounded-lg p-6 w-full max-w-md flex flex-col items-center space-y-4">
+                        {thumbnailPreview ? (
+                          <div className="relative">
+                            <img
+                              src={thumbnailPreview}
+                              alt="Course Thumbnail Preview"
+                              className="rounded-lg w-full h-48 object-cover"
+                            />
+                            <button
+                              type="button"
+                              onClick={removeThumbnail}
+                              className="absolute top-2 right-2 p-1 bg-red-500 rounded-full text-white hover:bg-red-600"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="text-center space-y-2">
+                            <Upload className="h-8 w-8 text-gray-400" />
+                            <p className="text-sm text-gray-500">
+                              Upload a thumbnail image (JPEG, PNG)
+                            </p>
+                          </div>
+                        )}
+                        <input
+                          type="file"
+                          ref={thumbnailInputRef}
+                          onChange={handleThumbnailUpload}
+                          accept="image/*"
+                          className="hidden"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => thumbnailInputRef.current?.click()}
+                          className="bg-white"
+                        >
+                          {thumbnailPreview ? 'Change Thumbnail' : 'Upload Thumbnail'}
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        <img
+                          src={thumbnailPreview || courseData.thumbnailUrl}
+                          alt="Course Thumbnail"
+                          className="rounded-lg w-full h-48 object-cover"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Videos Tab */}
+            <TabsContent value="videos" className="p-6 space-y-8 mt-0">
+              {/* Video List */}
+              <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+                <div className="flex justify-between items-center p-4 bg-gray-50 border-b">
+                  <h3 className="font-medium text-gray-800">Course Videos</h3>
+                  <Button
+                    size="sm"
+                    onClick={() => videoInputRef.current?.click()}
+                    className="bg-custom_primary hover:bg-custom_primary_hover"
+                  >
+                    <Upload className="h-4 w-4 mr-2" /> Upload Videos
+                  </Button>
+                  <input
+                    type="file"
+                    ref={videoInputRef}
+                    onChange={handleVideoUpload}
+                    accept="video/*"
+                    multiple
+                    className="hidden"
+                  />
+                </div>
+                <div className="p-4">
+                  {courseData.videos.length === 0 ? (
+                    <div className="text-center py-8">
+                      <FileVideo className="h-10 w-10 text-gray-400 mx-auto" />
+                      <p className="text-sm text-gray-500 mt-2">
+                        No videos uploaded yet. Click the button above to upload videos.
+                      </p>
+                    </div>
+                  ) : (
+                    <Accordion type="single" collapsible className="w-full">
+                      {courseData.videos.map((video, index) => (
+                        <AccordionItem key={index} value={`video-${index}`}>
+                          <AccordionTrigger
+                            onClick={() => setExpandedVideo(expandedVideo === index ? null : index)}
+                            className="hover:no-underline"
+                          >
+                            <div className="flex items-center space-x-4">
+                              <div className="flex-1 text-left">
+                                <p className="font-medium">
+                                  {video.title || `Video ${index + 1}`}
+                                </p>
+                                <p className="text-sm text-gray-500">
+                                  {video.file ? truncateFileName(video.file.name) : video.url}
+                                </p>
+                              </div>
+                              {expandedVideo === index ? (
+                                <ChevronUp className="h-4 w-4" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4" />
+                              )}
+                            </div>
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            <div className="space-y-4">
+                              <div className="grid md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                  <label className="text-sm font-medium">
+                                    Video Title <span className="text-red-500">*</span>
+                                  </label>
+                                  <Input
+                                    value={video.title}
+                                    onChange={(e) => handleVideoTitleChange(index, e.target.value)}
+                                    className={errors[`videoTitle${index}`] ? 'border-red-500' : ''}
+                                  />
+                                  {errors[`videoTitle${index}`] && (
+                                    <div className="text-red-500 text-sm flex items-center gap-1">
+                                      <AlertCircle className="h-3 w-3" /> {errors[`videoTitle${index}`]}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="space-y-2">
+                                  <label className="text-sm font-medium">
+                                    Video File
+                                  </label>
+                                  <div className="flex items-center gap-2">
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      onClick={() => videoFileInputRefs.current[index]?.click()}
+                                      className="w-full"
+                                    >
+                                      {video.file ? 'Replace Video' : 'Upload Video'}
+                                    </Button>
+                                    <input
+                                      type="file"
+                                      ref={(el) => (videoFileInputRefs.current[index] = el)}
+                                      onChange={(e) => handleVideoFileReplace(index, e)}
+                                      accept="video/*"
+                                      className="hidden"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium">
+                                  Video Description <span className="text-red-500">*</span>
+                                </label>
+                                <Textarea
+                                  value={video.description}
+                                  onChange={(e) => handleVideoDescriptionChange(index, e.target.value)}
+                                  className={errors[`videoDescription${index}`] ? 'border-red-500' : ''}
+                                />
+                                {errors[`videoDescription${index}`] && (
+                                  <div className="text-red-500 text-sm flex items-center gap-1">
+                                    <AlertCircle className="h-3 w-3" /> {errors[`videoDescription${index}`]}
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex justify-end">
+                                <Button
+                                  type="button"
+                                  variant="destructive"
+                                  onClick={() => removeVideo(index)}
+                                  className="flex items-center gap-1"
+                                >
+                                  <Trash2 className="h-4 w-4" /> Remove Video
+                                </Button>
+                              </div>
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
+                  )}
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+
+        {/* Footer with Save All Button */}
+        <div className="p-6 border-t bg-gray-50">
+          <div className="flex justify-end">
+            <Button
+              onClick={saveAllChanges}
+              disabled={isLoading || !unsavedChanges}
+              className="bg-custom_primary hover:bg-custom_primary_hover"
+            >
+              {isLoading ? 'Saving...' : 'Save All Changes'}
+            </Button>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+};
+
+export default UpdateCourse;
