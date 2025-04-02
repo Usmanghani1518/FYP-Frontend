@@ -1,18 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, AlertCircle, X, Check, FileVideo, Image as ImageIcon, Edit2, Save, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
+import { Upload, AlertCircle, X,  FileVideo, Edit2,  ChevronDown, ChevronUp, Trash2,    ArrowLeftIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { backendRequest } from '@/Helper/backendRequest';
 import { notifyResponse } from '@/Helper/notify';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useNavigate, useParams } from 'react-router-dom';
 
 interface FormErrors {
   [key: string]: string;
@@ -69,7 +67,7 @@ const UpdateCourse: React.FC = () => {
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
-  const [currentSection, setCurrentSection] = useState('info');
+  // const [currentSection, setCurrentSection] = useState('info');
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [openDialog, setOpenDialog] = useState<string | null>(null);
@@ -79,12 +77,13 @@ const UpdateCourse: React.FC = () => {
 
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
-
+  const params = useParams()
   useEffect(() => {
     const fetchCourseData = async () => {
       setIsLoading(true);
+      console.log("courseid is ",params.courseId)
       try {
-        const response = await backendRequest<CourseFormData>('GET', '/course/67e04bf1bf9d440ffe8de6b3');
+        const response = await backendRequest<CourseFormData>('GET', `/course/${params.courseId}`);
   
         if (response.success) {
           const dummyData = response;
@@ -116,6 +115,8 @@ const UpdateCourse: React.FC = () => {
           setThumbnailPreview(dummyData.thumbnail); // Set the thumbnail preview URL
         } else {
           console.error('Error:', response.detail);
+          notifyResponse(response)
+          navigate('/teacher/all-courses');
         }
       } catch (error) {
         console.error('Error fetching course data:', error);
@@ -316,7 +317,7 @@ const UpdateCourse: React.FC = () => {
       }
 
       // Simulate API request
-      await backendRequest('PUT', `/course/67e04bf1bf9d440ffe8de6b3`, formData, {}, true);
+      await backendRequest('PUT', `/course/${params.courseId}`, formData, {}, true);
       
       console.log(`Updated ${section} successfully`);
       notifyResponse({ success: true, detail: `${section.charAt(0).toUpperCase() + section.slice(1)} updated successfully` });
@@ -457,7 +458,7 @@ const UpdateCourse: React.FC = () => {
       });
 
       // Simulate successful API request
-      await backendRequest('PUT', `/course/67e04bf1bf9d440ffe8de6b3`, formData, {}, true);
+      await backendRequest('PUT', `/course/${params.courseId}`, formData, {}, true);
       
       console.log('Course updated successfully');
       notifyResponse({ success: true, message: 'Course updated successfully' });
@@ -492,9 +493,18 @@ const UpdateCourse: React.FC = () => {
   };
 
   const videoFileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const navigate = useNavigate();
 
   return (
-    <div className="container mx-auto py-8 max-w-6xl">
+    <div className=" mx-auto py-3 ">
+       <Button 
+        size="sm" 
+        variant="outline" 
+                      onClick={() => navigate('/teacher/all-courses')}
+                      className="flex items-center gap-1 mb-2"
+                    >
+                      <ArrowLeftIcon className="h-4 w-4" /> Back
+                    </Button>
       <Card className="shadow-xl border-0">
         <CardHeader className="bg-gradient-to-r from-custom_primary to-custom_primary_hover text-white rounded-t-lg">
           <div className="flex justify-between items-center">

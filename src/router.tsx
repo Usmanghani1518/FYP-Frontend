@@ -24,6 +24,7 @@ import {
   import StudentLayout from "./pages/Student/Layout";
   import StudentPage from "./pages/Student/StudentPage";
 import Profile from "./pages/Student/Profile";
+import { CoursesTable } from "./pages/Teacher/CourseList";
   // import CourseDetailDummy from "./pages/Teacher/CourseDetail";
   // import AllTeachers from "./components/admin/AllTeachers";
   // import AllStudents from "./components/admin/AllStudents";
@@ -68,10 +69,10 @@ import Profile from "./pages/Student/Profile";
               path: "course-list",
               element: <RoleChecker allowedRoles={["admin","teacher","student"]} ><CourseManagement /></RoleChecker>
           },
-          // {
-          //     path: "course-detail",
-          //     element: <RoleChecker allowedRoles={["admin","teacher","user"]} ><CourseDetailDummy /></RoleChecker>
-          // },
+        //   {
+        //       path: "course-detail",
+        //       element: <RoleChecker allowedRoles={["admin","teacher","user"]} ><CourseDetailDummy /></RoleChecker>
+        //   },
       ]
   },
     {
@@ -79,7 +80,7 @@ import Profile from "./pages/Student/Profile";
       element: <RoleChecker allowedRoles={["admin","teacher","student"]} ><TeacherLayout /></RoleChecker> ,
       children: [
           {
-              index: true,    
+              path: "dashboard",    
               element:  <RoleChecker allowedRoles={["admin","teacher","student"]} ><Dashboard /></RoleChecker>
           },
           {
@@ -87,13 +88,13 @@ import Profile from "./pages/Student/Profile";
               element: <RoleChecker allowedRoles={["admin","teacher","student"]} ><CreateCourse /></RoleChecker>
           },
           {
-              path: "course-list",
-              element: <RoleChecker allowedRoles={["admin","teacher","student"]} ><CourseManagement /></RoleChecker>
-          },
-          // {
-          //     path: "course-detail",
-          //     element: <RoleChecker allowedRoles={["admin","teacher","user"]} ><CourseDetailDummy /></RoleChecker>
-          // },
+              path: "all-courses",
+              element: <RoleChecker allowedRoles={["admin","teacher","student"]} ><CoursesTable /></RoleChecker>
+            },
+            {
+                path: "all-courses/:courseId",
+                element: <RoleChecker allowedRoles={["admin","teacher","student"]} ><CourseManagement /></RoleChecker>
+            },
       ]
   },
     {
