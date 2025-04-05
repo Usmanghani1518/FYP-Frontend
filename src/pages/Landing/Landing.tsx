@@ -1,122 +1,34 @@
-// import React from 'react'
-// import InstructorSlider from './Slider'
-
-// const Landing = () => {
-//   return (
-//     <div>
-//       <InstructorSlider/>
-//     </div>
-//   )
-// }
-
-// export default Landing
-
-const featuredCourses = [
-  {
-    title: "Advanced JavaScript Concepts",
-    instructor: "Jane Doe",
-    rating: 4.9,
-    reviews: 12345,
-    price: "$49.99",
-    image:
-      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=600",
-    badge: "Best Seller",
-  },
-  {
-    title: "React Native for Beginners",
-    instructor: "John Smith",
-    rating: 4.8,
-    reviews: 9876,
-    price: "$39.99",
-    image:
-      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=600",
-    badge: "New",
-  },
-  {
-    title: "Mastering Python",
-    instructor: "Alice Johnson",
-    rating: 4.7,
-    reviews: 5432,
-    price: "$59.99",
-    image:
-      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=600",
-    badge: "Top Rated",
-  },
-  {
-    title: "Mastering Python",
-    instructor: "Alice Johnson",
-    rating: 4.7,
-    reviews: 5432,
-    price: "$59.99",
-    image:
-      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=600",
-    badge: "Top Rated",
-  },
-  {
-    title: "Mastering Python",
-    instructor: "Alice Johnson",
-    rating: 4.7,
-    reviews: 5432,
-    price: "$59.99",
-    image:
-      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=600",
-    badge: "Top Rated",
-  },
-];
-
-
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, Clock, Award, TrendingUp, Play, Globe } from "lucide-react";
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 import { IoTrophyOutline } from "react-icons/io5";
-import { Badge } from "@/components/ui/badge";
 import { FaRegSmile, FaUsers, FaRegClipboard } from "react-icons/fa";
 import { useEffect, useRef, useState } from "react";
+import { backendRequest } from "@/Helper/backendRequest";
+import { useCart } from "@/redux/app.hooks";
+import { Course } from "@/redux/slices/cart.slice";
 
-
-
+interface Response {
+  success: boolean;
+  data: Course[];
+  message?: string;
+}
 function App() {
-  const courses = [
-    {
-      title: "Complete Web Development Bootcamp 2024",
-      instructor: "Sarah Johnson",
-      rating: 4.8,
-      reviews: 45892,
-      price: 89.99,
-      image:
-        "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=600",
-      students: "235,412",
-    },
-    {
-      title: "Machine Learning A-Z: Hands-On Python",
-      instructor: "David Chen",
-      rating: 4.9,
-      reviews: 32567,
-      price: 94.99,
-      image:
-        "https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&q=80&w=600",
-      students: "189,745",
-    },
-    {
-      title: "Financial Analysis & Business Intelligence",
-      instructor: "Michael Brown",
-      rating: 4.7,
-      reviews: 28934,
-      price: 79.99,
-      image:
-        "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600",
-      students: "156,289",
-    },
-  ];
+ 
+  const [courses, setCourses] = useState<Course[]>([])
+  const { addToCart, isInCart } = useCart();
+  
+  const fetchCourse = async () => { 
+    try {
+      const response = await backendRequest<Response>("GET","/course/trending")
+      if (response.success){
+        setCourses(response.data)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const stats = [
     {
@@ -137,18 +49,23 @@ function App() {
     },
   ];
 
+  useEffect(() => { 
+    fetchCourse()
+  }
+  ,[])
+
   const [api, setApi] = useState(null);
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(true);
+  // const [canScrollPrev, setCanScrollPrev] = useState(false);
+  // const [canScrollNext, setCanScrollNext] = useState(true);
 
-  const carouselRef = useRef(null);
+  // const carouselRef = useRef(null);
 
-  const handleCarouselScroll = () => {
-    if (carouselRef.current) {
-      setCanScrollPrev(carouselRef.current.canScrollPrev());
-      setCanScrollNext(carouselRef.current.canScrollNext());
-    }
-  };
+  // const handleCarouselScroll = () => {
+  //   if (carouselRef.current) {
+  //     setCanScrollPrev(carouselRef.current.canScrollPrev());
+  //     setCanScrollNext(carouselRef.current.canScrollNext());
+  //   }
+  // };
 
   useEffect(() => {
     if (!api) return;
@@ -165,46 +82,7 @@ function App() {
       {/* Hero Section */}
 
       <div className="relative">
-        {/* <div>
-        <Carousel
-          className="w-full max-w-7xl mx-auto"
-          setApi={setApi}
-          onSelect={(index) => setCurrent(index)}
-          opts={{
-            loop: true,
-          }}
-        >
-          <CarouselContent>
-            {slides.map((slide, index) => (
-              <CarouselItem key={index}>
-                <div className="relative h-[500px] w-full mt-5 overflow-hidden bg-gray-300 ">
-                  <img
-                    src={slide.image || "/placeholder.svg"}
-                    alt={slide.title}
-                    // fill
-                    className="object-cover"
-                    // priority={index === 0}
-                  />
-                  <div className="absolute inset-0 ">
-                    <Card className="absolute left-8 top-1/2 w-full max-w-lg -translate-y-1/2 border-none bg-transparent shadow-none lg:left-16">
-                      <CardContent className="space-y-4 p-6">
-                        <h1 className="text-2xl font-semibold tracking-tight text-gray-900 lg:text-5xl">
-                          {slide.title}
-                        </h1>
-                        <p className="text bg-gray-300 px-3 py-2 opacity-70 rounded-sm font-semibold text-gray-900">
-                          {slide.description}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="left-4 hidden sm:flex" />
-          <CarouselNext className="right-4 hidden sm:flex" />
-        </Carousel>
-        </div> */}
+      
         <section className="relative bg-cover bg-center bg-no-repeat py-20 px-6 md:px-12">
         <video 
     className="absolute top-0 left-0 w-full h-full object-cover" 
@@ -346,7 +224,7 @@ function App() {
                 {courses.map((course, index) => (
                   <Card key={index} className="overflow-hidden">
                     <img
-                      src={course.image}
+                      src={course.thumbnail}
                       alt={course.title}
                       className="w-full h-48 object-cover"
                     />
@@ -355,18 +233,18 @@ function App() {
                         {course.title}
                       </h3>
                       <p className="text-muted-foreground mb-2">
-                        {course.instructor}
+                        {course.teacher.name}
                       </p>
                       <div className="flex items-center mb-2">
-                        <span className="text-yellow-500 font-bold mr-2">
-                          {course.rating}
-                        </span>
+                       {course.averageRating > 0   && <span className="text-yellow-500 font-bold mr-2">
+                          { course.averageRating}
+                        </span>}
                         <div className="flex">
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
                               className={`w-4 h-4 ${
-                                i < Math.floor(course.rating)
+                                i < Math.floor(course.averageRating?course.averageRating :0)
                                   ? "text-yellow-500 fill-yellow-500"
                                   : "text-gray-300"
                               }`}
@@ -374,18 +252,23 @@ function App() {
                           ))}
                         </div>
                         <span className="text-muted-foreground ml-2">
-                          ({course.reviews.toLocaleString()})
+                          {/* ({course.reviews.toLocaleString()}) */}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-muted-foreground">
-                          {course.students} students
+                          {course.students? course.students.toLocaleString():0} students
                         </span>
                         <span className="font-bold text-lg">
                           ${course.price}
                         </span>
                       </div>
-                      <Button className="w-full mt-4">Add to cart</Button>
+                      <Button
+                       onClick={() => addToCart(course)}
+                       disabled={isInCart(course._id)}
+                      className="w-full mt-4">
+                         {isInCart(course._id) ? 'Added to Cart' : 'Add to Cart'}
+                        </Button>
                     </div>
                   </Card>
                 ))}
@@ -396,194 +279,7 @@ function App() {
 {/* ------------------------------Featured coureses -------------------------------*/}
           
 
-{/* <section className="py-16 bg-muted/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-12">
-          <h2 className="text-3xl font-bold font-josefin uppercase">
-            Featured Courses
-          </h2>
-          <div className="flex items-center gap-4">
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="icon"
-                onClick={() => carouselRef.current?.scrollPrev()}
-                disabled={!canScrollPrev}
-                className={!canScrollPrev ? "cursor-not-allowed opacity-50" : ""}
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </Button>
-              <Button 
-                variant="outline" 
-                size="icon"
-                onClick={() => carouselRef.current?.scrollNext()}
-                disabled={!canScrollNext}
-                className={!canScrollNext ? "cursor-not-allowed opacity-50" : ""}
-              >
-                <ChevronRight className="h-5 w-5" />
-              </Button>
-            </div>
-            <Button variant="outline">View all</Button>
-          </div>
-        </div>
-        <Carousel
-          ref={carouselRef}
-          opts={{
-            align: "start",
-            loop: true,
-          }}
-          className="w-full"
-          onScroll={handleCarouselScroll}
-        >
-          <CarouselContent>
-            {featuredCourses.map((course, index) => (
-              <CarouselItem
-                key={`${course.title}-${index}`}
-                className="sm:basis-1/2 lg:basis-1/3"
-              >
-                <Card className="h-full">
-                  <CardContent className="p-0">
-                    <div className="relative">
-                      <img
-                        src={course.image}
-                        alt={course.title}
-                        className="w-full aspect-video object-cover"
-                      />
-                      {course.badge && (
-                        <Badge className="absolute top-2 left-2">
-                          {course.badge}
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-bold mb-2 line-clamp-2">
-                        {course.title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {course.instructor}
-                      </p>
-                      <div className="flex items-center gap-1 mb-2">
-                        <span className="font-bold">{course.rating}</span>
-                        <div className="flex">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`h-4 w-4 ${
-                                i < Math.floor(course.rating)
-                                  ? "fill-yellow-400 text-yellow-400"
-                                  : "fill-muted text-muted"
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <span className="text-sm text-muted-foreground">
-                          ({course.reviews.toLocaleString()})
-                        </span>
-                      </div>
-                      <p className="font-bold">{course.price}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
-      </div>
-    </section> */}
 
-{/* <section className="py-16 bg-muted/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-12">
-          <h2 className="text-3xl font-bold font-josefin uppercase">
-            Featured Courses
-          </h2>
-          <div className="flex items-center gap-4">
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="icon"
-                onClick={() => api?.scrollPrev()}
-                disabled={!canScrollPrev}
-                className={!canScrollPrev ? "cursor-not-allowed opacity-50" : ""}
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </Button>
-              <Button 
-                variant="outline" 
-                size="icon"
-                onClick={() => api?.scrollNext()}
-                disabled={!canScrollNext}
-                className={!canScrollNext ? "cursor-not-allowed opacity-50" : ""}
-              >
-                <ChevronRight className="h-5 w-5" />
-              </Button>
-            </div>
-            <Button variant="outline">View all</Button>
-          </div>
-        </div>
-        <Carousel
-          opts={{
-            align: "start",
-            loop: true,
-          }}
-          className="w-full"
-          onApi={setApi}
-        >
-          <CarouselContent>
-            {featuredCourses.map((course, index) => (
-              <CarouselItem
-                key={`${course.title}-${index}`}
-                className="sm:basis-1/2 lg:basis-1/3"
-              >
-                <Card className="h-full">
-                  <CardContent className="p-0">
-                    <div className="relative">
-                      <img
-                        src={course.image}
-                        alt={course.title}
-                        className="w-full aspect-video object-cover"
-                      />
-                      {course.badge && (
-                        <Badge className="absolute top-2 left-2">
-                          {course.badge}
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-bold mb-2 line-clamp-2">
-                        {course.title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {course.instructor}
-                      </p>
-                      <div className="flex items-center gap-1 mb-2">
-                        <span className="font-bold">{course.rating}</span>
-                        <div className="flex">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`h-4 w-4 ${
-                                i < Math.floor(course.rating)
-                                  ? "fill-yellow-400 text-yellow-400"
-                                  : "fill-muted text-muted"
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <span className="text-sm text-muted-foreground">
-                          ({course.reviews.toLocaleString()})
-                        </span>
-                      </div>
-                      <p className="font-bold">{course.price}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
-      </div>
-    </section> */}
 
 {/* --------------------- Educonnect business --------------------*/}
           <section className="py-16 bg-primary text-primary-foreground">

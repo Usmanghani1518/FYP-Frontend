@@ -25,6 +25,8 @@ import {
   import StudentPage from "./pages/Student/StudentPage";
 import Profile from "./pages/Student/Profile";
 import { CoursesTable } from "./pages/Teacher/CourseList";
+import CartPage from "./pages/Cart";
+import ViewCourses from "./pages/Student/ViewCourse";
   // import CourseDetailDummy from "./pages/Teacher/CourseDetail";
   // import AllTeachers from "./components/admin/AllTeachers";
   // import AllStudents from "./components/admin/AllStudents";
@@ -53,6 +55,7 @@ import { CoursesTable } from "./pages/Teacher/CourseList";
         errorElement: <ErrorPage />,
     },
     
+    
     {
       path: "/student",
       element: <RoleChecker allowedRoles={["admin","teacher","student"]} ><StudentLayout /></RoleChecker> ,
@@ -69,10 +72,14 @@ import { CoursesTable } from "./pages/Teacher/CourseList";
               path: "course-list",
               element: <RoleChecker allowedRoles={["admin","teacher","student"]} ><CourseManagement /></RoleChecker>
           },
-        //   {
-        //       path: "course-detail",
-        //       element: <RoleChecker allowedRoles={["admin","teacher","user"]} ><CourseDetailDummy /></RoleChecker>
-        //   },
+          {
+            path: "cart",
+            element: <RoleChecker allowedRoles={["admin","teacher","student"]} ><CartPage /></RoleChecker>
+        },
+          {
+            path: "view/:courseId",
+            element: <RoleChecker allowedRoles={["admin","teacher","student"]} ><ViewCourses /></RoleChecker>
+        },
       ]
   },
     {
@@ -94,6 +101,10 @@ import { CoursesTable } from "./pages/Teacher/CourseList";
             {
                 path: "all-courses/:courseId",
                 element: <RoleChecker allowedRoles={["admin","teacher","student"]} ><CourseManagement /></RoleChecker>
+            },
+            {
+                path: "course-cart",
+                element: <RoleChecker allowedRoles={["admin","teacher","student"]} ><CartPage /></RoleChecker>
             },
       ]
   },

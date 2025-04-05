@@ -3,7 +3,7 @@ import ReactPlayer from 'react-player';
 import { Clock, Star, Users, PlayCircle, BookOpen, Lock, Play, CheckCircle, Video, ShoppingCart } from 'lucide-react';
 
 function App() {
-  const [currentVideo, setCurrentVideo] = useState("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+  const [currentVideo, setCurrentVideo] = useState("https://res.cloudinary.com/saadnaeem/video/upload/v1742844368/uploads/x47olhlovblltfzhhxas.mp4");
   const [currentLectureId, setCurrentLectureId] = useState(1);
 
   const courseData = {
@@ -160,7 +160,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen text-white bg-gray-50 ">
       {/* Header Section */}
       <div className="bg-gradient-to-r from-custom_primary to-custom_primary_hover  py-12">
         <div className="container mx-auto px-4 lg:px-8">
@@ -379,7 +379,7 @@ function App() {
         </div>
 
         {/* Recommended Courses */}
-        <div className="mt-16">
+        {/* <div className="mt-16">
           <h2 className="text-2xl font-bold mb-8">Recommended Courses</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {courseData.recommendedCourses.map((course) => (
@@ -406,7 +406,7 @@ function App() {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { BiLogOut } from "react-icons/bi";
 import { useState, useEffect, useRef } from "react";
 import { backendRequest } from "@/Helper/backendRequest";
 import logo from "../../../public/imagies/Logo.png";
+import { ShoppingCart } from "lucide-react";
 
 function StudentLayout() {
   const navigate = useNavigate();
@@ -56,7 +57,7 @@ function StudentLayout() {
         </div>
         
         <div className="flex items-center space-x-6">
-          <TbBell size={24} className="text-gray-700 cursor-pointer" />
+          <ShoppingCart size={24} className="text-gray-700 cursor-pointer" />
           
           {/* Profile Dropdown */}
           <div className="relative" ref={dropdownRef}>
