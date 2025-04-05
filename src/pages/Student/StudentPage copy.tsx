@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { 
   Card, 
   CardContent, 
@@ -50,7 +50,7 @@ function StudentPage() {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [topCourses, setTopCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const navigate = useNavigate()
   useEffect(() => {
     fetchData();
   }, []);
@@ -91,7 +91,9 @@ console.log("enrolledCourses",enrolledCourses)
   if (loading) {
     return <div>Loading...</div>;
   }
+  const handleCourseDetail = async () =>{
 
+  }
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-custom_primary text-white py-3 rounded-md">
@@ -232,7 +234,7 @@ console.log("enrolledCourses",enrolledCourses)
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                    <Button className="bg-white text-purple-900 hover:bg-gray-100">
+                    <Button  onClick={ () =>handleCourseDetail} className="bg-white text-purple-900 hover:bg-gray-100">
                       Enroll Now
                     </Button>
                   </div>

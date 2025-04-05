@@ -22,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { backendRequest } from "@/Helper/backendRequest";
 import { notifyResponse } from "@/Helper/notify";
+import { useNavigate } from "react-router-dom";
 
 // Define types for the data
 interface Course {
@@ -53,7 +54,7 @@ function StudentPage() {
   const [isRecommendedFetched, setIsRecommendedFetched] = useState(false);
   const [isCertificatesFetched, setIsCertificatesFetched] = useState(false);
   const [tabLoading, setTabLoading] = useState(false);
-
+  const navigate = useNavigate()
   useEffect(() => {
     fetchInitialData();
   }, []);
@@ -124,7 +125,9 @@ function StudentPage() {
   if (loading) {
     return <div>Loading...</div>;
   }
-
+  const handleDetail = (id: string) => {
+    navigate(`/student/course/${id}`);
+  };
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-custom_primary text-white py-3 rounded-md">
@@ -249,7 +252,7 @@ function StudentPage() {
         {/* Top Courses Section */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold">Top Courses</h2>
+            <h2 className="text-2xl font-bold">Top Coursesss</h2>
             <Button variant="outline" size="sm">
               View all courses
             </Button>
@@ -265,7 +268,7 @@ function StudentPage() {
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                    <Button className="bg-white text-purple-900 hover:bg-gray-100">
+                    <Button onClick = {()=> handleDetail(course._id)} className="bg-white text-purple-900 hover:bg-gray-100">
                       Enroll Now
                     </Button>
                   </div>
@@ -292,7 +295,7 @@ function StudentPage() {
                   
                   <div className="flex justify-between items-center">
                     <span className="font-bold">${course.price}</span>
-                    <Button size="sm">Enroll Now</Button>
+                    <Button onClick = {()=> handleDetail(course._id)} size="sm">Enroll Now</Button>
                   </div>
                 </CardContent>
               </Card>

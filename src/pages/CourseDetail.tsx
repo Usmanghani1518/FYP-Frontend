@@ -1,186 +1,214 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ReactPlayer from 'react-player';
 import { Clock, Star, Users, PlayCircle, BookOpen, Lock, Play, CheckCircle, Video, ShoppingCart } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { backendRequest } from '@/Helper/backendRequest';
 
-function App() {
-  const [currentVideo, setCurrentVideo] = useState("https://res.cloudinary.com/saadnaeem/video/upload/v1742844368/uploads/x47olhlovblltfzhhxas.mp4");
-  const [currentLectureId, setCurrentLectureId] = useState(1);
+interface Lecture {
+  title: string;
+  id: string;
+  duration: string;
+  isLocked: boolean;
+  thumbnail: string | null;
+  videoUrl: string | null;
+}
 
-  const courseData = {
-    title: "Advanced Web Development Masterclass",
-    description: "Master modern web development with this comprehensive course. Learn the latest technologies, best practices, and industry standards to build professional web applications. You'll start with the fundamentals and progress to advanced concepts, building real-world projects along the way. By the end of this course, you'll have the skills needed to create sophisticated web applications and be ready for a career in web development.",
-    videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    duration: "12 hours",
-    students: "15,432",
-    rating: "4.8",
-    lectures: "35",
-    progress: "28.5%",
-    curriculum: [
-      {
-        id: 1,
-        title: "Welcome to the Course",
-        duration: "15:30",
-        isLocked: false,
-        videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        thumbnail: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60"
-      },
-      {
-        id: 2,
-        title: "Setting Up Your Development Environment",
-        duration: "20:45",
-        isLocked: false,
-        videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        thumbnail: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60"
-      },
-      {
-        id: 3,
-        title: "Web Development Fundamentals",
-        duration: "25:15",
-        isLocked: false,
-        videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        thumbnail: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60"
-      },
-      {
-        id: 4,
-        title: "HTML5 Essential Training",
-        duration: "30:00",
-        isLocked: false,
-        videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        thumbnail: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60"
-      },
-      {
-        id: 5,
-        title: "CSS3 Basics",
-        duration: "28:20",
-        isLocked: false,
-        videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        thumbnail: "https://images.unsplash.com/photo-1523437113738-bbd3cc89fb19?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60"
-      },
-      {
-        id: 6,
-        title: "Responsive Design Principles",
-        duration: "35:10",
-        isLocked: false,
-        videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        thumbnail: "https://images.unsplash.com/photo-1516116216624-53e697fedbea?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60"
-      },
-      {
-        id: 7,
-        title: "JavaScript Fundamentals",
-        duration: "45:00",
-        isLocked: false,
-        videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        thumbnail: "https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60"
-      },
-      {
-        id: 8,
-        title: "DOM Manipulation",
-        duration: "32:15",
-        isLocked: false,
-        videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        thumbnail: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60"
-      },
-      {
-        id: 9,
-        title: "Event Handling",
-        duration: "28:45",
-        isLocked: false,
-        videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        thumbnail: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60"
-      },
-      {
-        id: 10,
-        title: "AJAX and Fetch API",
-        duration: "40:30",
-        isLocked: false,
-        videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        thumbnail: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60"
-      },
-      {
-        id: 11,
-        title: "Advanced JavaScript Concepts",
-        duration: "55:00",
-        isLocked: true,
-        videoUrl: null,
-        thumbnail: null
-      },
-      {
-        id: 35,
-        title: "Final Project and Deployment",
-        duration: "60:00",
-        isLocked: true,
-        videoUrl: null,
-        thumbnail: null
-      }
-    ],
-    instructor: {
-      name: "Dr. Sarah Johnson",
-      title: "Senior Web Developer & Tech Lead",
-      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-      bio: "With over 15 years of industry experience, Dr. Sarah Johnson has led development teams at major tech companies and has helped thousands of students master web development. She holds a Ph.D. in Computer Science and is passionate about making complex technical concepts accessible to everyone.",
-      stats: {
-        students: "50,000+",
-        courses: "12",
-        rating: "4.9"
-      }
-    },
-    recommendedCourses: [
-      {
-        id: 1,
-        title: "React Performance Optimization",
-        instructor: "Michael Chen",
-        image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-        rating: "4.7",
-        students: "8,245"
-      },
-      {
-        id: 2,
-        title: "Full-Stack Development with Node.js",
-        instructor: "Emma Wilson",
-        image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-        rating: "4.9",
-        students: "12,331"
-      },
-      {
-        id: 3,
-        title: "UI/UX Design Principles",
-        instructor: "Alex Thompson",
-        image: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-        rating: "4.6",
-        students: "9,876"
-      }
-    ]
+interface Instructor {
+  name: string;
+  title: string;
+  avatar: string;
+  bio: string;
+  stats: {
+    students: string;
+    courses: string;
+    rating: string;
   };
+}
 
-  const handleLectureClick = (lecture) => {
+interface CourseData {
+  title: string;
+  description: string;
+  videoUrl: string | null;
+  duration: string;
+  students: string;
+  rating: string;
+  lectures: string;
+  progress: string;
+  thumbnail: string;
+  curriculum: Lecture[];
+  instructor: Instructor;
+  price: {
+    original: number;
+    current: number;
+    discount: number;
+  };
+}
+
+function CourseDetailPage() {
+  const { courseId } = useParams<{ courseId: string }>();
+  const navigate = useNavigate();
+  const [courseData, setCourseData] = useState<CourseData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentVideo, setCurrentVideo] = useState<string | null>(null);
+  const [currentLectureId, setCurrentLectureId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCourseDetails = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        if (!courseId) {
+          throw new Error('Course ID is missing');
+        }
+
+        const response = await backendRequest("GET", `/student/course-detail/${courseId}`);
+        
+        if (!response.success) {
+          throw new Error(response.message || 'Failed to fetch course details');
+        }
+
+        const data = response.data;
+        
+        // Process and validate data
+        const processedData: CourseData = {
+          title: data.title || 'Untitled Course',
+          description: data.description || 'No description available',
+          videoUrl: data.videoUrl || null,
+          duration: data.duration || '0 hours',
+          students: data.students || '0',
+          rating: data.rating || '0.0',
+          lectures: data.lectures || '0',
+          progress: data.progress || '0%',
+          thumbnail: data.thumbnail || 'https://via.placeholder.com/800x450',
+          curriculum: data.curriculum?.map((lecture: any) => ({
+            id: lecture.id || '',
+            title: lecture.title || 'Untitled Lecture',
+            duration: lecture.duration || '00:00',
+            isLocked: lecture.isLocked || false,
+            videoUrl: lecture.isLocked ? null : lecture.videoUrl || null,
+            thumbnail: lecture.thumbnail || 'https://via.placeholder.com/300x200'
+          })) || [],
+          instructor: {
+            name: data.instructor?.name || 'Unknown Instructor',
+            title: data.instructor?.title || 'Instructor',
+            avatar: data.instructor?.avatar || 'https://via.placeholder.com/150',
+            bio: data.instructor?.bio || `About ${data.instructor?.name || 'the instructor'}`,
+            stats: {
+              students: data.instructor?.stats?.students || '0',
+              courses: data.instructor?.stats?.courses || '0',
+              rating: data.instructor?.stats?.rating || '0.0'
+            }
+          },
+          price: {
+            original: data.price?.original || 0,
+            current: data.price?.current || 0,
+            discount: data.price?.discount || 0
+          }
+        };
+
+        const demoVideoUrl = processedData.curriculum.length > 0 && !processedData.curriculum[0].isLocked 
+          ? processedData.curriculum[0].videoUrl 
+          : processedData.videoUrl;
+
+        setCourseData(processedData);
+        setCurrentVideo(demoVideoUrl);
+        setCurrentLectureId(processedData.curriculum[0]?.id || null);
+      } catch (err) {
+        console.error('Error fetching course details:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch course details');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourseDetails();
+  }, [courseId]);
+
+  const handleLectureClick = (lecture: Lecture) => {
     if (!lecture.isLocked) {
       setCurrentVideo(lecture.videoUrl);
       setCurrentLectureId(lecture.id);
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-custom_primary mx-auto"></div>
+          <p className="text-gray-600">Loading course details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-md p-6 bg-white rounded-lg shadow-md text-center">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">Error Loading Course</h2>
+          <p className="text-gray-700 mb-6">{error}</p>
+          <div className="flex justify-center space-x-4">
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-custom_primary text-white rounded hover:bg-custom_primary_hover"
+            >
+              Try Again
+            </button>
+            <button
+              onClick={() => navigate('/courses')}
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+            >
+              Browse Courses
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!courseData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-md p-6 bg-white rounded-lg shadow-md text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Course Not Found</h2>
+          <p className="text-gray-600 mb-6">The requested course could not be found.</p>
+          <button
+            onClick={() => navigate('/courses')}
+            className="px-4 py-2 bg-custom_primary text-white rounded hover:bg-custom_primary_hover"
+          >
+            Browse Available Courses
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen text-white bg-gray-50 ">
+    <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-custom_primary to-custom_primary_hover  py-12">
+      <div className="bg-gradient-to-r from-custom_primary to-custom_primary_hover py-12 text-white">
         <div className="container mx-auto px-4 lg:px-8">
-          <h1 className="text-4xl font-bold mb-4">{courseData.title}</h1>
-          <div className="flex flex-wrap items-center gap-6 text-sm">
-            <div className="flex items-center">
-              <Star className="w-5 h-5 mr-1" />
-              <span>{courseData.rating}</span>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2">{courseData.title}</h1>
+              <p className="text-sm opacity-90 max-w-3xl">{courseData.description}</p>
             </div>
-            <div className="flex items-center">
-              <Users className="w-5 h-5 mr-1" />
-              <span>{courseData.students} students</span>
-            </div>
-            <div className="flex items-center">
-              <Clock className="w-5 h-5 mr-1" />
-              <span>{courseData.duration}</span>
-            </div>
-            <div className="flex items-center">
-              <BookOpen className="w-5 h-5 mr-1" />
-              <span>{courseData.lectures} lectures</span>
+            <div className="flex flex-wrap gap-4 text-sm">
+              <div className="flex items-center bg-white/10 px-3 py-1 rounded-full">
+                <Star className="w-4 h-4 mr-1" />
+                <span>{courseData.rating}</span>
+              </div>
+              <div className="flex items-center bg-white/10 px-3 py-1 rounded-full">
+                <Users className="w-4 h-4 mr-1" />
+                <span>{courseData.students} students</span>
+              </div>
+              <div className="flex items-center bg-white/10 px-3 py-1 rounded-full">
+                <Clock className="w-4 h-4 mr-1" />
+                <span>{courseData.duration}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -190,649 +218,182 @@ function App() {
       <div className="container mx-auto px-4 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content Column */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
             {/* Video Player */}
-            <div className="rounded-lg overflow-hidden shadow-lg mb-8">
-              <ReactPlayer
-                url={currentVideo}
-                width="100%"
-                height="500px"
-                controls
-              />
+            <div className="rounded-xl overflow-hidden shadow-lg bg-black aspect-video">
+              {currentVideo ? (
+                <ReactPlayer
+                  url={currentVideo}
+                  width="100%"
+                  height="100%"
+                  controls
+                  style={{ aspectRatio: '16/9' }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gray-800">
+                  <div className="text-center p-6">
+                    <Video className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                    <h3 className="text-xl font-medium text-gray-300 mb-2">No Video Available</h3>
+                    <p className="text-gray-400">This course doesn't have any video content yet</p>
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Course Description */}
-            <div className="bg-white rounded-lg p-6 shadow-lg mb-8">
-              <h2 className="text-2xl text-black font-bold mb-4">About This Course</h2>
-              <p className="text-gray-700 leading-relaxed mb-6">
-                {courseData.description}
-              </p>
-            </div>
+            {/* Course Content */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Course Content</h2>
+              <div className="space-y-4">
+                {courseData.curriculum.length > 0 ? (
+                  courseData.curriculum.map((lecture) => (
+                    <div
+                      key={lecture.id}
+                      onClick={() => handleLectureClick(lecture)}
+                      className={`p-4 rounded-lg border transition-all ${
+                        !lecture.isLocked
+                          ? 'cursor-pointer hover:bg-gray-50 hover:border-gray-300'
+                          : 'cursor-not-allowed bg-gray-50'
+                      } ${
+                        currentLectureId === lecture.id
+                          ? 'border-custom_primary bg-custom_primary/5'
+                          : 'border-gray-200'
+                      }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="flex-shrink-0">
+                          {lecture.thumbnail ? (
+                            <img
+                              src={lecture.thumbnail}
+                              alt=""
+                              className="w-16 h-12 object-cover rounded"
+                            />
+                          ) : (
+                            <div className="w-16 h-12 bg-gray-200 rounded flex items-center justify-center">
+                              <Video className="w-5 h-5 text-gray-400" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-grow">
+                          <div className="flex items-center justify-between">
+                            <h3
+                              className={`font-medium ${
+                                lecture.isLocked ? 'text-gray-400' : 'text-gray-900'
+                              }`}
+                            >
+                              {lecture.title}
+                            </h3>
+                            <span className="text-sm text-gray-500">
+                              {lecture.duration}
+                            </span>
+                          </div>
+                          <div className="flex items-center mt-1">
+                            {lecture.isLocked ? (
+                              <>
+                                <Lock className="w-4 h-4 text-gray-400 mr-2" />
+                                <span className="text-sm text-gray-500">Locked</span>
+                              </>
+                            ) : (
+                              <>
+                                <PlayCircle className="w-4 h-4 text-custom_primary mr-2" />
+                                <span className="text-sm text-gray-500">Available</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <BookOpen className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                    <h3 className="text-lg font-medium text-gray-500">
+                      No curriculum available yet
+                    </h3>
+                  </div>
 
+                )}
+            </div>
+            </div>
             {/* Instructor Section */}
-            <div className="bg-white rounded-lg p-6 shadow-lg mb-8">
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-6">
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">About the Instructor</h2>
+              <div className="flex flex-col md:flex-row gap-6">
                 <img
                   src={courseData.instructor.avatar}
                   alt={courseData.instructor.name}
-                  className="w-24 h-24 rounded-full object-cover"
+                  className="w-24 h-24 rounded-full object-cover flex-shrink-0"
                 />
                 <div>
-                  <h2 className="text-2xl font-bold text-black mb-2">Meet Your Instructor</h2>
-                  <h3 className="text-xl font-semibold text-black mb-1">{courseData.instructor.name}</h3>
-                  <p className="text-gray-600">{courseData.instructor.title}</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-custom_primary">{courseData.instructor.stats.students}</div>
-                  <div className="text-sm text-gray-600">Students</div>
-                </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-custom_primary">{courseData.instructor.stats.courses}</div>
-                  <div className="text-sm text-gray-600">Courses</div>
-                </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-custom_primary">{courseData.instructor.stats.rating}</div>
-                  <div className="text-sm text-gray-600">Rating</div>
-                </div>
-              </div>
-
-              <p className="text-gray-700 leading-relaxed">
-                {courseData.instructor.bio}
-              </p>
-            </div>
-
-            {/* Mobile Curriculum */}
-            <div className="lg:hidden bg-white rounded-lg shadow-lg overflow-hidden mb-8">
-              <div className="p-6 border-b">
-                <h3 className="text-xl font-bold mb-2">Course Curriculum</h3>
-                <div className="flex items-center text-sm text-gray-600">
-                  <div className="flex-1 bg-gray-200 rounded-full h-2">
-                    <div className="bg-custom_primary h-2 rounded-full" style={{ width: courseData.progress }}></div>
-                  </div>
-                  <span className="ml-4">{courseData.progress} complete</span>
-                </div>
-              </div>
-              <div className="divide-y">
-                {courseData.curriculum.map((lecture) => (
-                  <div
-                    key={lecture.id}
-                    onClick={() => handleLectureClick(lecture)}
-                    className={`p-4 flex items-center justify-between ${
-                      !lecture.isLocked ? 'cursor-pointer hover:bg-gray-50' : 'cursor-not-allowed bg-gray-50'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-4">
-                      {lecture.thumbnail ? (
-                        <img src={lecture.thumbnail} alt="" className="w-16 h-12 object-cover rounded" />
-                      ) : (
-                        <div className="w-16 h-12 bg-gray-200 rounded flex items-center justify-center">
-                          <Video className="w-6 h-6 text-gray-400" />
-                        </div>
-                      )}
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          {lecture.videoUrl ? (
-                            <Lock className="w-4 h-4 text-gray-400" />
-                          ) : currentLectureId === lecture.id ? (
-                            <Play className="w-4 h-4 text-custom_primary" />
-                          ) : (
-                            <PlayCircle className="w-4 h-4 text-gray-600" />
-                          )}
-                          <span className={lecture.isLocked ? 'text-gray-400' : 'text-gray-900'}>
-                            {lecture.title}
-                          </span>
-                        </div>
-                        <span className="text-sm text-gray-500">{lecture.duration}</span>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-1">
+                    {courseData.instructor.name}
+                  </h3>
+                  <p className="text-gray-600 mb-4">{courseData.instructor.title}</p>
+                  <p className="text-gray-700 mb-6">{courseData.instructor.bio}</p>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                      <div className="text-xl font-bold text-custom_primary">
+                        {courseData.instructor.stats.students}
                       </div>
+                      <div className="text-sm text-gray-600">Students</div>
+                    </div>
+                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                      <div className="text-xl font-bold text-custom_primary">
+                        {courseData.instructor.stats.courses}
+                      </div>
+                      <div className="text-sm text-gray-600">Courses</div>
+                    </div>
+                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                      <div className="text-xl font-bold text-custom_primary">
+                        {courseData.instructor.stats.rating}
+                      </div>
+                      <div className="text-sm text-gray-600">Rating</div>
                     </div>
                   </div>
-                ))}
+                </div>
               </div>
             </div>
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-1">
-          <div className="bg-white text-black rounded-lg shadow-lg p-6 mb-8 sticky top-4">
+          <div className="lg:col-span-1 space-y-6">
+            {/* Purchase Card */}
+            <div className="bg-white rounded-xl shadow-lg p-6 sticky top-6">
               <div className="flex items-baseline mb-4">
-                <span className="text-3xl font-bold text-gray-900">${1000}</span>
-                <span className="text-xl text-gray-500 line-through ml-2">${1500}</span>
-                <span className="ml-2 px-2 py-1 bg-red-100 text-red-800 text-sm font-semibold rounded">
-                  {25}% off
+                <span className="text-3xl font-bold text-gray-900">
+                  ${courseData.price.original.toFixed(2)}
                 </span>
+              
+              
               </div>
               <button
-                className="w-full text-white
-                 bg-custom_primary py-4 px-6 rounded-lg font-semibold text-lg mb-4 hover:bg-custom_primary_hover transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-custom_primary hover:bg-custom_primary_hover text-white py-3 px-6 rounded-lg font-semibold text-lg mb-4 transition-colors flex items-center justify-center gap-2"
                 onClick={() => alert('Purchase functionality would go here')}
               >
                 <ShoppingCart className="w-5 h-5" />
                 Purchase Course
               </button>
-              <div className="space-y-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span>Full lifetime access</span>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                  <span className="text-sm">Full lifetime access</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span>Access on mobile and desktop</span>
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                  <span className="text-sm">Access on mobile and desktop</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span>Certificate of completion</span>
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                  <span className="text-sm">Certificate of completion</span>
                 </div>
               </div>
             </div>
-            {/* Desktop Curriculum */}
-            <div className="hidden lg:block bg-white rounded-lg shadow-lg overflow-hidden sticky top-4">
-              <div className="p-6 border-b">
-                <h3 className="text-xl text-black font-bold mb-2">Course Curriculum</h3>
-                <div className="flex items-center text-sm text-gray-600">
-                  <div className="flex-1 bg-gray-200 rounded-full h-2">
-                    <div className="bg-custom_primary h-2 rounded-full" style={{ width: courseData.progress }}></div>
-                  </div>
-                  <span className="ml-4">{courseData.progress} complete</span>
-                </div>
-              </div>
-              <div className="divide-y max-h-[calc(100vh-8rem)] overflow-y-auto">
-                {courseData.curriculum.map((lecture) => (
-                  <div
-                    key={lecture.id}
-                    onClick={() => handleLectureClick(lecture)}
-                    className={`p-4 flex items-center justify-between ${
-                      !lecture.isLocked ? 'cursor-pointer hover:bg-gray-50' : 'cursor-not-allowed bg-gray-50'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-4">
-                      {lecture.thumbnail ? (
-                        <img src={lecture.thumbnail} alt="" className="w-16 h-12 object-cover rounded" />
-                      ) : (
-                        <div className="w-16 h-12 bg-gray-200 rounded flex items-center justify-center">
-                          <Video className="w-6 h-6 text-gray-400" />
-                        </div>
-                      )}
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          {lecture.isLocked ? (
-                            <Lock className="w-4 h-4 text-gray-400" />
-                          ) : currentLectureId === lecture.id ? (
-                            <Play className="w-4 h-4 text-custom_primary" />
-                          ) : (
-                            <PlayCircle className="w-4 h-4 text-gray-600" />
-                          )}
-                          <span className={lecture.isLocked ? 'text-gray-400' : 'text-gray-900'}>
-                            {lecture.title}
-                          </span>
-                        </div>
-                        <span className="text-sm text-gray-500">{lecture.duration}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+
+   
           </div>
         </div>
-
-        {/* Recommended Courses */}
-        {/* <div className="mt-16">
-          <h2 className="text-2xl font-bold mb-8">Recommended Courses</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {courseData.recommendedCourses.map((course) => (
-              <div key={course.id} className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105">
-                <img
-                  src={course.image}
-                  alt={course.title}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-2">{course.title}</h3>
-                  <p className="text-gray-600 mb-4">{course.instructor}</p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <Star className="w-5 h-5 text-yellow-400 mr-1" />
-                      <span>{course.rating}</span>
-                    </div>
-                    <div className="flex items-center text-gray-600">
-                      <Users className="w-5 h-5 mr-1" />
-                      <span>{course.students}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div> */}
       </div>
     </div>
   );
 }
 
-export default App;
-
-
-// import React, { useState } from 'react';
-// import ReactPlayer from 'react-player';
-// import { Clock, Star, Users, PlayCircle, BookOpen, Lock, Play, CheckCircle, Video, ShoppingCart } from 'lucide-react';
-
-// function App() {
-//   const [currentVideo, setCurrentVideo] = useState("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
-//   const [currentLectureId, setCurrentLectureId] = useState(1);
-
-//   const courseData = {
-//     title: "Advanced Web Development Masterclass",
-//     description: "Master modern web development with this comprehensive course. Learn the latest technologies, best practices, and industry standards to build professional web applications. You'll start with the fundamentals and progress to advanced concepts, building real-world projects along the way. By the end of this course, you'll have the skills needed to create sophisticated web applications and be ready for a career in web development.",
-//     videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-//     duration: "12 hours",
-//     students: "15,432",
-//     rating: "4.8",
-//     lectures: "35",
-//     progress: "28.5%",
-//     price: {
-//       original: 199.99,
-//       current: 89.99,
-//       discount: 55
-//     },
-//     curriculum: [
-//       {
-//         id: 1,
-//         title: "Welcome to the Course",
-//         duration: "15:30",
-//         isLocked: false,
-//         videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-//         thumbnail: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60"
-//       },
-//       {
-//         id: 2,
-//         title: "Setting Up Your Development Environment",
-//         duration: "20:45",
-//         isLocked: false,
-//         videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-//         thumbnail: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60"
-//       },
-//       {
-//         id: 3,
-//         title: "Web Development Fundamentals",
-//         duration: "25:15",
-//         isLocked: false,
-//         videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-//         thumbnail: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60"
-//       },
-//       {
-//         id: 4,
-//         title: "HTML5 Essential Training",
-//         duration: "30:00",
-//         isLocked: false,
-//         videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-//         thumbnail: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60"
-//       },
-//       {
-//         id: 5,
-//         title: "CSS3 Basics",
-//         duration: "28:20",
-//         isLocked: false,
-//         videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-//         thumbnail: "https://images.unsplash.com/photo-1523437113738-bbd3cc89fb19?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60"
-//       },
-//       {
-//         id: 6,
-//         title: "Responsive Design Principles",
-//         duration: "35:10",
-//         isLocked: false,
-//         videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-//         thumbnail: "https://images.unsplash.com/photo-1516116216624-53e697fedbea?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60"
-//       },
-//       {
-//         id: 7,
-//         title: "JavaScript Fundamentals",
-//         duration: "45:00",
-//         isLocked: false,
-//         videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-//         thumbnail: "https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60"
-//       },
-//       {
-//         id: 8,
-//         title: "DOM Manipulation",
-//         duration: "32:15",
-//         isLocked: false,
-//         videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-//         thumbnail: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60"
-//       },
-//       {
-//         id: 9,
-//         title: "Event Handling",
-//         duration: "28:45",
-//         isLocked: false,
-//         videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-//         thumbnail: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60"
-//       },
-//       {
-//         id: 10,
-//         title: "AJAX and Fetch API",
-//         duration: "40:30",
-//         isLocked: false,
-//         videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-//         thumbnail: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60"
-//       },
-//       {
-//         id: 11,
-//         title: "Advanced JavaScript Concepts",
-//         duration: "55:00",
-//         isLocked: true,
-//         videoUrl: null,
-//         thumbnail: null
-//       },
-//       {
-//         id: 35,
-//         title: "Final Project and Deployment",
-//         duration: "60:00",
-//         isLocked: true,
-//         videoUrl: null,
-//         thumbnail: null
-//       }
-//     ],
-//     instructor: {
-//       name: "Dr. Sarah Johnson",
-//       title: "Senior Web Developer & Tech Lead",
-//       avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-//       bio: "With over 15 years of industry experience, Dr. Sarah Johnson has led development teams at major tech companies and has helped thousands of students master web development. She holds a Ph.D. in Computer Science and is passionate about making complex technical concepts accessible to everyone.",
-//       stats: {
-//         students: "50,000+",
-//         courses: "12",
-//         rating: "4.9"
-//       }
-//     },
-//     recommendedCourses: [
-//       {
-//         id: 1,
-//         title: "React Performance Optimization",
-//         instructor: "Michael Chen",
-//         image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-//         rating: "4.7",
-//         students: "8,245"
-//       },
-//       {
-//         id: 2,
-//         title: "Full-Stack Development with Node.js",
-//         instructor: "Emma Wilson",
-//         image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-//         rating: "4.9",
-//         students: "12,331"
-//       },
-//       {
-//         id: 3,
-//         title: "UI/UX Design Principles",
-//         instructor: "Alex Thompson",
-//         image: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-//         rating: "4.6",
-//         students: "9,876"
-//       }
-//     ]
-//   };
-
-//   const handleLectureClick = (lecture) => {
-//     if (!lecture.isLocked) {
-//       setCurrentVideo(lecture.videoUrl);
-//       setCurrentLectureId(lecture.id);
-//     }
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-gray-50">
-//       {/* Header Section */}
-//       <div className="bg-gradient-to-r from-custom_primary to-blue-800 text-white py-12">
-//         <div className="container mx-auto px-4 lg:px-8">
-//           <h1 className="text-4xl font-bold mb-4">{courseData.title}</h1>
-//           <div className="flex flex-wrap items-center gap-6 text-sm">
-//             <div className="flex items-center">
-//               <Star className="w-5 h-5 mr-1" />
-//               <span>{courseData.rating}</span>
-//             </div>
-//             <div className="flex items-center">
-//               <Users className="w-5 h-5 mr-1" />
-//               <span>{courseData.students} students</span>
-//             </div>
-//             <div className="flex items-center">
-//               <Clock className="w-5 h-5 mr-1" />
-//               <span>{courseData.duration}</span>
-//             </div>
-//             <div className="flex items-center">
-//               <BookOpen className="w-5 h-5 mr-1" />
-//               <span>{courseData.lectures} lectures</span>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Main Content */}
-//       <div className="container mx-auto px-4 lg:px-8 py-8">
-//         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-//           {/* Main Content Column */}
-//           <div className="lg:col-span-2">
-//             {/* Video Player */}
-//             <div className="rounded-lg overflow-hidden shadow-lg mb-8">
-//               <ReactPlayer
-//                 url={currentVideo}
-//                 width="100%"
-//                 height="500px"
-//                 controls
-//               />
-//             </div>
-
-//             {/* Course Description */}
-//             <div className="bg-white rounded-lg p-6 shadow-lg mb-8">
-//               <h2 className="text-2xl font-bold mb-4">About This Course</h2>
-//               <p className="text-gray-700 leading-relaxed mb-6">
-//                 {courseData.description}
-//               </p>
-//             </div>
-
-//             {/* Instructor Section */}
-//             <div className="bg-white rounded-lg p-6 shadow-lg mb-8">
-//               <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-6">
-//                 <img
-//                   src={courseData.instructor.avatar}
-//                   alt={courseData.instructor.name}
-//                   className="w-24 h-24 rounded-full object-cover"
-//                 />
-//                 <div>
-//                   <h2 className="text-2xl font-bold mb-2">Meet Your Instructor</h2>
-//                   <h3 className="text-xl font-semibold mb-1">{courseData.instructor.name}</h3>
-//                   <p className="text-gray-600">{courseData.instructor.title}</p>
-//                 </div>
-//               </div>
-              
-//               <div className="grid grid-cols-3 gap-4 mb-6">
-//                 <div className="text-center p-4 bg-gray-50 rounded-lg">
-//                   <div className="text-2xl font-bold text-custom_primary">{courseData.instructor.stats.students}</div>
-//                   <div className="text-sm text-gray-600">Students</div>
-//                 </div>
-//                 <div className="text-center p-4 bg-gray-50 rounded-lg">
-//                   <div className="text-2xl font-bold text-custom_primary">{courseData.instructor.stats.courses}</div>
-//                   <div className="text-sm text-gray-600">Courses</div>
-//                 </div>
-//                 <div className="text-center p-4 bg-gray-50 rounded-lg">
-//                   <div className="text-2xl font-bold text-custom_primary">{courseData.instructor.stats.rating}</div>
-//                   <div className="text-sm text-gray-600">Rating</div>
-//                 </div>
-//               </div>
-
-//               <p className="text-gray-700 leading-relaxed">
-//                 {courseData.instructor.bio}
-//               </p>
-//             </div>
-
-//             {/* Mobile Curriculum */}
-//             <div className="lg:hidden bg-white rounded-lg shadow-lg overflow-hidden mb-8">
-//               <div className="p-6 border-b">
-//                 <h3 className="text-xl font-bold mb-2">Course Curriculum</h3>
-//                 <div className="flex items-center text-sm text-gray-600">
-//                   <div className="flex-1 bg-gray-200 rounded-full h-2">
-//                     <div className="bg-custom_primary h-2 rounded-full" style={{ width: courseData.progress }}></div>
-//                   </div>
-//                   <span className="ml-4">{courseData.progress} complete</span>
-//                 </div>
-//               </div>
-//               <div className="divide-y">
-//                 {courseData.curriculum.map((lecture) => (
-//                   <div
-//                     key={lecture.id}
-//                     onClick={() => handleLectureClick(lecture)}
-//                     className={`p-4 flex items-center justify-between ${
-//                       !lecture.isLocked ? 'cursor-pointer hover:bg-gray-50' : 'cursor-not-allowed bg-gray-50'
-//                     }`}
-//                   >
-//                     <div className="flex items-center space-x-4">
-//                       {lecture.thumbnail ? (
-//                         <img src={lecture.thumbnail} alt="" className="w-16 h-12 object-cover rounded" />
-//                       ) : (
-//                         <div className="w-16 h-12 bg-gray-200 rounded flex items-center justify-center">
-//                           <Video className="w-6 h-6 text-gray-400" />
-//                         </div>
-//                       )}
-//                       <div>
-//                         <div className="flex items-center space-x-2">
-//                           {lecture.isLocked ? (
-//                             <Lock className="w-4 h-4 text-gray-400" />
-//                           ) : currentLectureId === lecture.id ? (
-//                             <Play className="w-4 h-4 text-custom_primary" />
-//                           ) : (
-//                             <PlayCircle className="w-4 h-4 text-gray-600" />
-//                           )}
-//                           <span className={lecture.isLocked ? 'text-gray-400' : 'text-gray-900'}>
-//                             {lecture.title}
-//                           </span>
-//                         </div>
-//                         <span className="text-sm text-gray-500">{lecture.duration}</span>
-//                       </div>
-//                     </div>
-//                   </div>
-//                 ))}
-//               </div>
-//             </div>
-//           </div>
-
-//           {/* Sidebar */}
-//           <div className="lg:col-span-1">
-//             {/* Purchase Card */}
-//             <div className="bg-white rounded-lg shadow-lg p-6 mb-8 sticky top-4">
-//               <div className="flex items-baseline mb-4">
-//                 <span className="text-3xl font-bold text-gray-900">${courseData.price.current}</span>
-//                 <span className="text-xl text-gray-500 line-through ml-2">${courseData.price.original}</span>
-//                 <span className="ml-2 px-2 py-1 bg-red-100 text-red-800 text-sm font-semibold rounded">
-//                   {courseData.price.discount}% off
-//                 </span>
-//               </div>
-//               <button
-//                 className="w-full bg-custom_primary text-white py-4 px-6 rounded-lg font-semibold text-lg mb-4 hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-//                 onClick={() => alert('Purchase functionality would go here')}
-//               >
-//                 <ShoppingCart className="w-5 h-5" />
-//                 Purchase Course
-//               </button>
-//               <div className="space-y-4 text-sm">
-//                 <div className="flex items-center gap-2">
-//                   <CheckCircle className="w-5 h-5 text-green-500" />
-//                   <span>Full lifetime access</span>
-//                 </div>
-//                 <div className="flex items-center gap-2">
-//                   <CheckCircle className="w-5 h-5 text-green-500" />
-//                   <span>Access on mobile and desktop</span>
-//                 </div>
-//                 <div className="flex items-center gap-2">
-//                   <CheckCircle className="w-5 h-5 text-green-500" />
-//                   <span>Certificate of completion</span>
-//                 </div>
-//               </div>
-//             </div>
-
-//             {/* Desktop Curriculum */}
-//             <div className="hidden lg:block bg-white rounded-lg shadow-lg overflow-hidden sticky top-[calc(4rem+24rem)]">
-//               <div className="p-6 border-b">
-//                 <h3 className="text-xl font-bold mb-2">Course Curriculum</h3>
-//                 <div className="flex items-center text-sm text-gray-600">
-//                   <div className="flex-1 bg-gray-200 rounded-full h-2">
-//                     <div className="bg-custom_primary h-2 rounded-full" style={{ width: courseData.progress }}></div>
-//                   </div>
-//                   <span className="ml-4">{courseData.progress} complete</span>
-//                 </div>
-//               </div>
-//               <div className="divide-y max-h-[calc(100vh-8rem)] overflow-y-auto">
-//                 {courseData.curriculum.map((lecture) => (
-//                   <div
-//                     key={lecture.id}
-//                     onClick={() => handleLectureClick(lecture)}
-//                     className={`p-4 flex items-center justify-between ${
-//                       !lecture.isLocked ? 'cursor-pointer hover:bg-gray-50' : 'cursor-not-allowed bg-gray-50'
-//                     }`}
-//                   >
-//                     <div className="flex items-center space-x-4">
-//                       {lecture.thumbnail ? (
-//                         <img src={lecture.thumbnail} alt="" className="w-16 h-12 object-cover rounded" />
-//                       ) : (
-//                         <div className="w-16 h-12 bg-gray-200 rounded flex items-center justify-center">
-//                           <Video className="w-6 h-6 text-gray-400" />
-//                         </div>
-//                       )}
-//                       <div>
-//                         <div className="flex items-center space-x-2">
-//                           {lecture.isLocked ? (
-//                             <Lock className="w-4 h-4 text-gray-400" />
-//                           ) : currentLectureId === lecture.id ? (
-//                             <Play className="w-4 h-4 text-custom_primary" />
-//                           ) : (
-//                             <PlayCircle className="w-4 h-4 text-gray-600" />
-//                           )}
-//                           <span className={lecture.isLocked ? 'text-gray-400' : 'text-gray-900'}>
-//                             {lecture.title}
-//                           </span>
-//                         </div>
-//                         <span className="text-sm text-gray-500">{lecture.duration}</span>
-//                       </div>
-//                     </div>
-//                   </div>
-//                 ))}
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Recommended Courses */}
-//         <div className="mt-16">
-//           <h2 className="text-2xl font-bold mb-8">Recommended Courses</h2>
-//           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-//             {courseData.recommendedCourses.map((course) => (
-//               <div key={course.id} className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105">
-//                 <img
-//                   src={course.image}
-//                   alt={course.title}
-//                   className="w-full h-48 object-cover"
-//                 />
-//                 <div className="p-6">
-//                   <h3 className="text-xl font-bold mb-2">{course.title}</h3>
-//                   <p className="text-gray-600 mb-4">{course.instructor}</p>
-//                   <div className="flex items-center justify-between">
-//                     <div className="flex items-center">
-//                       <Star className="w-5 h-5 text-yellow-400 mr-1" />
-//                       <span>{course.rating}</span>
-//                     </div>
-//                     <div className="flex items-center text-gray-600">
-//                       <Users className="w-5 h-5 mr-1" />
-//                       <span>{course.students}</span>
-//                     </div>
-//                   </div>
-//                 </div>
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default App;
+export default CourseDetailPage;

@@ -80,6 +80,10 @@ import ViewCourses from "./pages/Student/ViewCourse";
             path: "view/:courseId",
             element: <RoleChecker allowedRoles={["admin","teacher","student"]} ><ViewCourses /></RoleChecker>
         },
+        {
+            path: "course/:courseId",
+            element: <RoleChecker allowedRoles={["admin","teacher","student"]} ><CourseDetail /></RoleChecker>
+        },
       ]
   },
     {
