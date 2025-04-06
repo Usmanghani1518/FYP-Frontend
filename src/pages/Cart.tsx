@@ -1,17 +1,37 @@
-// components/CartPage.tsx
+import { backendRequest } from '@/Helper/backendRequest';
 import { useAppSelector, useAppDispatch } from '../redux/app.hooks';
 import { removeFromCart, clearCart } from '../redux/slices/cart.slice';
 import { ShoppingCart, X, ArrowLeft } from 'lucide-react';
+import { useState } from 'react';
 
+
+interface Response {
+  success: boolean;
+  url: string;
+}
 const CartPage = () => {
+  const [loading,setLoading] = useState(false);
   const { items } = useAppSelector((state) => state.cart);
   const dispatch = useAppDispatch();
 
   const totalPrice = items.reduce((sum, item) => sum + item.price, 0);
 
-  const handlePurchase = () => {
-    alert('Purchase completed successfully!');
-    dispatch(clearCart());
+  const handlePurchase = async () => {
+    const ids = items.map((item) => item._id);
+    console.log('Proceeding to checkout...', ids);
+    setLoading(true)
+    try {
+      const response = await backendRequest<Response>("POST", "/course/purchase", { courseIds: ids });
+      if (response.success){
+        dispatch(clearCart());
+        window.location.href = response.url; 
+      }
+    } catch (error) {
+      console.log("Error during checkout:", error);
+    }finally{
+      setLoading(false)
+    }
+
   };
 
   return (
@@ -24,7 +44,7 @@ const CartPage = () => {
           </h1>
           <button 
             onClick={() => window.history.back()}
-            className="flex items-center gap-1 text-blue-600 hover:text-blue-800"
+            className="flex items-center gap-1 text-custom_primary hover:text-custom_primary_hover"
           >
             <ArrowLeft className="w-5 h-5" />
             Back to courses
@@ -92,13 +112,14 @@ const CartPage = () => {
                   Clear Cart
                 </button>
                 <button
+                disabled={loading}
                   onClick={handlePurchase}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                  className={`px-6 py-3 bg-gradient-to-r from-custom_primary to-custom_primary_hover text-white rounded-lg hover:from-custom_primary_hover hover:to-custom_primary transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2`}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                   </svg>
-                  Secure Checkout
+                  {loading?"Loading...":"Secure Checkout"}
                 </button>
               </div>
             </div>

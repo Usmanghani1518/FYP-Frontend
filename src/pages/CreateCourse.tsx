@@ -30,6 +30,7 @@ const CreateCourse: React.FC = () => {
   const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [videoPreviewUrls, setVideoPreviewUrls] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -90,19 +91,17 @@ const CreateCourse: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return; // Prevent multiple submissions
 
-    // Validate the form
     const newErrors = validateForm();
     setErrors(newErrors);
 
-    // Mark all fields as touched
     const allTouched: { [key: string]: boolean } = {};
     Object.keys(formData).forEach((key) => {
       allTouched[key] = true;
     });
     setTouched(allTouched);
 
-    // If no errors, submit the form
     if (Object.keys(newErrors).length === 0) {
       const formDataToSend = new FormData();
 
@@ -119,7 +118,6 @@ const CreateCourse: React.FC = () => {
         formDataToSend.append('thumbnail', formData.thumbnail);
       }
 
-      // Append videos with titles and descriptions
       formData.videos.forEach((video, index) => {
         formDataToSend.append(`video[${index}].file`, video);
         formDataToSend.append(`video[${index}].title`, formData.videoTitles[index]);
@@ -127,15 +125,33 @@ const CreateCourse: React.FC = () => {
       });
 
       // Send the request to the backend
+      setIsSubmitting(true);
       try {
         const response = await backendRequest('POST',"/course/create",formDataToSend,  {},
           true);
 
-       
-        console.log('Response:', response);
-        notifyResponse(response)
+          if (response.success){
+            setFormData({
+             title: '',
+             price: '',
+             language: '',
+             description: '',
+             level: 'beginner',
+             category: '', // New field for category
+             thumbnail:  null,
+             videos: [] as File[],
+             videoTitles: [] as string[], // Array to store video titles
+             videoDescriptions: [] as string[], // Array to store video descriptions
+           })
+           setThumbnailPreview(null);
+            
+           notifyResponse(response)
+       }
       } catch (error) {
         console.error('Error:', error);
+      }finally{
+        console.log("Form submitted successfully!");
+        setIsSubmitting(false);
       }
     }
   };
@@ -489,10 +505,11 @@ const CreateCourse: React.FC = () => {
           </div>
 
           <Button
+            disabled={isSubmitting}
             type="submit"
             className="w-full bg-gradient-to-r from-custom_primary to-custom_primary_hover hover:from-indigo-700 hover:to-purple-700 text-white py-6 font-medium shadow-lg hover:shadow-xl transition-all duration-200"
           >
-            Create Course
+           {isSubmitting?"Creating...": "Create Course"}
           </Button>
         </form>
       </CardContent>
