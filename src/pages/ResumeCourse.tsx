@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { backendRequest } from '@/Helper/backendRequest';
-import { Clock, Star, Users, PlayCircle, BookOpen, Lock, Play, CheckCircle, Video, Award } from 'lucide-react';
+import { Clock, Star, Users, PlayCircle, BookOpen, Lock, Play, CheckCircle, Video, Edit, Send, ChevronLeft, ChevronRight } from 'lucide-react';
 import ReactPlayer from 'react-player';
+import { notifyResponse } from '@/Helper/notify';
 
 interface CourseData {
   title: string;
@@ -45,12 +46,50 @@ interface CourseData {
   };
 }
 
+interface Review {
+  _id: string;
+  user: {
+    _id: string;
+    name: string;
+    profilePicture: string;
+  };
+  rating: number;
+  comment: string;
+  createdAt: string;
+  isEdited: boolean;
+}
+
+interface RatingDetails {
+  averageRating: number;
+  totalReviews: number;
+  ratingDistribution: {
+    "1": number;
+    "2": number;
+    "3": number;
+    "4": number;
+    "5": number;
+  };
+}
+
 function ResumeCourse() {
   const { courseId } = useParams<{ courseId: string }>();
   const [courseData, setCourseData] = useState<CourseData | null>(null);
   const [currentVideo, setCurrentVideo] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Reviews states
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [userReview, setUserReview] = useState<Review | null>(null);
+  const [ratingDetails, setRatingDetails] = useState<RatingDetails | null>(null);
+  const [isEditingReview, setIsEditingReview] = useState(false);
+  const [reviewRating, setReviewRating] = useState<number>(5);
+  const [reviewComment, setReviewComment] = useState<string>('');
+  const [reviewsPage, setReviewsPage] = useState(1);
+  const [reviewsLimit] = useState(5);
+  const [reviewsTotalPages, setReviewsTotalPages] = useState(1);
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const reviewFormRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchCourseData = async () => {
@@ -79,8 +118,130 @@ function ResumeCourse() {
     fetchCourseData();
   }, [courseId]);
 
+  useEffect(() => {
+    if (courseId) {
+      fetchReviews();
+      fetchRatingDetails();
+    }
+  }, [courseId, reviewsPage]);
+
+  const fetchReviews = async () => {
+    try {
+      const response = await backendRequest(
+        'GET', 
+        `/review/${courseId}?page=${reviewsPage}&limit=${reviewsLimit}`
+      );
+      
+      if (response.success) {
+        // Find user's own review (if any) and remove it from the list as we'll display it separately
+        const userId = localStorage.getItem('userId'); // Assuming user ID is stored in localStorage
+        const userReviewIndex = response.data.findIndex((review: Review) => review.user._id === userId);
+        
+        if (userReviewIndex !== -1) {
+          const userReview = response.data[userReviewIndex];
+          setUserReview(userReview);
+          setReviewRating(userReview.rating);
+          setReviewComment(userReview.comment);
+          
+          // Remove user review from the main list
+          const otherReviews = [...response.data];
+          otherReviews.splice(userReviewIndex, 1);
+          setReviews(otherReviews);
+        } else {
+          setUserReview(null);
+          setReviews(response.data);
+        }
+        
+        setReviewsTotalPages(response.pagination.pages);
+      }
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    }
+  };
+
+  const fetchRatingDetails = async () => {
+    try {
+      const response = await backendRequest('GET', `/review/review-rating/${courseId}`);
+      if (response.success) {
+        setRatingDetails(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching rating details:", error);
+    }
+  };
+
   const handleVideoSelect = (videoUrl: string) => {
     setCurrentVideo(videoUrl);
+  };
+
+  const handleEditReview = () => {
+    setIsEditingReview(true);
+    setTimeout(() => {
+      reviewFormRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+
+  const handleCancelEdit = () => {
+    if (userReview) {
+      setReviewRating(userReview.rating);
+      setReviewComment(userReview.comment);
+    } else {
+      setReviewRating(5);
+      setReviewComment('');
+    }
+    setIsEditingReview(false);
+  };
+
+  const handleSubmitReview = async () => {
+    if (!reviewComment.trim()) {
+      return;
+    }
+    
+    try {
+      setIsSubmittingReview(true);
+      
+      const response = await backendRequest(
+        'POST',
+        `/review/${courseId}`,
+        {
+          rating: reviewRating,
+          comment: reviewComment
+        }
+      );
+      
+      if (response.success) {
+        setIsEditingReview(false);
+        notifyResponse(response)
+        await Promise.all([fetchReviews(), fetchRatingDetails()]);
+      }
+    } catch (error) {
+      console.error("Error submitting review:", error);
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
+  const renderStarRating = (rating: number, interactive = false) => {
+    return (
+      <div className="flex items-center">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+            key={star}
+            className={`w-5 h-5 ${
+              star <= rating 
+                ? 'fill-yellow-400 text-yellow-400' 
+                : 'text-gray-300'
+            } ${interactive ? 'cursor-pointer' : ''}`}
+            onClick={interactive ? () => setReviewRating(star) : undefined}
+          />
+        ))}
+      </div>
+    );
+  };
+
+  const calculateRatingPercentage = (count: number) => {
+    if (!ratingDetails || ratingDetails.totalReviews === 0) return 0;
+    return (count / ratingDetails.totalReviews) * 100;
   };
 
   if (isLoading) {
@@ -160,6 +321,218 @@ function ResumeCourse() {
                   <h3 className="text-xl font-semibold text-gray-900 mb-1">{courseData.instructor.name}</h3>
                   <p className="text-gray-600">{courseData.instructor.bio}</p>
                 </div>
+              </div>
+            </div>
+            
+            {/* Reviews Section */}
+            <div className="bg-white rounded-lg p-6 shadow-lg mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Student Reviews</h2>
+              
+              {/* Rating Summary */}
+              {ratingDetails && (
+                <div className="flex flex-col md:flex-row gap-8 mb-8 pb-8 border-b border-gray-200">
+                  {/* Average Rating Display */}
+                  <div className="text-center md:text-left md:mr-8">
+                    <div className="text-5xl font-bold text-gray-900 mb-2">
+                      {ratingDetails.averageRating || 0}
+                    </div>
+                    <div className="flex justify-center md:justify-start mb-1">
+                      {renderStarRating(ratingDetails.averageRating || 0)}
+                    </div>
+                    <div className="text-gray-600 text-sm">
+                      {ratingDetails.totalReviews} {ratingDetails.totalReviews === 1 ? 'review' : 'reviews'}
+                    </div>
+                  </div>
+                  
+                  {/* Rating Distribution */}
+                  <div className="flex-1">
+                    {[5, 4, 3, 2, 1].map((star) => (
+                      <div key={star} className="flex items-center mb-2">
+                        <div className="flex items-center w-20">
+                          <span className="text-sm mr-1">{star}</span>
+                          <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                        </div>
+                        <div className="flex-1 mx-2">
+                          <div className="bg-gray-200 rounded-full h-2.5 w-full">
+                            <div 
+                              className="bg-yellow-400 h-2.5 rounded-full" 
+                              style={{ width: `${calculateRatingPercentage(ratingDetails.ratingDistribution[star as keyof typeof ratingDetails.ratingDistribution])}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                        <div className="w-12 text-right text-sm text-gray-500">
+                          {ratingDetails.ratingDistribution[star as keyof typeof ratingDetails.ratingDistribution]}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* User's own review or review form */}
+              <div ref={reviewFormRef} className="mb-8 pb-8 border-b border-gray-200">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                  {userReview ? 'Your Review' : 'Write a Review'}
+                </h3>
+                
+                {!isEditingReview && userReview ? (
+                  <div className="bg-blue-50 rounded-lg p-4 mb-6">
+                    <div className="flex justify-between mb-2">
+                      <div className="flex items-center">
+                        <img 
+                            src="https://res.cloudinary.com/saadnaeem/image/upload/v1743880130/profile-icon-design-free-vector_luwo6w.jpg"
+                  
+                          alt={userReview.user.name} 
+                          className="w-10 h-10 rounded-full mr-3"
+                        />
+                        <div>
+                          <div className="font-medium text-gray-900">{userReview.user.name}</div>
+                          <div className="text-sm text-gray-500">
+                            {new Date(userReview.createdAt).toLocaleDateString()}
+                            {userReview.isEdited && <span className="ml-2 text-xs">(edited)</span>}
+                          </div>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={handleEditReview}
+                        className="text-blue-600 hover:text-blue-800 flex items-center"
+                      >
+                        <Edit className="w-4 h-4 mr-1" />
+                        Edit Review
+                      </button>
+                    </div>
+                    <div className="mb-2">{renderStarRating(userReview.rating)}</div>
+                    <p className="text-gray-700">{userReview.comment}</p>
+                  </div>
+                ) : (
+                  <div className="bg-gray-50 rounded-lg p-6">
+                    <div className="mb-4">
+                      <label className="block text-gray-700 mb-2">Your Rating</label>
+                      <div className="flex items-center">
+                        {renderStarRating(reviewRating, true)}
+                        <span className="ml-2 text-gray-600">({reviewRating}/5)</span>
+                      </div>
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-gray-700 mb-2">Your Review</label>
+                      <textarea
+                        value={reviewComment}
+                        onChange={(e) => setReviewComment(e.target.value)}
+                        className="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        rows={4}
+                        placeholder="Share your experience with this course..."
+                      />
+                    </div>
+                    <div className="flex justify-end space-x-3">
+                      {userReview && (
+                        <button
+                          onClick={handleCancelEdit}
+                          className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100"
+                          disabled={isSubmittingReview}
+                        >
+                          Cancel
+                        </button>
+                      )}
+                      <button
+                        onClick={handleSubmitReview}
+                        className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-800 flex items-center"
+                        disabled={isSubmittingReview || !reviewComment.trim()}
+                      >
+                        {isSubmittingReview ? (
+                          <>Submitting...</>
+                        ) : (
+                          <>
+                            <Send className="w-4 h-4 mr-2" />
+                            {userReview ? 'Update Review' : 'Submit Review'}
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Other reviews */}
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                  Student Feedback
+                </h3>
+                
+                {reviews.length > 0 ? (
+                  <div className="space-y-6">
+                    {reviews.map((review) => (
+                      <div key={review._id} className="pb-6 border-b border-gray-100 last:border-0">
+                        <div className="flex mb-2">
+                          <img 
+                            src="https://res.cloudinary.com/saadnaeem/image/upload/v1743880130/profile-icon-design-free-vector_luwo6w.jpg"
+                            alt={review.user.name} 
+                            className="w-10 h-10 rounded-full mr-3"
+                          />
+                          <div>
+                            <div className="font-medium text-gray-900">{review.user.name}</div>
+                            <div className="text-sm text-gray-500">
+                              {new Date(review.createdAt).toLocaleDateString()}
+                              {review.isEdited && <span className="ml-2 text-xs">(edited)</span>}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="mb-2">{renderStarRating(review.rating)}</div>
+                        <p className="text-gray-700">{review.comment}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    No reviews yet. Be the first to leave a review!
+                  </div>
+                )}
+                
+                {/* Pagination */}
+                {reviewsTotalPages > 1 && (
+                  <div className="flex justify-center items-center mt-8">
+                    <button
+                      onClick={() => setReviewsPage(prev => Math.max(prev - 1, 1))}
+                      disabled={reviewsPage === 1}
+                      className={`flex items-center px-3 py-1 rounded ${
+                        reviewsPage === 1 
+                          ? 'text-gray-400 cursor-not-allowed' 
+                          : 'text-blue-600 hover:bg-blue-50'
+                      }`}
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                      Prev
+                    </button>
+                    
+                    <div className="flex space-x-1 mx-2">
+                      {Array.from({ length: reviewsTotalPages }, (_, i) => i + 1).map((page) => (
+                        <button
+                          key={page}
+                          onClick={() => setReviewsPage(page)}
+                          className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                            reviewsPage === page
+                              ? 'bg-blue-600 text-white'
+                              : 'text-gray-700 hover:bg-gray-100'
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      ))}
+                    </div>
+                    
+                    <button
+                      onClick={() => setReviewsPage(prev => Math.min(prev + 1, reviewsTotalPages))}
+                      disabled={reviewsPage === reviewsTotalPages}
+                      className={`flex items-center px-3 py-1 rounded ${
+                        reviewsPage === reviewsTotalPages 
+                          ? 'text-gray-400 cursor-not-allowed' 
+                          : 'text-blue-600 hover:bg-blue-50'
+                      }`}
+                    >
+                      Next
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

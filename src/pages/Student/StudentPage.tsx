@@ -34,7 +34,7 @@ interface Course {
   thumbnail: string;
   price: number;
   category: string;
-  rating?: number;
+  averageRating?: number;
 }
 
 interface Certificate {
@@ -259,13 +259,13 @@ function StudentPage() {
                   <p className="text-gray-600 text-sm mb-3">{course.teacher?.name || "Unknown Instructor"}</p>
                   
                   <div className="flex items-center gap-1 mb-3">
-                    <span className="font-bold">{course.rating || 4.5}</span>
+                    <span className="font-bold">{course.averageRating || 0.0}</span>
                     <div className="flex">
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
                           className={`h-4 w-4 ${
-                            i < Math.floor(course.rating || 4.5)
+                            i < Math.floor(course.averageRating || 0.0)
                               ? "fill-yellow-400 text-yellow-400"
                               : "fill-gray-300 text-gray-300"
                           }`}
@@ -374,13 +374,13 @@ function StudentPage() {
               <p className="text-gray-600 text-sm mb-3">{course.teacher?.name || "Unknown Instructor"}</p>
               
               <div className="flex items-center gap-1 mb-3">
-                <span className="font-bold">{course.rating || 4.5}</span>
+                <span className="font-bold">{course.averageRating || 0}</span>
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
                       className={`h-4 w-4 ${
-                        i < Math.floor(course.rating || 4.5)
+                        i < Math.floor(course.averageRating || 0)
                           ? "fill-yellow-400 text-yellow-400"
                           : "fill-gray-300 text-gray-300"
                       }`}
