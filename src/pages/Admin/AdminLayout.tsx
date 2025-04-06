@@ -9,6 +9,7 @@ import {
 } from "react-icons/tb";
 import { useState, useEffect } from "react";
 import { BiLogOut } from "react-icons/bi";
+import { backendRequest } from "@/Helper/backendRequest";
 
 function AdminLayout() {
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
@@ -26,9 +27,10 @@ function AdminLayout() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  function logout() {
+  async function logout() {
     localStorage.clear();
-    navigate("/login");
+        const response = await backendRequest('GET', '/auth/logout');
+        if (response.success) navigate("/login");
   }
 
   return (

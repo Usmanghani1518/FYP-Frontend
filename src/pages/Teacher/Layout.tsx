@@ -211,12 +211,12 @@ function DashboardLayout() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
+    <div className="flex h-screen overflow-hidden bg-gray-900 ">
       {/* Mobile Menu Button - Only on small screens */}
       {!isLargeScreen && (
         <button
           onClick={toggleSidebar}
-          className="fixed top-4 left-4 z-30 p-2 rounded-full bg-white shadow-lg md:hidden"
+          className="fixed top-4 left-4 z-30 p-2 rounded-full  bg-gray-900 shadow-lg md:hidden"
           aria-label="Toggle Sidebar"
         >
           <TbMenu2 size={24} className="text-gray-700" />
@@ -237,8 +237,8 @@ function DashboardLayout() {
           <div 
             className={`
               ${isLargeScreen ? 
-                "h-full bg-white" : 
-                "absolute left-0 top-0 h-full w-64 bg-white shadow-xl"
+                "h-full bg-gray-950 text-white" : 
+                "absolute left-0 top-0 h-full w-64 bg-gray-900 shadow-xl"
               }
             `}
             onClick={e => e.stopPropagation()}
@@ -249,7 +249,7 @@ function DashboardLayout() {
                 {!isCollapsed && <div className="w-10 h-10 bg-indigo-600 rounded-full"></div>}
                 <button
                   onClick={toggleSidebar}
-                  className="p-1 rounded-md hover:bg-gray-100 text-gray-500"
+                  className="p-1 rounded-md hover:bg-gray-600 text-gray-300"
                 >
                   {isLargeScreen ? (
                     isCollapsed ? <TbMenu2 size={20} /> : <TbX size={20} />
@@ -272,7 +272,7 @@ function DashboardLayout() {
                     key={i}
                     className={({ isActive }) =>
                       `flex items-center py-3 px-3 rounded-lg transition-all duration-200
-                      ${isActive ? "bg-indigo-50 text-indigo-600" : "text-gray-600 hover:bg-gray-100"}
+                      ${isActive ? "bg-indigo-50 text-indigo-600" : "text-gray-600 hover:bg-gray-300"}
                       ${isCollapsed ? 'justify-center' : ''}`
                     }
                     onClick={() => !isLargeScreen && setShowSidebar(false)}
@@ -299,7 +299,7 @@ function DashboardLayout() {
                 onClick={logout}
                 className={`mt-auto cursor-pointer mb-4 ${isCollapsed ? 'px-0' : 'px-3'}`}
               >
-                <div className={`flex items-center py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-all duration-200 ${isCollapsed ? 'justify-center px-3' : 'px-3'}`}>
+                <div className={`flex items-center py-3 rounded-lg text-gray-600 hover:bg-gray-200 transition-all duration-200 ${isCollapsed ? 'justify-center px-3' : 'px-3'}`}>
                   <BiLogOut className="text-xl text-gray-500" />
                   {!isCollapsed && (
                     <span className="ml-3 font-medium">Logout</span>
