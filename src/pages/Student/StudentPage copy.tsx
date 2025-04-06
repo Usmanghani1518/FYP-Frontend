@@ -187,13 +187,7 @@ console.log("enrolledCourses",enrolledCourses)
                   <h3 className="font-bold text-lg mb-1 line-clamp-1">{course.title}</h3>
                   <p className="text-gray-600 text-sm mb-3">{course.teacher?.name || "Unknown Instructor"}</p>
                   
-                  <div className="mb-3">
-                    <div className="flex justify-between text-sm text-gray-600 mb-1">
-                      <span>Progress: 45%</span>
-                      <span>5h 30m remaining</span>
-                    </div>
-                    {/* <Progress value={45} className="h-2 bg-gray-200" /> */}
-                  </div>
+                 
                   
                   <div className="flex justify-between items-center text-sm">
                     <div className="flex items-center text-gray-600">

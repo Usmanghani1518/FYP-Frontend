@@ -27,6 +27,7 @@ import Profile from "./pages/Student/Profile";
 import { CoursesTable } from "./pages/Teacher/CourseList";
 import CartPage from "./pages/Cart";
 import ViewCourses from "./pages/Student/ViewCourse";
+import ResumeCourse from "./pages/ResumeCourse";
   // import CourseDetailDummy from "./pages/Teacher/CourseDetail";
   // import AllTeachers from "./components/admin/AllTeachers";
   // import AllStudents from "./components/admin/AllStudents";
@@ -83,6 +84,10 @@ import ViewCourses from "./pages/Student/ViewCourse";
         {
             path: "course/:courseId",
             element: <RoleChecker allowedRoles={["admin","teacher","student"]} ><CourseDetail /></RoleChecker>
+        },
+        {
+            path: "course-resume/:courseId",
+            element: <RoleChecker allowedRoles={["admin","teacher","student"]} ><ResumeCourse /></RoleChecker>
         },
       ]
   },
