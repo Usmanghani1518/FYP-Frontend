@@ -372,6 +372,8 @@ const UpdateCourse: React.FC = () => {
   };
 
   const saveAllChanges = async () => {
+    console.log("---------");
+    
     const newErrors: FormErrors = {};
     let hasErrors = false;
 
