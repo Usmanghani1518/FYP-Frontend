@@ -55,17 +55,7 @@ function App() {
   ,[])
 
   const [api, setApi] = useState(null);
-  // const [canScrollPrev, setCanScrollPrev] = useState(false);
-  // const [canScrollNext, setCanScrollNext] = useState(true);
 
-  // const carouselRef = useRef(null);
-
-  // const handleCarouselScroll = () => {
-  //   if (carouselRef.current) {
-  //     setCanScrollPrev(carouselRef.current.canScrollPrev());
-  //     setCanScrollNext(carouselRef.current.canScrollNext());
-  //   }
-  // };
 
   useEffect(() => {
     if (!api) return;
@@ -281,7 +271,6 @@ function App() {
 
 
 
-{/* --------------------- Educonnect business --------------------*/}
           <section className="py-16 bg-primary text-primary-foreground">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -320,7 +309,6 @@ function App() {
               </div>
             </div>
           </section>
-{/* ------------------------------Stats -------------------------------*/}
 
 
         </div>

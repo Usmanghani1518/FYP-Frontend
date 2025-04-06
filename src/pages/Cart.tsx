@@ -23,8 +23,8 @@ const CartPage = () => {
     try {
       const response = await backendRequest<Response>("POST", "/course/purchase", { courseIds: ids });
       if (response.success){
-        dispatch(clearCart());
         window.location.href = response.url; 
+        dispatch(clearCart());
       }
     } catch (error) {
       console.log("Error during checkout:", error);
@@ -59,7 +59,7 @@ const CartPage = () => {
             <h3 className="text-xl font-medium text-gray-900 mb-2">Your cart is empty</h3>
             <p className="text-gray-600 mb-6">Looks like you haven't added any courses yet</p>
             <button 
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-md hover:shadow-lg"
+              className="px-6 py-3 bg-custom_primary hover:bg-custom_primary_hover text-white rounded-lg transition-all shadow-md hover:shadow-lg"
               onClick={() => window.history.back()}
             >
               Browse Courses

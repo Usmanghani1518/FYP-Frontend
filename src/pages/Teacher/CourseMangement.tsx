@@ -945,7 +945,7 @@ const UpdateCourse: React.FC = () => {
                                   </div>
                                 )}
                               </div>
-                              <div className="flex justify-end">
+                              {/* <div className="flex justify-end">
                                 <Button
                                   type="button"
                                   variant="destructive"
@@ -954,7 +954,7 @@ const UpdateCourse: React.FC = () => {
                                 >
                                   <Trash2 className="h-4 w-4" /> Remove Video
                                 </Button>
-                              </div>
+                              </div> */}
                             </div>
                           </AccordionContent>
                         </AccordionItem>

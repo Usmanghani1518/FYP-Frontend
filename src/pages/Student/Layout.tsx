@@ -5,16 +5,21 @@ import { useState, useEffect, useRef } from "react";
 import { backendRequest } from "@/Helper/backendRequest";
 import logo from "../../../public/imagies/Logo.png";
 import { ShoppingCart } from "lucide-react";
+import { useAppDispatch, useCart } from "@/redux/app.hooks";
+import { clearCart } from "@/redux/slices/cart.slice";
 
 function StudentLayout() {
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null); // Ref for dropdown
+   const { totalItems } = useCart();
+  const dispatch = useAppDispatch();
 
   async function logout() {
     localStorage.clear();
     const response = await backendRequest("GET", "/auth/logout");
     if (response.success) {
+      dispatch(clearCart());
       navigate("/login");
     }
   }
@@ -57,7 +62,14 @@ function StudentLayout() {
         </div>
         
         <div className="flex items-center space-x-6">
-          <ShoppingCart size={24} className="text-gray-700 cursor-pointer" />
+        <Link to="/student/cart" className="relative p-1">
+                  <ShoppingCart className="h-5 w-5 text-gray-700" />
+                  {totalItems > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-bounce">
+                      {totalItems}
+                    </span>
+                  )}
+                </Link>
           
           {/* Profile Dropdown */}
           <div className="relative" ref={dropdownRef}>

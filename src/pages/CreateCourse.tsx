@@ -301,7 +301,7 @@ const CreateCourse: React.FC = () => {
         <CardTitle className="text-2xl font-bold">Create New Course</CardTitle>
       </CardHeader>
 
-      <CardContent className="p-6 pt-8">
+      <CardContent className="p-6 pt-8 bg-gray-900 text-gray-100">
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="grid md:grid-cols-2 gap-6">
             {renderInputField('Course Title', 'title', 'text', 'Enter course title')}
