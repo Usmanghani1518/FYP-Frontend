@@ -22,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { backendRequest } from "@/Helper/backendRequest";
 import { notifyResponse } from "@/Helper/notify";
+import { useNavigate } from "react-router-dom";
 
 // Define types for the data
 interface Course {
@@ -53,7 +54,7 @@ function StudentPage() {
   const [isRecommendedFetched, setIsRecommendedFetched] = useState(false);
   const [isCertificatesFetched, setIsCertificatesFetched] = useState(false);
   const [tabLoading, setTabLoading] = useState(false);
-
+  const navigate = useNavigate()
   useEffect(() => {
     fetchInitialData();
   }, []);
@@ -80,7 +81,7 @@ function StudentPage() {
   };
 
   const fetchRecommendedCourses = async () => {
-    if (isRecommendedFetched) return; // Skip if already fetched
+    if (isRecommendedFetched) return; 
     setTabLoading(true);
     try {
       const recommendedRes = await backendRequest("GET", "/student/recommended-courses");
@@ -124,14 +125,19 @@ function StudentPage() {
   if (loading) {
     return <div>Loading...</div>;
   }
-
+  const handleDetail = (id: string) => {
+    navigate(`/student/course/${id}`);
+  };
+  const handleResume = (id: string) => {
+    navigate(`/student/course-resume/${id}`);
+  };
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-custom_primary text-white py-3 rounded-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-xl font-bold">Welcome back, Alex!</h1>
+              <h1 className="text-xl font-bold">Welcome back</h1>
               <p className="text-purple-200">Continue your learning journey</p>
             </div>
             <div className="flex items-center space-x-4">
@@ -170,24 +176,12 @@ function StudentPage() {
               </div>
               <div>
                 <p className="text-purple-100">Completed Courses</p>
-                <h3 className="text-2xl font-bold">7</h3>
+                <h3 className="text-2xl font-bold">0</h3>
                 <p className="text-sm text-purple-100">Keep going!</p>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-r from-green-500 to-green-700 text-white">
-            <CardContent className="flex items-center p-6">
-              <div className="rounded-full bg-white/20 p-3 mr-4">
-                <Award className="h-8 w-8" />
-              </div>
-              <div>
-                <p className="text-green-100">Achievements</p>
-                <h3 className="text-2xl font-bold">12</h3>
-                <p className="text-sm text-green-100">2 new this month</p>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Continue Learning Section */}
@@ -216,22 +210,12 @@ function StudentPage() {
                 </div>
                 <CardContent className="p-5">
                   <h3 className="font-bold text-lg mb-1 line-clamp-1">{course.title}</h3>
-                  <p className="text-gray-600 text-sm mb-3">{course.teacher?.name || "Unknown Instructor"}</p>
+                  <p className="text-gray-600 text-sm mb-3">Instructor : <span className="text-purple-800 font-semibold">{course.teacher?.name || "Unknown Instructor"}</span></p>
                   
-                  <div className="mb-3">
-                    <div className="flex justify-between text-sm text-gray-600 mb-1">
-                      <span>Progress: 45%</span>
-                      <span>5h 30m remaining</span>
-                    </div>
-                    {/* <Progress value={45} className="h-2 bg-gray-200" /> */}
-                  </div>
-                  
+                 
                   <div className="flex justify-between items-center text-sm">
-                    <div className="flex items-center text-gray-600">
-                      <Clock className="h-4 w-4 mr-1" />
-                      <span>Last accessed: 2 days ago</span>
-                    </div>
                     <Button 
+                    onClick = {()=> handleResume(course._id)}
                       variant="ghost" 
                       size="sm" 
                       className="text-purple-700 hover:text-purple-900 p-0"
@@ -249,7 +233,7 @@ function StudentPage() {
         {/* Top Courses Section */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold">Top Courses</h2>
+            <h2 className="text-2xl font-bold">Top Coursesss</h2>
             <Button variant="outline" size="sm">
               View all courses
             </Button>
@@ -265,7 +249,7 @@ function StudentPage() {
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                    <Button className="bg-white text-purple-900 hover:bg-gray-100">
+                    <Button onClick = {()=> handleDetail(course._id)} className="bg-white text-purple-900 hover:bg-gray-100">
                       Enroll Now
                     </Button>
                   </div>
@@ -292,7 +276,7 @@ function StudentPage() {
                   
                   <div className="flex justify-between items-center">
                     <span className="font-bold">${course.price}</span>
-                    <Button size="sm">Enroll Now</Button>
+                    <Button onClick = {()=> handleDetail(course._id)} size="sm">Enroll Now</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -369,49 +353,61 @@ function StudentPage() {
           </TabsContent>
           
           <TabsContent value="recommended" className="mt-0">
-            {tabLoading ? (
-              <div>Loading recommended courses...</div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {recommendedCourses.map((course) => (
-                  <Card key={course._id} className="overflow-hidden hover:shadow-md transition-shadow">
-                    <div className="relative">
-                      <img 
-                        src={course.thumbnail} 
-                        alt={course.title} 
-                        className="w-full h-40 object-cover"
-                      />
-                    </div>
-                    <CardContent className="p-5">
-                      <h3 className="font-bold text-lg mb-2 line-clamp-2">{course.title}</h3>
-                      <p className="text-gray-600 text-sm mb-3">{course.teacher?.name || "Unknown Instructor"}</p>
-                      
-                      <div className="flex items-center gap-1 mb-3">
-                        <span className="font-bold">{course.rating || 4.5}</span>
-                        <div className="flex">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`h-4 w-4 ${
-                                i < Math.floor(course.rating || 4.5)
-                                  ? "fill-yellow-400 text-yellow-400"
-                                  : "fill-gray-300 text-gray-300"
-                              }`}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <div className="flex justify-between items-center">
-                        <span className="font-bold">${course.price}</span>
-                        <Button size="sm">Enroll Now</Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+  {tabLoading ? (
+    <div className="flex justify-center items-center h-40">
+      <div>Loading recommended courses...</div>
+    </div>
+  ) : (
+    recommendedCourses.length > 0 ? (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {recommendedCourses.map((course) => (
+          <Card key={course._id} className="overflow-hidden hover:shadow-md transition-shadow">
+            <div className="relative">
+              <img 
+                src={course.thumbnail} 
+                alt={course.title} 
+                className="w-full h-40 object-cover"
+              />
+            </div>
+            <CardContent className="p-5">
+              <h3 className="font-bold text-lg mb-2 line-clamp-2">{course.title}</h3>
+              <p className="text-gray-600 text-sm mb-3">{course.teacher?.name || "Unknown Instructor"}</p>
+              
+              <div className="flex items-center gap-1 mb-3">
+                <span className="font-bold">{course.rating || 4.5}</span>
+                <div className="flex">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`h-4 w-4 ${
+                        i < Math.floor(course.rating || 4.5)
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "fill-gray-300 text-gray-300"
+                      }`}
+                    />
+                  ))}
+                </div>
               </div>
-            )}
-          </TabsContent>
+              
+              <div className="flex justify-between items-center">
+                <span className="font-bold">${course.price}</span>
+                <Button size="sm">Enroll Now</Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    ) : (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <BookOpen className="h-12 w-12 text-gray-400 mb-4" />
+        <h3 className="text-lg font-medium text-gray-900 mb-2">No Recommended Courses</h3>
+        <p className="text-gray-500 max-w-md">
+          We couldn't find any courses to recommend at this time. Check back later!
+        </p>
+      </div>
+    )
+  )}
+</TabsContent>
           
           <TabsContent value="certificates" className="mt-0">
             {tabLoading ? (

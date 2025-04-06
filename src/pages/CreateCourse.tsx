@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { backendRequest } from '@/Helper/backendRequest';
 import { notifyResponse } from '@/Helper/notify';
+import { useNavigate } from 'react-router-dom';
 
 interface FormErrors {
   [key: string]: string;
@@ -34,7 +35,7 @@ const CreateCourse: React.FC = () => {
 
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
-
+  const navigate = useNavigate()
   // Validate the entire form
   const validateForm = () => {
     const newErrors: FormErrors = {};
@@ -130,6 +131,14 @@ const CreateCourse: React.FC = () => {
         const response = await backendRequest('POST',"/course/create",formDataToSend,  {},
           true);
 
+
+       
+        console.log('Response:', response);
+        notifyResponse(response)
+        if(response.success){
+          navigate("/teacher/all-courses")
+        }
+
           if (response.success){
             setFormData({
              title: '',
@@ -147,6 +156,7 @@ const CreateCourse: React.FC = () => {
             
            notifyResponse(response)
        }
+
       } catch (error) {
         console.error('Error:', error);
       }finally{
