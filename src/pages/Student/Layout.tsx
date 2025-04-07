@@ -85,12 +85,12 @@ function StudentLayout() {
                 <NavLink to="/student/profile" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center">
                   <TbUser className="mr-2" /> My Profile
                 </NavLink>
-                <NavLink to="/courses" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center">
+                <NavLink to="/student/courses" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center">
                   <TbBook className="mr-2" /> Courses
                 </NavLink>
-                <NavLink to="/settings" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center">
+                {/* <NavLink to="/settings" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center">
                   <TbSettings className="mr-2" /> Settings
-                </NavLink>
+                </NavLink> */}
                 <button
                   onClick={logout}
                   className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center"

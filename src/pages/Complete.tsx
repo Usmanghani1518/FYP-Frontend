@@ -75,10 +75,7 @@ const CoursesPage = () => {
 
   // Fetch courses (mock data for now)
   useEffect(() => {
-    // This would be your API call in a real application
-  
-    
-    // setCourses(fetchedCourses);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     handleFetchCourses()
     
   }, []);
@@ -393,21 +390,7 @@ const CoursesPage = () => {
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end opacity-0 group-hover:opacity-100 transition-opacity">
-                      {/* <div className="p-4 w-full flex justify-between items-center">
-                        <button 
-                          onClick={() => handleDetail(course._id)} 
-                          className="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg font-medium transition-colors"
-                        >
-                          Enroll Now
-                        </button>
-                        <button 
-                          onClick={() => addToCart(course)}
-                          disabled={isInCart(course._id)}
-                          className="bg-white hover:bg-gray-100 text-purple-700 p-2 rounded-full shadow-md transition-colors"
-                        >
-                          <ShoppingCart size={20} />
-                        </button>
-                      </div> */}
+                      
                     </div>
                   </div>
                   <div className="p-5">
