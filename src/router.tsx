@@ -100,6 +100,10 @@ import { DiscussionBoard } from "./pages/Discussion";
           element: <ResumeCourse />
         },
         {
+          path: "courses",
+          element: <CoursesPage />
+        },
+        {
           path: "cahtbot",
           element:  <SocketProvider>
           <DiscussionBoard  courseId="67e1aba26ce0cbc0e3397a97" isTeacher/>

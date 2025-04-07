@@ -22,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { backendRequest } from "@/Helper/backendRequest";
 import { notifyResponse } from "@/Helper/notify";
+import { useNavigate } from "react-router-dom";
 
 // Define types for the data
 interface Course {
@@ -163,7 +164,7 @@ console.log("enrolledCourses",enrolledCourses)
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold">Continue Learning</h2>
-            <Button variant="outline" size="sm">
+            <Button onClick={()=>navigate("/student/courses")} variant="outline" size="sm">
               View all courses
             </Button>
           </div>
@@ -213,7 +214,7 @@ console.log("enrolledCourses",enrolledCourses)
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold">Top Courses</h2>
-            <Button variant="outline" size="sm">
+            <Button onClick={()=>navigate("/student/courses")} variant="outline" size="sm">
               View all courses
             </Button>
           </div>
