@@ -78,7 +78,7 @@ const CartPage = () => {
                     />
                     <div className="flex-1">
                       <h3 className="font-semibold text-lg text-gray-900">{course.title}</h3>
-                      <p className="text-gray-600 text-sm">Instructor: {course.teacher.name}</p>
+                      <p className="text-gray-600 text-sm"> {course.description}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-6 w-full sm:w-auto">

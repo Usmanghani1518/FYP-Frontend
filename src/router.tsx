@@ -27,6 +27,9 @@ import {
   import CartPage from "./pages/Cart";
   import ViewCourses from "./pages/Student/ViewCourse";
   import ResumeCourse from "./pages/ResumeCourse";
+import CoursesPage from "./pages/Complete";
+import { SocketProvider } from "./redux/SocketContext";
+import { DiscussionBoard } from "./pages/Discussion";
   
   export const router = createBrowserRouter([
     {
@@ -45,6 +48,14 @@ import {
         {
           path: "login-teacher",
           element: <RoleChecker allowedRoles={[]} allowedUser="not-logged-in"><Teacher /></RoleChecker>
+        },
+        {
+          path: "courses",
+          element: <RoleChecker allowedRoles={[]} allowedUser="not-logged-in"><CoursesPage /></RoleChecker>
+        },
+        {
+          path: "course/:courseId",
+          element: <CourseDetail />
         },
       ],
     },
@@ -88,6 +99,12 @@ import {
           path: "course-resume/:courseId",
           element: <ResumeCourse />
         },
+        {
+          path: "cahtbot",
+          element:  <SocketProvider>
+          <DiscussionBoard  courseId="67e1aba26ce0cbc0e3397a97" isTeacher/>
+        </SocketProvider>,
+        },
       ]
     },
     
@@ -124,6 +141,12 @@ import {
       path: "/login",
       element: <RoleChecker allowedRoles={[]} allowedUser="not-logged-in"><LoginPage /></RoleChecker>,
     },
+    // {
+    //   path: "/cahtbot",
+    //   element: <RoleChecker allowedRoles={[]} allowedUser="not-logged-in"> <SocketProvider>
+    //   <DiscussionBoard  courseId="67e1aba26ce0cbc0e3397a97" isTeacher/>
+    // </SocketProvider></RoleChecker>,
+    // },
     {
       path: "/signup",
       element: <RoleChecker allowedRoles={[]} allowedUser="not-logged-in"><SignupPage /></RoleChecker>,

@@ -9,6 +9,7 @@ import { useCart } from '@/redux/app.hooks';
 export default function Header() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSearchActive, setIsSearchActive] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const { totalItems } = useCart();
   const navigate = useNavigate();
 
@@ -19,6 +20,17 @@ export default function Header() {
       document.body.style.overflow = 'unset';
     }
   }, [isSidebarOpen]);
+
+  const hanldeSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Escape') {
+      setIsSearchActive(false);
+    }
+    if(searchQuery.trim() === "") return;
+    if (e.key === 'Enter') {
+      navigate(`/courses?search=${encodeURIComponent(searchQuery.trim())}`);
+      setIsSearchActive(false);
+    }
+  }
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
@@ -60,6 +72,10 @@ export default function Header() {
           <div className="absolute inset-x-0 top-0 bg-white p-2 md:hidden">
             <div className="relative flex">
               <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={hanldeSearch }
+
                 type="search"
                 placeholder="Search for anything"
                 className="w-full shadow-none pl-10 pr-10 py-2 rounded-3xl border border-b-2 outline-none"
@@ -82,7 +98,7 @@ export default function Header() {
           <nav>
             <ul className="flex space-x-4">
               <li>
-                <Link to="#" className="text-sm hover:text-custom_primary">
+                <Link to="/courses" className="text-sm hover:text-custom_primary">
                   Categories
                 </Link>
               </li>
@@ -92,6 +108,9 @@ export default function Header() {
         <div className="flex-grow mx-4 hidden md:block">
           <div className="relative">
             <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={hanldeSearch }
               type="search"
               placeholder="Search for anything"
               className="w-full pl-10 pr-4 py-2 rounded-3xl border border-black"
@@ -142,6 +161,9 @@ export default function Header() {
           </div>
           <div className="p-4 space-y-4">
             <Input
+             value={searchQuery}
+             onChange={(e) => setSearchQuery(e.target.value)}
+             onKeyDown={hanldeSearch }
               type="search"
               placeholder="Search for anything"
               className="w-full pl-10 pr-4 py-2 rounded-3xl border border-black"
@@ -149,7 +171,7 @@ export default function Header() {
             <nav>
               <ul className="space-y-2">
                 <li>
-                  <Link to="#" className="block py-2 hover:text-custom_primary rounded">
+                  <Link to="/courses" className="block py-2 hover:text-custom_primary rounded">
                     Categories
                   </Link>
                 </li>

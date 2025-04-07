@@ -152,7 +152,6 @@ export const RoleChecker = ({ allowedRoles, children, allowedUser, isHomePage = 
     return isAuthenticated ? <Navigate to="/" replace /> : <>{children}</>;
   }
 
-  // Handle protected routes - redirect to login if not authenticated
   if (!isHomePage && !isAuthenticated) {
     return <Navigate to="/login" replace />;
   }

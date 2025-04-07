@@ -76,10 +76,17 @@ interface CourseData {
   };
 }
 
+interface Response {
+  success: boolean;
+  url: string;
+}
+
 function CourseDetailPage() {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const [courseData, setCourseData] = useState<CourseData | null>(null);
+  // const [checkOutLoading, setCheckOutLoading] = useState(false);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentVideo, setCurrentVideo] = useState<string | null>(null);
@@ -232,6 +239,7 @@ function CourseDetailPage() {
     return (distribution[rating as keyof RatingDistribution] / totalReviews) * 100;
   };
 
+
   // Format date for reviews
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -251,6 +259,21 @@ function CourseDetailPage() {
         </div>
       </div>
     );
+  }
+
+  const handleCheckout = async () => {
+    setLoading(true);
+    try {
+      const response = await backendRequest<Response>("POST", "/course/purchase", { courseIds: [courseId] });
+           if (response.success){
+             window.location.href = response.url; 
+           }
+    } catch (error) {
+      console.log("error is this ",error)
+    }finally{
+      console.log("muniii")
+      setLoading(false)
+    }
   }
 
   if (error) {
@@ -665,8 +688,9 @@ function CourseDetailPage() {
                 </span>
               </div>
               <button
+              // disabled={checkOutLoading}
                 className="w-full bg-custom_primary hover:bg-custom_primary_hover text-white py-3 px-6 rounded-lg font-semibold text-lg mb-4 transition-colors flex items-center justify-center gap-2"
-                onClick={() => alert('Purchase functionality would go here')}
+                onClick={handleCheckout}
               >
                 <ShoppingCart className="w-5 h-5" />
                 Purchase Course

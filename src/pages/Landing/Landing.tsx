@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { backendRequest } from "@/Helper/backendRequest";
 import { useCart } from "@/redux/app.hooks";
 import { Course } from "@/redux/slices/cart.slice";
+import { useNavigate } from "react-router-dom";
 
 interface Response {
   success: boolean;
@@ -18,6 +19,7 @@ function App() {
  
   const [courses, setCourses] = useState<Course[]>([])
   const { addToCart, isInCart } = useCart();
+  const navigate = useNavigate()
   
   const fetchCourse = async () => { 
     try {
@@ -207,7 +209,7 @@ function App() {
                     Most popular courses among our students
                   </p>
                 </div>
-                <TrendingUp className="w-8 h-8 text-primary" />
+                <TrendingUp onClick={()=>navigate("/courses")} className="w-8 h-8 text-primary cursor-pointer" />
               </div>
 
               <div className="grid md:grid-cols-3 gap-8">

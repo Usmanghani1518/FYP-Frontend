@@ -391,7 +391,7 @@ function StudentPage() {
               
               <div className="flex justify-between items-center">
                 <span className="font-bold">${course.price}</span>
-                <Button size="sm">Enroll Now</Button>
+                <Button onClick = {()=> handleDetail(course._id)} size="sm">Enroll Now</Button>
               </div>
             </CardContent>
           </Card>

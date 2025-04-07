@@ -212,6 +212,8 @@ function ResumeCourse() {
       if (response.success) {
         setIsEditingReview(false);
         notifyResponse(response)
+        setReviewRating(5);
+        setReviewComment('');
         await Promise.all([fetchReviews(), fetchRatingDetails()]);
       }
     } catch (error) {
