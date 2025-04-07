@@ -246,7 +246,7 @@ function DashboardLayout() {
             <div className="p-4 h-full flex flex-col">
               {/* Header with close/collapse button */}
               <div className={`mb-6 flex ${isCollapsed ? 'justify-center' : 'justify-between items-center'}`}>
-                {!isCollapsed && <div className="w-10 h-10 bg-indigo-600 rounded-full"></div>}
+                {!isCollapsed && <div className=" text-xl text-purple-600 font-semibold rounded-full">Teacher Dashboard</div>}
                 <button
                   onClick={toggleSidebar}
                   className="p-1 rounded-md hover:bg-gray-600 text-gray-300"

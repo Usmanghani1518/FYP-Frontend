@@ -261,7 +261,7 @@ function ResumeCourse() {
   return (
     <div className="min-h-screen text-white bg-gray-50">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 py-12">
+      <div className="bg-gradient-to-r from-custom_primary to-blue-800 py-12">
         <div className="container mx-auto px-4 lg:px-8">
           <h1 className="text-4xl font-bold mb-4">{courseData.title}</h1>
           <div className="flex flex-wrap items-center gap-6 text-sm">
@@ -397,7 +397,7 @@ function ResumeCourse() {
                       </div>
                       <button 
                         onClick={handleEditReview}
-                        className="text-blue-600 hover:text-blue-800 flex items-center"
+                        className="text-custom_primary hover:text-blue-800 flex items-center"
                       >
                         <Edit className="w-4 h-4 mr-1" />
                         Edit Review
@@ -512,7 +512,7 @@ function ResumeCourse() {
                           onClick={() => setReviewsPage(page)}
                           className={`w-8 h-8 rounded-full flex items-center justify-center ${
                             reviewsPage === page
-                              ? 'bg-blue-600 text-white'
+                              ? 'bg-custom_primary text-white'
                               : 'text-gray-700 hover:bg-gray-100'
                           }`}
                         >
@@ -527,7 +527,7 @@ function ResumeCourse() {
                       className={`flex items-center px-3 py-1 rounded ${
                         reviewsPage === reviewsTotalPages 
                           ? 'text-gray-400 cursor-not-allowed' 
-                          : 'text-blue-600 hover:bg-blue-50'
+                          : 'text-custom_primary hover:bg-blue-50'
                       }`}
                     >
                       Next
@@ -586,7 +586,7 @@ function ResumeCourse() {
                 <div className="flex items-center text-sm text-gray-600">
                   <div className="flex-1 bg-gray-200 rounded-full h-2">
                     <div 
-                      className="bg-blue-600 h-2 rounded-full" 
+                      className="bg-custom_primary h-2 rounded-full" 
                       style={{ width: `${courseData.progress.percentage}%` }}
                     ></div>
                   </div>
@@ -614,7 +614,7 @@ function ResumeCourse() {
                             ) : lecture.completed ? (
                               <CheckCircle className="w-4 h-4 text-green-500" />
                             ) : currentVideo === lecture.videoUrl ? (
-                              <Play className="w-4 h-4 text-blue-600" />
+                              <Play className="w-4 h-4 text-custom_primary" />
                             ) : (
                               <PlayCircle className="w-4 h-4 text-gray-600" />
                             )}

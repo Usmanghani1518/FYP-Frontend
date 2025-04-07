@@ -29,7 +29,7 @@ interface Course {
   _id: string;
   title: string;
   description: string;
-  teacher?: { name: string };
+  teacher?: string;
   level: string;
   thumbnail: string;
   price: number;
@@ -210,7 +210,7 @@ function StudentPage() {
                 </div>
                 <CardContent className="p-5">
                   <h3 className="font-bold text-lg mb-1 line-clamp-1">{course.title}</h3>
-                  <p className="text-gray-600 text-sm mb-3">Instructor : <span className="text-purple-800 font-semibold">{course.teacher?.name || "Unknown Instructor"}</span></p>
+                  <p className="text-gray-600 text-sm mb-3">Instructor : <span className="text-purple-800 font-semibold">{course.teacher || "Unknown Instructor"}</span></p>
                   
                  
                   <div className="flex justify-between items-center text-sm">
@@ -233,7 +233,7 @@ function StudentPage() {
         {/* Top Courses Section */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold">Top Coursesss</h2>
+            <h2 className="text-2xl font-bold">Top Courses</h2>
             <Button variant="outline" size="sm">
               View all courses
             </Button>
@@ -242,7 +242,7 @@ function StudentPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {topCourses.map((course) => (
               <Card key={course._id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="relative h-40">
+                <div className="relative h-50">
                   <img 
                     src={course.thumbnail} 
                     alt={course.title} 
@@ -256,7 +256,7 @@ function StudentPage() {
                 </div>
                 <CardContent className="p-5">
                   <h3 className="font-bold text-lg mb-1 line-clamp-1">{course.title}</h3>
-                  <p className="text-gray-600 text-sm mb-3">{course.teacher?.name || "Unknown Instructor"}</p>
+                  <p className="text-gray-600 text-sm mb-3">{course.teacher || "Unknown Instructor"}</p>
                   
                   <div className="flex items-center gap-1 mb-3">
                     <span className="font-bold">{course.averageRating || 0.0}</span>
@@ -331,7 +331,7 @@ function StudentPage() {
                 <Card key={course._id} className="hover:shadow-md transition-shadow">
                   <CardContent className="p-5">
                     <h3 className="font-bold text-lg mb-2">{course.title}</h3>
-                    <p className="text-gray-600 text-sm mb-4">{course.teacher?.name || ""}</p>
+                    <p className="text-gray-600 text-sm mb-4">{course.teacher || ""}</p>
                     
                     <div className="mb-4">
                       <div className="flex justify-between text-sm text-gray-600 mb-1">
@@ -371,7 +371,7 @@ function StudentPage() {
             </div>
             <CardContent className="p-5">
               <h3 className="font-bold text-lg mb-2 line-clamp-2">{course.title}</h3>
-              <p className="text-gray-600 text-sm mb-3">{course.teacher?.name || "Unknown Instructor"}</p>
+              <p className="text-gray-600 text-sm mb-3">{course.teacher || "Unknown Instructor"}</p>
               
               <div className="flex items-center gap-1 mb-3">
                 <span className="font-bold">{course.averageRating || 0}</span>
