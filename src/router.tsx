@@ -28,8 +28,8 @@ import {
   import ViewCourses from "./pages/Student/ViewCourse";
   import ResumeCourse from "./pages/ResumeCourse";
 import CoursesPage from "./pages/Complete";
-import { SocketProvider } from "./redux/SocketContext";
-import { DiscussionBoard } from "./pages/Discussion";
+// import { SocketProvider } from "./redux/SocketContext";
+// import { DiscussionBoard } from "./pages/Discussion";
   
   export const router = createBrowserRouter([
     {
@@ -103,12 +103,12 @@ import { DiscussionBoard } from "./pages/Discussion";
           path: "courses",
           element: <CoursesPage />
         },
-        {
-          path: "cahtbot",
-          element:  <SocketProvider>
-          <DiscussionBoard  courseId="67e1aba26ce0cbc0e3397a97" isTeacher/>
-        </SocketProvider>,
-        },
+        // {
+        //   path: "cahtbot",
+        //   element:  <SocketProvider>
+        //   <DiscussionBoard  courseId="67e1aba26ce0cbc0e3397a97" isTeacher/>
+        // </SocketProvider>,
+        // },
       ]
     },
     

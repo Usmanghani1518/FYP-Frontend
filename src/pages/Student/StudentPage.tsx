@@ -29,7 +29,7 @@ interface Course {
   _id: string;
   title: string;
   description: string;
-  teacher?: string;
+  teacher?: {name:string};
   level: string;
   thumbnail: string;
   price: number;
@@ -210,7 +210,7 @@ function StudentPage() {
                 </div>
                 <CardContent className="p-5">
                   <h3 className="font-bold text-lg mb-1 line-clamp-1">{course.title}</h3>
-                  <p className="text-gray-600 text-sm mb-3">Instructor : <span className="text-purple-800 font-semibold">{course.teacher || "Unknown Instructor"}</span></p>
+                  <p className="text-gray-600 text-sm mb-3">Instructor : <span className="text-purple-800 font-semibold">{course.teacher.name || "Unknown Instructor"}</span></p>
                   
                  
                   <div className="flex justify-between items-center text-sm">
@@ -256,7 +256,7 @@ function StudentPage() {
                 </div>
                 <CardContent className="p-5">
                   <h3 className="font-bold text-lg mb-1 line-clamp-1">{course.title}</h3>
-                  <p className="text-gray-600 text-sm mb-3">{course.teacher || "Unknown Instructor"}</p>
+                  <p className="text-gray-600 text-sm mb-3">{course.teacher.name || "Unknown Instructor"}</p>
                   
                   <div className="flex items-center gap-1 mb-3">
                     <span className="font-bold">{course.averageRating || 0.0}</span>
@@ -331,7 +331,7 @@ function StudentPage() {
                 <Card key={course._id} className="hover:shadow-md transition-shadow">
                   <CardContent className="p-5">
                     <h3 className="font-bold text-lg mb-2">{course.title}</h3>
-                    <p className="text-gray-600 text-sm mb-4">{course.teacher || ""}</p>
+                    <p className="text-gray-600 text-sm mb-4">{course.teacher.name || ""}</p>
                     
                     <div className="mb-4">
                       <div className="flex justify-between text-sm text-gray-600 mb-1">
@@ -371,7 +371,7 @@ function StudentPage() {
             </div>
             <CardContent className="p-5">
               <h3 className="font-bold text-lg mb-2 line-clamp-2">{course.title}</h3>
-              <p className="text-gray-600 text-sm mb-3">{course.teacher || "Unknown Instructor"}</p>
+              <p className="text-gray-600 text-sm mb-3">{course.teacher.name || "John Henry"}</p>
               
               <div className="flex items-center gap-1 mb-3">
                 <span className="font-bold">{course.averageRating || 0}</span>
