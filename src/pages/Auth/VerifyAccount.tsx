@@ -33,7 +33,7 @@ const VerifyAccount = ({email}:{email:string}) => {
         // setUserToken(response)
         if (response.success){
           notifyResponse(response);
-          navigate("/login");
+          navigate("/");
         }else{
           notifyResponse(response);
         }

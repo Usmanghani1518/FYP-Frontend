@@ -694,7 +694,6 @@ const CreateCourse: React.FC = () => {
             videoDescriptions: [],
           });
           setThumbnailPreview(null);
-          notifyResponse(response);
         }
       } catch (error) {
         console.error('Error:', error);
