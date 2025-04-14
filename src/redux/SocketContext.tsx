@@ -21,7 +21,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     // Connect to your backend URL
     const socketInstance = io( 'http://localhost:5000');
 
-    socketInstance.on('connect', () => {
+    socketInstance.on('connection', () => {
       setIsConnected(true);
     });
 

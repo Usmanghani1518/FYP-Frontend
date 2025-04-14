@@ -105,9 +105,8 @@ import { DiscussionBoard } from "./pages/Discussion";
         },
         {
           path: "cahtbot",
-          element:  <SocketProvider>
-          <DiscussionBoard  courseId="67e1aba26ce0cbc0e3397a97" isTeacher/>
-        </SocketProvider>,
+          element: 
+          <DiscussionBoard  courseId="67e1aba26ce0cbc0e3397a97" isTeacher={false}/>
         },
       ]
     },
