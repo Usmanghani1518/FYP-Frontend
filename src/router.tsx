@@ -28,6 +28,7 @@ import {
   import ViewCourses from "./pages/Student/ViewCourse";
   import ResumeCourse from "./pages/ResumeCourse";
 import CoursesPage from "./pages/Complete";
+import { TeacherSettings } from "./pages/Teacher/Settings";
 // import { SocketProvider } from "./redux/SocketContext";
 // import { DiscussionBoard } from "./pages/Discussion";
   
@@ -134,6 +135,10 @@ import CoursesPage from "./pages/Complete";
           path: "course-cart",
           element: <CartPage />
         },
+        {
+          path: "settings",
+          element: <TeacherSettings  />
+        },
       ]
     },
     
@@ -188,6 +193,10 @@ import CoursesPage from "./pages/Complete";
           path: "purchases",
           element: <ViewPurchaseCourse />
         },
+        // {
+        //   path: "settings",
+        //   element: < />
+        // },
       ]
     },
     

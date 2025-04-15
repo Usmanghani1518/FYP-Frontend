@@ -32,6 +32,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { backendRequest } from "@/Helper/backendRequest";
 import { notifyResponse } from "@/Helper/notify";
+import VerifyCode from "@/pages/Auth/VerifyCode";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -50,6 +51,7 @@ const formSchema = z.object({
 const Teacher = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -103,6 +105,8 @@ const Teacher = () => {
   };
 
   return (
+    <>
+    {isVerified ? <VerifyCode  email={"muniii"}  />:
     <div className="bg-slate-100 min-h-screen relative flex items-center">
       <div className="container mx-auto px-12 xl:px-20 py-12">
         <div className="grid md:grid-cols-2 gap-8 items-center">
@@ -290,6 +294,8 @@ const Teacher = () => {
         </div>
       </div>
     </div>
+     }
+    </>
   );
 };
 

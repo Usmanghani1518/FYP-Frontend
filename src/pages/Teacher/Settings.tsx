@@ -1,280 +1,370 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/components/ui/use-toast";
-import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Plus, Trash } from "lucide-react";
+import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Save, Briefcase, Link, Trash2, Edit, User, Mail } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { notifyResponse } from '@/Helper/notify';
 
-// Form validation schema
-const profileFormSchema = z.object({
-  headline: z.string().min(5, {
-    message: "Headline must be at least 5 characters.",
-  }),
-  bio: z.string().max(500).optional(),
-  experience: z.enum(["beginner", "intermediate", "professional"]),
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  profilePicture?: string;
+}
+
+interface SocialAccount {
+  platform: 'facebook' | 'twitter' | 'linkedin';
+  url: string;
+}
+
+interface Teacher {
+  _id: string;
+  user: User;
+  bio?: string;
+  headline: string;
+  experience: 'beginner' | 'intermediate' | 'advanced';
+  socialAccounts?: SocialAccount[];
+}
+
+const teacherSchema = z.object({
+  bio: z.string().max(500, "Bio must be less than 500 characters").optional(),
+  headline: z.string().min(10, "Headline must be at least 10 characters"),
+  experience: z.enum(["beginner", "intermediate", "advanced"]),
   socialAccounts: z.array(
     z.object({
       platform: z.enum(["facebook", "twitter", "linkedin"]),
-      url: z.string().url({ message: "Please enter a valid URL." }),
+      url: z.string().url("Invalid URL")
     })
-  ),
+  ).optional()
 });
 
-type ProfileFormValues = z.infer<typeof profileFormSchema>;
+type TeacherFormData = z.infer<typeof teacherSchema>;
 
-export default function TeacherSettingsPage() {
-  // Mock data - in a real app, this would come from your API
-  const defaultValues: Partial<ProfileFormValues> = {
-    headline: "Mathematics Professor with 10+ years of experience",
-    bio: "Passionate about making complex mathematical concepts accessible to all students.",
-    experience: "professional",
-    socialAccounts: [
-      {
-        platform: "linkedin",
-        url: "https://linkedin.com/in/example",
-      },
-    ],
+export const TeacherSettings = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
+  const [socialAccounts, setSocialAccounts] = useState<SocialAccount[]>([]);
+  const [isEditingUser, setIsEditingUser] = useState(false);
+  const [userData, setUserData] = useState<User>({
+    _id: '',
+    name: '',
+    email: '',
+    profilePicture: undefined
+  });
+  const [teacherData, setTeacherData] = useState<Teacher | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+    setValue,
+    watch
+  } = useForm<TeacherFormData>({
+    resolver: zodResolver(teacherSchema),
+    defaultValues: {
+      bio: '',
+      headline: '',
+      experience: 'beginner',
+      socialAccounts: []
+    }
+  });
+
+  useEffect(() => {
+    const fetchTeacherData = async () => {
+      try {
+        setIsFetching(true);
+        const response = await fetch('/api/teacher/settings');
+        const data = await response.json();
+        if (response.ok) {
+          setTeacherData(data);
+          setUserData(data.user);
+          setSocialAccounts(data.socialAccounts || []);
+          reset({
+            bio: data.bio,
+            headline: data.headline,
+            experience: data.experience,
+            socialAccounts: data.socialAccounts || []
+          });
+        } else {
+          notifyResponse({ success: false, detail: "Failed to fetch teacher data" });
+        }
+      } catch (error) {
+        notifyResponse({ 
+          success: false, 
+          detail: "Network error occurred. Please try again." 
+        });
+      } finally {
+        setIsFetching(false);
+      }
+    };
+
+    fetchTeacherData();
+  }, [reset]);
+
+  const addSocialAccount = () => {
+    setSocialAccounts([...socialAccounts, { platform: 'facebook', url: '' }]);
   };
 
-  const form = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileFormSchema),
-    defaultValues,
-    mode: "onChange",
-  });
+  const removeSocialAccount = (index: number) => {
+    const updatedAccounts = [...socialAccounts];
+    updatedAccounts.splice(index, 1);
+    setSocialAccounts(updatedAccounts);
+    setValue('socialAccounts', updatedAccounts);
+  };
 
-  const { fields, append, remove } = useFieldArray({
-    name: "socialAccounts",
-    control: form.control,
-  });
+  const updateSocialAccount = (index: number, field: 'platform' | 'url', value: string) => {
+    const updatedAccounts = [...socialAccounts];
+    updatedAccounts[index] = { ...updatedAccounts[index], [field]: value };
+    setSocialAccounts(updatedAccounts);
+    setValue('socialAccounts', updatedAccounts);
+  };
 
-  function onSubmit(data: ProfileFormValues) {
-    toast({
-      title: "Profile updated successfully",
-      description: "Your changes have been saved.",
-    });
-    console.log(data);
-    // Here you would typically call your API to update the teacher profile
+  const handleUserUpdate = () => {
+    // Here you would typically make an API call to update user data
+    setIsEditingUser(false);
+    notifyResponse({ success: true, detail: "User information updated successfully" });
+  };
+
+  const onSubmit = async (data: TeacherFormData) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/teacher/settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      });
+      const result = await response.json();
+      notifyResponse(result, "Teacher profile updated successfully", "Failed to update teacher profile");
+      if (result.success) {
+        setTeacherData(result.data);
+      }
+    } catch {
+      notifyResponse({ 
+        success: false, 
+        detail: "Network error occurred. Please try again." 
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isFetching) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 bg-gray-900 rounded-lg shadow-lg shadow-gray-800/50">
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6 p-4 md:p-6 max-w-4xl mx-auto">
-      <div>
-        <h3 className="text-lg font-medium">Teacher Profile</h3>
-        <p className="text-sm text-muted-foreground">
-          Update your public teacher profile information.
-        </p>
-      </div>
-      <Separator />
-
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Profile Picture Section */}
-        <div className="w-full md:w-1/3 space-y-4">
-          <div className="space-y-2">
-            <h4 className="font-medium">Profile Picture</h4>
-            <div className="flex items-center gap-4">
-              <Avatar className="h-24 w-24">
-                <AvatarImage src="/default-avatar.png" />
-                <AvatarFallback>TP</AvatarFallback>
-              </Avatar>
-              <div className="space-y-2">
-                <Button variant="outline" size="sm">
-                  Change
+    <div className="max-w-4xl mx-auto p-6 bg-gray-900 rounded-lg shadow-lg shadow-gray-800/50">
+      <div className="flex items-center gap-4 mb-8">
+        <Avatar className="h-16 w-16 border-2 border-purple-200 border-gray-700">
+          {userData.profilePicture ? (
+            <AvatarImage src={userData.profilePicture} />
+          ) : (
+            <AvatarFallback className="bg-purple-500 text-white text-2xl">
+              {userData.name.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          )}
+        </Avatar>
+        <div className="flex-1">
+          {isEditingUser ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4 text-gray-400" />
+                <Input
+                  value={userData.name}
+                  onChange={(e) => setUserData({...userData, name: e.target.value})}
+                  className="bg-gray-800"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-gray-400" />
+                <Input
+                  value={userData.email}
+                  onChange={(e) => setUserData({...userData, email: e.target.value})}
+                  className="bg-gray-800"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  onClick={handleUserUpdate}
+                  className="bg-purple-700 hover:bg-purple-800"
+                >
+                  Save
                 </Button>
-                <Button variant="ghost" size="sm" className="text-destructive">
-                  Remove
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={() => setIsEditingUser(false)}
+                >
+                  Cancel
                 </Button>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">
-              JPG, GIF or PNG. Max size of 2MB
-            </p>
-          </div>
+          ) : (
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-xl font-bold text-white">{userData.name}</h2>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-6 w-6 text-gray-400 hover:text-purple-400"
+                  onClick={() => setIsEditingUser(true)}
+                >
+                  <Edit className="h-3 w-3" />
+                </Button>
+              </div>
+              <p className="text-sm text-gray-400">{userData.email}</p>
+            </div>
+          )}
         </div>
+      </div>
 
-        {/* Form Section */}
-        <div className="w-full md:w-2/3">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="headline"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Headline</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Your professional headline"
-                        {...field}
-                        className="max-w-lg"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+      <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+        <Briefcase className="h-5 w-5 text-purple-400" />
+        Teacher Profile
+      </h2>
 
-              <FormField
-                control={form.control}
-                name="bio"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Bio</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Tell students about yourself and your teaching approach"
-                        className="resize-none max-w-lg"
-                        rows={5}
-                        {...field}
-                      />
-                    </FormControl>
-                    <div className="flex justify-between items-center">
-                      <FormMessage />
-                      <span className="text-xs text-muted-foreground">
-                        {field.value?.length || 0}/500 characters
-                      </span>
-                    </div>
-                  </FormItem>
-                )}
-              />
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="headline" className="block text-sm font-medium text-gray-300 mb-2">
+              Professional Headline
+            </Label>
+            <Input
+              id="headline"
+              {...register('headline')}
+              className={`mt-1 bg-gray-800 ${errors.headline ? 'border-red-500' : ''}`}
+              placeholder="e.g. Senior Web Developer & Educator"
+            />
+            {errors.headline?.message && (
+              <p className="mt-1 text-sm text-red-400">{errors.headline.message}</p>
+            )}
+          </div>
 
-              <FormField
-                control={form.control}
-                name="experience"
-                render={({ field }) => (
-                  <FormItem className="max-w-xs">
-                    <FormLabel>Experience Level</FormLabel>
+          <div>
+            <Label htmlFor="experience" className="block text-sm font-medium text-gray-300 mb-2">
+              Teaching Experience Level
+            </Label>
+            <Select
+              onValueChange={(value) => setValue('experience', value as "beginner" | "intermediate" | "advanced")}
+              defaultValue={teacherData?.experience || 'beginner'}
+            >
+              <SelectTrigger className="mt-1 bg-gray-800">
+                <SelectValue placeholder="Select experience level" />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-800">
+                <SelectItem value="beginner" className="hover:bg-gray-700">Beginner</SelectItem>
+                <SelectItem value="intermediate" className="hover:bg-gray-700">Intermediate</SelectItem>
+                <SelectItem value="advanced" className="hover:bg-gray-700">Advanced</SelectItem>
+              </SelectContent>
+            </Select>
+            {errors.experience?.message && (
+              <p className="mt-1 text-sm text-red-400">{errors.experience.message}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="bio" className="block text-sm font-medium text-gray-300 mb-2">
+              Bio
+            </Label>
+            <Textarea
+              id="bio"
+              {...register('bio')}
+              className={`mt-1 min-h-[120px] bg-gray-800 ${errors.bio ? 'border-red-500' : ''}`}
+              placeholder="Tell students about your background, expertise, and teaching style..."
+            />
+            <div className="flex justify-between mt-1">
+              <p className="text-xs text-red-400">
+                {errors.bio?.message}
+              </p>
+              <p className="text-xs text-gray-400">
+                {watch('bio')?.length || 0}/500 characters
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <Label className="text-sm font-medium text-gray-300">
+                Social Accounts
+              </Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addSocialAccount}
+                className="flex items-center gap-1"
+              >
+                <Link className="h-4 w-4" />
+                Add Account
+              </Button>
+            </div>
+            
+            {socialAccounts.length > 0 && (
+              <div className="space-y-3">
+                {socialAccounts.map((account, index) => (
+                  <div key={index} className="flex gap-2 items-center">
                     <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      value={account.platform}
+                      onValueChange={(value) => updateSocialAccount(index, 'platform', value)}
                     >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select your experience level" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="beginner">Beginner</SelectItem>
-                        <SelectItem value="intermediate">
-                          Intermediate
-                        </SelectItem>
-                        <SelectItem value="professional">
-                          Professional
-                        </SelectItem>
+                      <SelectTrigger className="w-32 bg-gray-800">
+                        <SelectValue placeholder="Platform" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-gray-800">
+                        <SelectItem value="facebook" className="hover:bg-gray-700">Facebook</SelectItem>
+                        <SelectItem value="twitter" className="hover:bg-gray-700">Twitter</SelectItem>
+                        <SelectItem value="linkedin" className="hover:bg-gray-700">LinkedIn</SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium">Social Accounts</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Add links to your professional social media profiles.
-                  </p>
-                </div>
-
-                {fields.map((field, index) => (
-                  <div key={field.id} className="flex gap-2 items-start">
-                    <FormField
-                      control={form.control}
-                      name={`socialAccounts.${index}.platform`}
-                      render={({ field }) => (
-                        <FormItem className="w-32">
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Platform" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="facebook">Facebook</SelectItem>
-                              <SelectItem value="twitter">Twitter</SelectItem>
-                              <SelectItem value="linkedin">LinkedIn</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                    <Input
+                      value={account.url}
+                      onChange={(e) => updateSocialAccount(index, 'url', e.target.value)}
+                      placeholder="Profile URL"
+                      className="flex-1 bg-gray-800"
                     />
-
-                    <FormField
-                      control={form.control}
-                      name={`socialAccounts.${index}.url`}
-                      render={({ field }) => (
-                        <FormItem className="flex-1">
-                          <FormControl>
-                            <Input
-                              placeholder="https://example.com/yourprofile"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      onClick={() => remove(index)}
-                      className="text-destructive"
+                      onClick={() => removeSocialAccount(index)}
+                      className="text-red-400 hover:text-red-500"
                     >
-                      <Trash className="h-4 w-4" />
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 ))}
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="mt-2"
-                  onClick={() => append({ platform: "facebook", url: "" })}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Social Account
-                </Button>
               </div>
-
-              <div className="flex justify-end gap-4">
-                <Button variant="outline" type="button">
-                  Cancel
-                </Button>
-                <Button type="submit">Save Changes</Button>
-              </div>
-            </form>
-          </Form>
+            )}
+          </div>
         </div>
-      </div>
+
+        <div className="flex justify-end gap-3">
+          <Button 
+            type="submit" 
+            className="gap-2 bg-purple-700 hover:bg-purple-800"
+            loading={isLoading}
+          >
+            <Save className="h-4 w-4" />
+            Save Teacher Profile
+          </Button>
+        </div>
+      </form>
     </div>
   );
-}
-
-function useFieldArray(arg0: { name: string; control: any; }) {
-    throw new Error("Function not implemented.");
-}
+};
