@@ -28,6 +28,7 @@ import {
   import ViewCourses from "./pages/Student/ViewCourse";
   import ResumeCourse from "./pages/ResumeCourse";
 import CoursesPage from "./pages/Complete";
+import QuizForm from "./components/teacher/QuizForm";
 // import { SocketProvider } from "./redux/SocketContext";
 // import { DiscussionBoard } from "./pages/Discussion";
   
@@ -129,6 +130,10 @@ import CoursesPage from "./pages/Complete";
         {
           path: "all-courses/:courseId",
           element: <CourseManagement />
+        },
+        {
+          path: "courses/:courseId/quizzes/new",
+          element: <QuizForm />
         },
         {
           path: "course-cart",

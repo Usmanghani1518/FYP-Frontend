@@ -10,7 +10,8 @@ import { notifyResponse } from '@/Helper/notify';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import QuizezList from './QuizezList';
 
 interface FormErrors {
   [key: string]: string;
@@ -77,14 +78,22 @@ const UpdateCourse: React.FC = () => {
 
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
+  const [quizzes, setQuizzes] = useState([]);
+  const [loading, setLoading] = useState(true);
   const params = useParams()
+    
+  
+  
   useEffect(() => {
     const fetchCourseData = async () => {
       setIsLoading(true);
       console.log("courseid is ",params.courseId)
       try {
         const response = await backendRequest<CourseFormData>('GET', `/course/${params.courseId}`);
-  
+        const quizez = await backendRequest("GET", `/quiz/courses/${params.courseId}/quizzes`)
+        if (quizez.success) {
+          setQuizzes(quizez.data);
+        }
         if (response.success) {
           const dummyData = response;
   
@@ -126,6 +135,7 @@ const UpdateCourse: React.FC = () => {
     };
   
     fetchCourseData();
+
   }, []);
 
   const validateField = (field: string, value: any): string => {
@@ -533,6 +543,9 @@ const UpdateCourse: React.FC = () => {
                 </TabsTrigger>
                 <TabsTrigger value="videos" className="data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-custom_primary data-[state=active]:text-custom_primary rounded-none">
                   Videos
+                </TabsTrigger>
+                <TabsTrigger value="quiz" className="data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-custom_primary data-[state=active]:text-custom_primary rounded-none">
+                Quiz Management
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -966,6 +979,79 @@ const UpdateCourse: React.FC = () => {
                 </div>
               </div>
             </TabsContent>
+
+
+            {/* quiz tab */}
+           <TabsContent value="quiz" className="p-6 space-y-6 mt-0">
+  <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+    <div className="flex justify-between items-center p-4 bg-gray-50 border-b">
+      <h2 className="text-lg font-semibold">Course Quiz</h2>
+   
+    </div>
+
+    <div className="p-6">
+      {quizzes.length === 0 ? (
+        <div className="text-center py-8">
+          <svg
+            className="mx-auto h-12 w-12 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">No quiz created</h3>
+          <p className="mt-1 text-sm text-gray-500">Get started by creating a new quiz for this course.</p>
+          <div className="mt-6" >
+            <button onClick={()=> navigate(`/teacher/courses/${params.courseId}/quizzes/new`)} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Create Quiz
+
+            </button>
+            
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {quizzes.map(quiz => (
+            <div key={quiz._id} className="border rounded-lg p-6 hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-lg font-medium">{quiz.title}</h3>
+                  <p className="text-sm text-gray-500 mt-1">{quiz.description || "No description"}</p>
+                </div>
+                
+              </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-4">
+                <div className="bg-gray-50 p-3 rounded-md">
+                  <p className="text-sm font-medium text-gray-500">Questions</p>
+                  <p className="text-lg font-semibold">{quiz.questions.length}</p>
+                </div>
+                <div className="bg-gray-50 p-3 rounded-md">
+                  <p className="text-sm font-medium text-gray-500">Passing Score</p>
+                  <p className="text-lg font-semibold">{quiz.passingScore}/{quiz.questions.length}</p>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-4 border-t">
+                <p className="text-sm text-gray-500">
+                  Created on {new Date(quiz.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+           </TabsContent>
           </Tabs>
         </CardContent>
 
