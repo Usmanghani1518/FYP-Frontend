@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, AlertCircle, X,  FileVideo, Edit2,  ChevronDown, ChevronUp, Trash2,    ArrowLeftIcon } from 'lucide-react';
+import { Upload, AlertCircle, X, FileVideo, Edit2, ChevronDown, ChevronUp, Trash2, ArrowLeftIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -35,7 +35,7 @@ interface CourseFormData {
   description: string;
   level: string;
   category: string;
-  thumbnail: string; // API response has thumbnail as a URL
+  thumbnail: string;
   videos: VideoData[];
 }
 
@@ -48,7 +48,7 @@ const UpdateCourse: React.FC = () => {
     description: '',
     level: 'beginner',
     category: '',
-    thumbnail: '', // Thumbnail is a URL in the API response
+    thumbnail: '',
     videos: [],
   });
   
@@ -60,14 +60,13 @@ const UpdateCourse: React.FC = () => {
     description: '',
     level: 'beginner',
     category: '',
-    thumbnail: null as File | null, // Thumbnail is a File | null in the state
-    thumbnailUrl: '', // Use this to store the thumbnail URL
+    thumbnail: null as File | null,
+    thumbnailUrl: '',
     videos: [] as VideoData[],
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
-  // const [currentSection, setCurrentSection] = useState('info');
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [openDialog, setOpenDialog] = useState<string | null>(null);
@@ -78,6 +77,8 @@ const UpdateCourse: React.FC = () => {
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const params = useParams()
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchCourseData = async () => {
       setIsLoading(true);
@@ -112,7 +113,7 @@ const UpdateCourse: React.FC = () => {
             })),
           });
   
-          setThumbnailPreview(dummyData.thumbnail); // Set the thumbnail preview URL
+          setThumbnailPreview(dummyData.thumbnail);
         } else {
           console.error('Error:', response.detail);
           notifyResponse(response)
@@ -133,7 +134,6 @@ const UpdateCourse: React.FC = () => {
       case 'title':
         return !value.trim() ? 'Course title is required' : '';
       case 'price':
-        if (!value.trim()) return 'Price is required';
         if (isNaN(Number(value))) return 'Price must be a valid number';
         if (Number(value) < 0) return 'Price must be a positive number';
         return '';
@@ -192,10 +192,12 @@ const UpdateCourse: React.FC = () => {
     const newFiles = Array.from(e.target.files || []);
     
     const newVideos = newFiles.map(file => ({
+      id: '', // New videos won't have an ID
       title: '',
       description: '',
       file: file,
-      isNew: true,
+      url: '',
+      isNew: true
     }));
 
     setCourseData({
@@ -316,7 +318,6 @@ const UpdateCourse: React.FC = () => {
         }
       }
 
-      // Simulate API request
       await backendRequest('PUT', `/course/${params.courseId}`, formData, {}, true);
       
       console.log(`Updated ${section} successfully`);
@@ -372,11 +373,10 @@ const UpdateCourse: React.FC = () => {
   };
 
   const saveAllChanges = async () => {
-    console.log("---------");
-    
     const newErrors: FormErrors = {};
     let hasErrors = false;
 
+    // Validate all fields
     ['title', 'price', 'language', 'category', 'description'].forEach(field => {
       const error = validateField(field, courseData[field as keyof typeof courseData]);
       if (error) {
@@ -385,6 +385,7 @@ const UpdateCourse: React.FC = () => {
       }
     });
 
+    // Validate videos
     courseData.videos.forEach((video, index) => {
       const titleError = validateField('videoTitle', video.title);
       if (titleError) {
@@ -406,79 +407,55 @@ const UpdateCourse: React.FC = () => {
     try {
       const formData = new FormData();
       
-      // Append basic course details only if they have changed
-      if (courseData.title !== originalData.title) {
-        formData.append('title', courseData.title);
-      }
-      if (courseData.price !== originalData.price) {
-        formData.append('price', courseData.price);
-      }
-      if (courseData.language !== originalData.language) {
-        formData.append('language', courseData.language);
-      }
-      if (courseData.description !== originalData.description) {
-        formData.append('description', courseData.description);
-      }
-      if (courseData.level !== originalData.level) {
-        formData.append('level', courseData.level);
-      }
-      if (courseData.category !== originalData.category) {
-        formData.append('category', courseData.category);
-      }
+      // Append basic course info
+      formData.append('title', courseData.title);
+      formData.append('price', courseData.price);
+      formData.append('language', courseData.language);
+      formData.append('description', courseData.description);
+      formData.append('level', courseData.level);
+      formData.append('category', courseData.category);
 
       // Append thumbnail if changed
       if (courseData.thumbnail) {
         formData.append('thumbnail', courseData.thumbnail);
       }
 
-      // Append videos
+      // Append videos in the same format as CreateCourse
       courseData.videos.forEach((video, index) => {
+        if (video.file) {
+          formData.append(`video[${index}].file`, video.file);
+        }
+        formData.append(`video[${index}].title`, video.title);
+        formData.append(`video[${index}].description`, video.description);
+        
+        // Include video ID for existing videos
         if (video.id) {
-          // Existing video: only include updated fields
-          const originalVideo = originalData.videos.find(v => v.id === video.id);
-          if (!originalVideo) return;
-
-          if (video.title !== originalVideo.title) {
-            formData.append(`video[${index}].title`, video.title);
-          }
-          if (video.description !== originalVideo.description) {
-            formData.append(`video[${index}].description`, video.description);
-          }
-          if (video.file) {
-            formData.append(`video[${index}].file`, video.file);
-          }
           formData.append(`video[${index}].id`, video.id);
-        } else {
-          // New video: include all fields
-          formData.append(`video[${index}].title`, video.title);
-          formData.append(`video[${index}].description`, video.description);
-          if (video.file) {
-            formData.append(`video[${index}].file`, video.file);
-          }
-          formData.append(`video[${index}].isNew`, 'true');
         }
       });
 
-      // Simulate successful API request
-      await backendRequest('PUT', `/course/${params.courseId}`, formData, {}, true);
+      const response = await backendRequest('PUT', `/course/${params.courseId}`, formData, {}, true);
       
       console.log('Course updated successfully');
-      notifyResponse({ success: true, message: 'Course updated successfully' });
+      notifyResponse(response);
       
-      // Update original data to match current data
-      setOriginalData({
-        ...courseData,
-        thumbnail: thumbnailPreview || '',
-        videos: courseData.videos.map(v => ({
-          id: v.id,
-          title: v.title,
-          description: v.description,
-          file: null,
-          url: v.url,
-        }))
-      });
-      
-      setUnsavedChanges(false);
+      if (response.success) {
+        // Update original data to match current data
+        // setOriginalData({
+        //   ...courseData,
+        //   thumbnail: thumbnailPreview || courseData.thumbnailUrl,
+        //   videos: courseData.videos.map(v => ({
+        //     id: v.id || response.data.videos.find((v2: any) => v2.title === v.title)?.id || '',
+        //     title: v.title,
+        //     description: v.description,
+        //     file: null,
+        //     url: v.url || response.data.videos.find((v2: any) => v2.title === v.title)?.url || '',
+        //   }))
+        // });
+        
+        setUnsavedChanges(false);
+        // navigate('/teacher/all-courses');
+      }
     } catch (error) {
       console.error('Error updating course:', error);
       notifyResponse({ success: false, message: 'Failed to update course. Please try again.' });
@@ -495,7 +472,6 @@ const UpdateCourse: React.FC = () => {
   };
 
   const videoFileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const navigate = useNavigate();
 
   return (
     <div className=" mx-auto py-3 ">
@@ -947,16 +923,6 @@ const UpdateCourse: React.FC = () => {
                                   </div>
                                 )}
                               </div>
-                              {/* <div className="flex justify-end">
-                                <Button
-                                  type="button"
-                                  variant="destructive"
-                                  onClick={() => removeVideo(index)}
-                                  className="flex items-center gap-1"
-                                >
-                                  <Trash2 className="h-4 w-4" /> Remove Video
-                                </Button>
-                              </div> */}
                             </div>
                           </AccordionContent>
                         </AccordionItem>
