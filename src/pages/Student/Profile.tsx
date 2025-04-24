@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, Camera, Edit2, Book, Mail, Calendar, BookOpen } from 'lucide-react';
+import { Bell, Camera, Edit2, Book, Mail, Calendar, BookOpen, ChevronRight } from 'lucide-react';
 import { LiaCertificateSolid } from "react-icons/lia";
 import { backendRequest } from '@/Helper/backendRequest';
+import { notifyResponse } from '@/Helper/notify';
+import { useNavigate } from 'react-router-dom';
 
 type Course = {
   id: string;
@@ -35,8 +37,6 @@ const Profile: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editableProfile, setEditableProfile] = useState<UserProfile | null>(null);
   const [activeTab, setActiveTab] = useState<'courses' | 'certificates'>('courses');
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [isCoursesFetched, setIsCoursesFetched] = useState(false);
@@ -44,6 +44,8 @@ const Profile: React.FC = () => {
   const [tabLoading, setTabLoading] = useState(false);
 
   const userId = 'your-user-id'; // Replace with the actual user ID
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -77,7 +79,6 @@ const Profile: React.FC = () => {
       const enrolledCourses = await backendRequest("GET", "/student/courses");
       if(Array.isArray(enrolledCourses.data)){
         setCourses(enrolledCourses.data);
-
       }
       setIsCoursesFetched(true);
     } catch (error) {
@@ -93,7 +94,6 @@ const Profile: React.FC = () => {
       const certificatesData = await backendRequest("GET", "/student/certificates");
       if(Array.isArray(certificatesData.data)){
         setCertificates(certificatesData.data);
-
       }
       setIsCertificatesFetched(true);
     } catch (error) {
@@ -104,15 +104,17 @@ const Profile: React.FC = () => {
   };
 
   if (!profile) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    );
   }
 
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
     if (!isEditing) {
       setEditableProfile({ ...profile });
-      setAvatarPreview(null);
-      setCoverPreview(null);
     }
   };
 
@@ -136,228 +138,238 @@ const Profile: React.FC = () => {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (editableProfile) {
-      setProfile(editableProfile);
-      setIsEditing(false);
+      try {
+        setIsEditing(true); // Show loading state
+        const response = await backendRequest(
+          "PUT", 
+          "/student/update", 
+          {
+            name: editableProfile.name,
+            // email: editableProfile.email
+            // Add any other fields you want to update
+          }
+        );
+
+        if (response.success) {
+          setProfile(editableProfile);
+          setIsEditing(false);
+          notifyResponse({ success: true, detail: "Profile updated successfully" });
+        } else {
+          notifyResponse({ success: false, detail: "Failed to update profile" });
+        }
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        notifyResponse({ success: false, detail: "Error updating profile" });
+      } finally {
+        setIsEditing(false);
+      }
     }
   };
 
   const handleCancel = () => {
     setIsEditing(false);
     setEditableProfile({ ...profile });
-    setAvatarPreview(null);
-    setCoverPreview(null);
+  };
+
+  // Function to get initials from name
+  const getInitials = (name: string) => {
+    const names = name.split(' ');
+    let initials = names[0].substring(0, 1).toUpperCase();
+    
+    if (names.length > 1) {
+      initials += names[names.length - 1].substring(0, 1).toUpperCase();
+    }
+    
+    return initials;
   };
 
   return (
     <div className="bg-gray-50 min-h-screen">
-
-      <main className="max-w-6xl mx-auto p-4">
-        {/* Cover Photo */}
-        <div className="relative mb-16 sm:mb-24 rounded-lg overflow-hidden shadow-md">
-          <div className="h-48 sm:h-64 md:h-72 bg-indigo-100 relative">
-            <img
-              src={coverPreview || profile.profilePicture}
-              alt="Cover"
-              className="w-full h-full object-cover"
-            />
-            {isEditing && (
-              <label className="absolute bottom-4 right-4 bg-white p-2 rounded-full shadow-md cursor-pointer">
-                <Camera size={20} className="text-gray-700" />
-                <input
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={(e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      const file = e.target.files[0];
-                      const reader = new FileReader();
-                      reader.onloadend = () => {
-                        setCoverPreview(reader.result as string);
-                      };
-                      reader.readAsDataURL(file);
-                    }
-                  }}
-                />
-              </label>
-            )}
-          </div>
-
-          {/* Profile Picture */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-12 sm:-bottom-16">
-            <div className="relative">
-           
-              {isEditing && (
-                <label className="absolute bottom-0 right-0 bg-white p-2 rounded-full shadow-md cursor-pointer">
-                  <Camera size={16} className="text-gray-700" />
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={(e) => {
-                      if (e.target.files && e.target.files[0]) {
-                        const file = e.target.files[0];
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          setAvatarPreview(reader.result as string);
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                  />
-                </label>
-              )}
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 pb-8">
+        {/* Profile Header - Centered */}
+        <div className="flex flex-col items-center pt-8">
+          {/* Profile Picture with Initials */}
+          <div className="relative mb-6">
+            <div className="h-32 w-32 sm:h-40 sm:w-40 rounded-full bg-custom_primary flex items-center justify-center text-white text-4xl sm:text-5xl font-bold shadow-lg">
+              {getInitials(profile.name)}
             </div>
           </div>
-        </div>
 
-        {/* Action Buttons */}
-        <div className="flex justify-end mb-6">
-          {isEditing ? (
-            <div className="flex space-x-3">
-              <button
-                onClick={handleCancel}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-              >
-                Save Changes
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={handleEditToggle}
-              className="flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-            >
-              <Edit2 size={16} />
-              <span>Edit Profile</span>
-            </button>
-          )}
-        </div>
-
-        {/* Profile Info */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          {/* Profile Info */}
           <div className="text-center mb-6">
             {isEditing ? (
-              <>
+              <div className="space-y-4">
                 <input
                   type="text"
                   name="name"
                   value={editableProfile?.name || ''}
                   onChange={handleInputChange}
-                  className="text-2xl font-bold text-center w-full mb-2 border-b border-gray-200 focus:outline-none focus:border-indigo-300"
+                  className="text-3xl font-bold text-center w-full mb-2 border-b border-gray-200 focus:outline-none focus:border-indigo-300 bg-transparent"
                 />
-                <input
-                  type="text"
-                  name="username"
-                  value={editableProfile?.username || ''}
-                  onChange={handleInputChange}
-                  className="text-gray-500 text-center w-full mb-4 border-b border-gray-200 focus:outline-none focus:border-indigo-300"
-                />
-
-              </>
+                
+              </div>
             ) : (
-              <>
-                <h1 className="text-2xl font-bold mb-1">{profile.name}</h1>
-                <p className="text-gray-500 mb-4">@{profile.username}</p>
-              </>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-1">{profile.name}</h1>
+                {/* <p className="text-lg text-gray-600 mb-4">@{profile.username}</p> */}
+              </div>
             )}
           </div>
 
-          {/* Learning Stats */}
-          <div className="flex flex-wrap justify-center gap-4 mb-6">
-            <div className="text-center bg-indigo-50 p-3 rounded-lg w-32">
-              <div className="flex justify-center mb-1">
-                <Book size={20} className="text-indigo-600" />
+          {/* Edit Profile Button */}
+          <div className="mb-8">
+            {isEditing ? (
+              <div className="flex gap-3">
+                <button
+                  onClick={handleCancel}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="px-4 py-2 bg-custom_primary text-white rounded-lg hover:bg-custom_primary_hover transition-colors shadow-md"
+                >
+                  Save Changes
+                </button>
               </div>
-              <p className="font-bold text-gray-900">{profile.stats.coursesCompleted}</p>
-              <p className="text-gray-600 text-sm">Courses Completed</p>
-            </div>
+            ) : (
+              <button
+                onClick={handleEditToggle}
+                className="flex items-center gap-2 px-4 py-2 bg-custom_primary text-white rounded-lg hover:bg-custom_primary_hover transition-colors shadow-md"
+              >
+                <Edit2 size={16} />
+                <span>Edit Profile</span>
+              </button>
+            )}
+          </div>
+        </div>
 
-            <div className="text-center bg-indigo-50 p-3 rounded-lg w-32">
-              <div className="flex justify-center mb-1">
-                <LiaCertificateSolid size={20} className="text-indigo-600" />
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-8">
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-indigo-100 rounded-lg">
+                <Book size={24} className="text-indigo-600" />
               </div>
-              <p className="font-bold text-gray-900">{profile.stats.certificatesEarned}</p>
-              <p className="text-gray-600 text-sm">Certificates</p>
+              <div>
+                <p className="text-2xl font-bold text-gray-900">{profile.stats.coursesCompleted}</p>
+                <p className="text-gray-500">Courses Completed</p>
+              </div>
             </div>
           </div>
-
-          <div className="flex flex-col space-y-2">
-            <div className="flex items-center text-gray-700">
-              <Mail size={18} className="mr-2 text-gray-500" />
-              {isEditing ? (
-                <input
-                  type="email"
-                  name="email"
-                  value={editableProfile?.email || ''}
-                  onChange={handleInputChange}
-                  className="w-full p-1 border-b border-gray-200 focus:outline-none focus:border-indigo-300"
-                />
-              ) : (
-                <span>{profile.email}</span>
-              )}
+          
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-indigo-100 rounded-lg">
+                <LiaCertificateSolid size={24} className="text-indigo-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-gray-900">{profile.stats.certificatesEarned}</p>
+                <p className="text-gray-500">Certificates Earned</p>
+              </div>
             </div>
-         
-            <div className="flex items-center text-gray-700">
-              <Calendar size={18} className="mr-2 text-gray-500" />
-              <span>Joined {new Date(profile.createdAt).toLocaleDateString()}</span>
+          </div>
+        </div>
 
+        {/* Profile Details */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Profile Details</h2>
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="p-2 bg-gray-100 rounded-lg">
+                <Mail size={18} className="text-gray-600" />
+              </div>
+              <div className="flex-1">
+                {isEditing ? (
+                  <input
+                    type="email"
+                    name="email"
+                    value={editableProfile?.email || ''}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border-b border-gray-200 focus:outline-none focus:border-indigo-300"
+                  />
+                ) : (
+                  <div>
+                    <p className="text-sm text-gray-500">Email</p>
+                    <p className="text-gray-900">{profile.email}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <div className="p-2 bg-gray-100 rounded-lg">
+                <Calendar size={18} className="text-gray-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Member Since</p>
+                <p className="text-gray-900">{new Date(profile.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Tabs Navigation */}
-        <div className="bg-white rounded-lg shadow-md mb-6 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="flex border-b">
             <button
               onClick={() => setActiveTab('courses')}
-              className={`flex-1 py-3 px-4 text-center font-medium ${
-                activeTab === 'courses' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-700'
+              className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${
+                activeTab === 'courses' 
+                  ? 'text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50' 
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
               }`}
             >
               My Courses
             </button>
             <button
               onClick={() => setActiveTab('certificates')}
-              className={`flex-1 py-3 px-4 text-center font-medium ${
-                activeTab === 'certificates' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-700'
+              className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${
+                activeTab === 'certificates' 
+                  ? 'text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50' 
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
               }`}
             >
-              Certificates
+              My Certificates
             </button>
           </div>
 
-          <div className="p-4">
+          <div className="p-6">
             {/* My Courses Tab */}
             {activeTab === 'courses' && (
               <div>
                 {tabLoading ? (
-                  <div>Loading courses...</div>
+                  <div className="flex justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
+                  </div>
+                ) : courses.length === 0 ? (
+                  <div className="text-center py-12">
+                    <BookOpen size={48} className="mx-auto text-gray-400 mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900">No courses enrolled yet</h3>
+                    <p className="text-gray-500 mt-2">Start learning by exploring our courses</p>
+                  </div>
                 ) : (
                   <div className="space-y-4">
                     {courses.map((course) => (
-                      <div key={course.id} className="flex items-center border rounded-md p-3 hover:bg-gray-50">
-                        <img src={course.thumbnail} alt={course.title} className="w-16 h-12 object-cover rounded mr-4" />
-                        <div className="flex-1">
-                          <h4 className="font-medium">{course.title}</h4>
-                          <p className="text-sm text-gray-500">by {course.instructor}</p>
-                          <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-indigo-600 h-2 rounded-full"
-                              style={{ width: `${course.progress}%` }}
-                            ></div>
+                      <div key={course.id} className="flex flex-col sm:flex-row items-center gap-4 border rounded-xl p-4 hover:shadow-md transition-shadow">
+                        <img 
+                          src={course.thumbnail} 
+                          alt={course.title} 
+                          className="w-full sm:w-32 h-24 object-cover rounded-lg" 
+                        />
+                        <div className="flex-1 w-full">
+                          <h4 className="font-medium text-gray-900">{course.title}</h4>
+                         
+                          <div className="flex justify-end items-center">
+                            {/* <span className="text-xs text-gray-500">{course.progress}% complete</span> */}
+                            <button onClick={()=>{console.log("courseid is ",course._id);navigate(`/student/course-resume/${course._id}`)}} className="text-indigo-600 hover:text-indigo-800 text-sm font-medium flex items-center">
+                              Continue <ChevronRight size={16} />
+                            </button>
                           </div>
-                          <p className="text-xs text-gray-500 mt-1">{course.progress}% complete</p>
                         </div>
-                        <button className="ml-4 bg-indigo-100 text-indigo-700 px-3 py-1 rounded text-sm hover:bg-indigo-200">
-                          Continue
-                        </button>
                       </div>
                     ))}
                   </div>
@@ -369,28 +381,38 @@ const Profile: React.FC = () => {
             {activeTab === 'certificates' && (
               <div>
                 {tabLoading ? (
-                  <div>Loading certificates...</div>
+                  <div className="flex justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
+                  </div>
+                ) : certificates.length === 0 ? (
+                  <div className="text-center py-12">
+                    <LiaCertificateSolid size={48} className="mx-auto text-gray-400 mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900">No certificates earned yet</h3>
+                    <p className="text-gray-500 mt-2">Complete courses to earn certificates</p>
+                  </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {certificates.map((cert) => (
-                      <div key={cert.id} className="border rounded-lg p-4 bg-gradient-to-r from-indigo-50 to-white">
-                        <div className="flex items-center mb-4">
-                          <LiaCertificateSolid size={24} className="text-indigo-600 mr-2" />
-                          <h3 className="font-bold text-lg">{cert.title}</h3>
+                      <div key={cert.id} className="border rounded-xl p-6 bg-gradient-to-br from-indigo-50 to-white hover:shadow-md transition-shadow">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="p-2 bg-indigo-100 rounded-lg">
+                            <LiaCertificateSolid size={24} className="text-indigo-600" />
+                          </div>
+                          <h3 className="font-bold text-lg text-gray-900">{cert.title}</h3>
                         </div>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
+                        <div className="space-y-3 text-sm">
+                          <div className="flex justify-between items-center">
                             <span className="text-gray-500">Issued</span>
-                            <span>{cert.issueDate}</span>
+                            <span className="font-medium">{new Date(cert.issueDate).toLocaleDateString()}</span>
                           </div>
-                          <div className="flex justify-between">
+                          <div className="flex justify-between items-center">
                             <span className="text-gray-500">Credential ID</span>
-                            <span className="font-mono">{cert.credential}</span>
+                            <span className="font-mono text-gray-700">{cert.credential}</span>
                           </div>
                         </div>
-                        <div className="mt-4 flex justify-end">
-                          <button className="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                            Download PDF
+                        <div className="mt-6 flex justify-end">
+                          <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm">
+                            Download Certificate
                           </button>
                         </div>
                       </div>

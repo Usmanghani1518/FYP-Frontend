@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, AlertCircle, X, FileVideo, Edit2, ChevronDown, ChevronUp, Trash2, ArrowLeftIcon } from 'lucide-react';
+import { Upload, AlertCircle, X, FileVideo, Edit2,  ArrowLeftIcon, Check } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -71,7 +71,7 @@ const UpdateCourse: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [openDialog, setOpenDialog] = useState<string | null>(null);
   const [editingVideoIndex, setEditingVideoIndex] = useState<number | null>(null);
-  const [expandedVideo, setExpandedVideo] = useState<number | null>(null);
+  const [expandedVideo, setExpandedVideo] = useState<string | null>(null);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
 
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
@@ -204,6 +204,12 @@ const UpdateCourse: React.FC = () => {
       ...courseData,
       videos: [...courseData.videos, ...newVideos],
     });
+
+    // Auto-expand the newly added videos
+    if (newVideos.length > 0) {
+      const newVideoIndex = courseData.videos.length;
+      setExpandedVideo(`video-${newVideoIndex}`);
+    }
     
     setUnsavedChanges(true);
   };
@@ -249,12 +255,7 @@ const UpdateCourse: React.FC = () => {
     setUnsavedChanges(true);
   };
 
-  const removeVideo = (index: number) => {
-    const updatedVideos = [...courseData.videos];
-    updatedVideos.splice(index, 1);
-    setCourseData({ ...courseData, videos: updatedVideos });
-    setUnsavedChanges(true);
-  };
+ 
 
   const saveSection = async (section: string) => {
     let hasErrors = false;
@@ -440,21 +441,7 @@ const UpdateCourse: React.FC = () => {
       notifyResponse(response);
       
       if (response.success) {
-        // Update original data to match current data
-        // setOriginalData({
-        //   ...courseData,
-        //   thumbnail: thumbnailPreview || courseData.thumbnailUrl,
-        //   videos: courseData.videos.map(v => ({
-        //     id: v.id || response.data.videos.find((v2: any) => v2.title === v.title)?.id || '',
-        //     title: v.title,
-        //     description: v.description,
-        //     file: null,
-        //     url: v.url || response.data.videos.find((v2: any) => v2.title === v.title)?.url || '',
-        //   }))
-        // });
-        
         setUnsavedChanges(false);
-        // navigate('/teacher/all-courses');
       }
     } catch (error) {
       console.error('Error updating course:', error);
@@ -474,21 +461,21 @@ const UpdateCourse: React.FC = () => {
   const videoFileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   return (
-    <div className=" mx-auto py-3 ">
-       <Button 
+    <div className="mx-auto py-3 bg-gray-900 min-h-screen">
+      <Button 
         size="sm" 
         variant="outline" 
-                      onClick={() => navigate('/teacher/all-courses')}
-                      className="flex items-center gap-1 mb-2"
-                    >
-                      <ArrowLeftIcon className="h-4 w-4" /> Back
-                    </Button>
-      <Card className="shadow-xl border-0">
+        onClick={() => navigate('/teacher/all-courses')}
+        className="flex items-center gap-1 mb-2 bg-gray-800 text-gray-200 hover:bg-gray-700 hover:text-white"
+      >
+        <ArrowLeftIcon className="h-4 w-4" /> Back
+      </Button>
+      <Card className="shadow-xl border-0 bg-gray-800">
         <CardHeader className="bg-gradient-to-r from-custom_primary to-custom_primary_hover text-white rounded-t-lg">
           <div className="flex justify-between items-center">
             <div>
               <CardTitle className="text-2xl font-bold">Update Course</CardTitle>
-              <CardDescription className="text-gray-100 mt-1">
+              <CardDescription className="text-gray-200 mt-1">
                 Edit your course details and content
               </CardDescription>
             </div>
@@ -502,23 +489,29 @@ const UpdateCourse: React.FC = () => {
 
         <CardContent className="p-0">
           <Tabs defaultValue="overview" className="w-full">
-            <div className="border-b px-6 bg-gray-50">
+            <div className="border-b px-6 bg-gray-700">
               <TabsList className="bg-transparent h-14">
-                <TabsTrigger value="overview" className="data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-custom_primary data-[state=active]:text-custom_primary rounded-none">
+                <TabsTrigger 
+                  value="overview" 
+                  className="data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-custom_primary data-[state=active]:text-custom_primary rounded-none text-gray-200 hover:text-white"
+                >
                   Overview
                 </TabsTrigger>
-                <TabsTrigger value="videos" className="data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-custom_primary data-[state=active]:text-custom_primary rounded-none">
+                <TabsTrigger 
+                  value="videos" 
+                  className="data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-custom_primary data-[state=active]:text-custom_primary rounded-none text-gray-200 hover:text-white"
+                >
                   Videos
                 </TabsTrigger>
               </TabsList>
             </div>
 
             {/* Overview Tab */}
-            <TabsContent value="overview" className="p-6 space-y-8 mt-0">
+            <TabsContent value="overview" className="p-6 space-y-8 mt-0 bg-gray-900">
               {/* Course Basic Info */}
-              <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
-                <div className="flex justify-between items-center p-4 bg-gray-50 border-b">
-                  <h3 className="font-medium text-gray-800">Course Information</h3>
+              <div className="bg-gray-800 rounded-lg border border-gray-700 shadow-sm overflow-hidden">
+                <div className="flex justify-between items-center p-4 bg-gray-700 border-b border-gray-600">
+                  <h3 className="font-medium text-gray-200">Course Information</h3>
                   {editingSection === 'info' ? (
                     <div className="flex gap-2">
                       <Button 
@@ -526,6 +519,7 @@ const UpdateCourse: React.FC = () => {
                         variant="outline" 
                         onClick={() => setEditingSection(null)}
                         disabled={isLoading}
+                        className="bg-gray-600 text-gray-200 hover:bg-gray-600 hover:text-white"
                       >
                         Cancel
                       </Button>
@@ -543,7 +537,7 @@ const UpdateCourse: React.FC = () => {
                       size="sm" 
                       variant="outline" 
                       onClick={() => setEditingSection('info')}
-                      className="flex items-center gap-1"
+                      className="flex items-center gap-1 bg-gray-600 text-gray-200 hover:bg-gray-600 hover:text-white"
                     >
                       <Edit2 className="h-4 w-4" /> Edit
                     </Button>
@@ -553,110 +547,135 @@ const UpdateCourse: React.FC = () => {
                   {editingSection === 'info' ? (
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">
+                        <label className="text-sm font-medium text-gray-300">
                           Course Title <span className="text-red-500">*</span>
                         </label>
                         <Input
                           value={courseData.title}
                           onChange={(e) => handleInputChange('title', e.target.value)}
-                          className={errors.title ? 'border-red-500' : ''}
+                          className={`${errors.title ? 'border-red-500 focus-visible:ring-red-500' : ''} bg-gray-700 text-gray-200 border-gray-600`}
                         />
                         {errors.title && (
-                          <div className="text-red-500 text-sm flex items-center gap-1">
+                          <div className="text-red-400 text-sm flex items-center gap-1">
                             <AlertCircle className="h-3 w-3" /> {errors.title}
+                          </div>
+                        )}
+                        {!errors.title && courseData.title && (
+                          <div className="text-green-400 text-sm flex items-center gap-1">
+                            <Check className="h-3 w-3" /> Looks good
                           </div>
                         )}
                       </div>
                       
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">
+                        <label className="text-sm font-medium text-gray-300">
                           Price ($) <span className="text-red-500">*</span>
                         </label>
                         <Input
                           type="number"
                           value={courseData.price}
                           onChange={(e) => handleInputChange('price', e.target.value)}
-                          className={errors.price ? 'border-red-500' : ''}
+                          className={`${errors.price ? 'border-red-500 focus-visible:ring-red-500' : ''} bg-gray-700 text-gray-200 border-gray-600`}
                         />
                         {errors.price && (
-                          <div className="text-red-500 text-sm flex items-center gap-1">
+                          <div className="text-red-400 text-sm flex items-center gap-1">
                             <AlertCircle className="h-3 w-3" /> {errors.price}
+                          </div>
+                        )}
+                        {!errors.price && courseData.price && (
+                          <div className="text-green-400 text-sm flex items-center gap-1">
+                            <Check className="h-3 w-3" /> Looks good
                           </div>
                         )}
                       </div>
                       
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">
+                        <label className="text-sm font-medium text-gray-300">
                           Language <span className="text-red-500">*</span>
                         </label>
                         <Input
                           value={courseData.language}
                           onChange={(e) => handleInputChange('language', e.target.value)}
-                          className={errors.language ? 'border-red-500' : ''}
+                          className={`${errors.language ? 'border-red-500 focus-visible:ring-red-500' : ''} bg-gray-700 text-gray-200 border-gray-600`}
                         />
                         {errors.language && (
-                          <div className="text-red-500 text-sm flex items-center gap-1">
+                          <div className="text-red-400 text-sm flex items-center gap-1">
                             <AlertCircle className="h-3 w-3" /> {errors.language}
+                          </div>
+                        )}
+                        {!errors.language && courseData.language && (
+                          <div className="text-green-400 text-sm flex items-center gap-1">
+                            <Check className="h-3 w-3" /> Looks good
                           </div>
                         )}
                       </div>
                       
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">
+                        <label className="text-sm font-medium text-gray-300">
                           Category <span className="text-red-500">*</span>
                         </label>
                         <Input
                           value={courseData.category}
                           onChange={(e) => handleInputChange('category', e.target.value)}
-                          className={errors.category ? 'border-red-500' : ''}
+                          className={`${errors.category ? 'border-red-500 focus-visible:ring-red-500' : ''} bg-gray-700 text-gray-200 border-gray-600`}
                         />
                         {errors.category && (
-                          <div className="text-red-500 text-sm flex items-center gap-1">
+                          <div className="text-red-400 text-sm flex items-center gap-1">
                             <AlertCircle className="h-3 w-3" /> {errors.category}
+                          </div>
+                        )}
+                        {!errors.category && courseData.category && (
+                          <div className="text-green-400 text-sm flex items-center gap-1">
+                            <Check className="h-3 w-3" /> Looks good
                           </div>
                         )}
                       </div>
                       
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">
+                        <label className="text-sm font-medium text-gray-300">
                           Level <span className="text-red-500">*</span>
                         </label>
                         <Select
                           value={courseData.level}
                           onValueChange={(value) => handleInputChange('level', value)}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="bg-gray-700 text-gray-200 border-gray-600">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="beginner">Beginner</SelectItem>
-                            <SelectItem value="intermediate">Intermediate</SelectItem>
-                            <SelectItem value="advanced">Advanced</SelectItem>
+                          <SelectContent className="bg-gray-800 text-gray-200 border-gray-700">
+                            <SelectItem value="beginner" className="hover:bg-gray-700">Beginner</SelectItem>
+                            <SelectItem value="intermediate" className="hover:bg-gray-700">Intermediate</SelectItem>
+                            <SelectItem value="advanced" className="hover:bg-gray-700">Advanced</SelectItem>
                           </SelectContent>
                         </Select>
+                        {courseData.level && (
+                          <div className="text-green-400 text-sm flex items-center gap-1">
+                            <Check className="h-3 w-3" /> Looks good
+                          </div>
+                        )}
                       </div>
                     </div>
                   ) : (
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
-                        <p className="text-sm text-gray-500">Course Title</p>
-                        <p className="font-medium">{courseData.title}</p>
+                        <p className="text-sm text-gray-400">Course Title</p>
+                        <p className="font-medium text-gray-200">{courseData.title}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-500">Price</p>
-                        <p className="font-medium">${courseData.price}</p>
+                        <p className="text-sm text-gray-400">Price</p>
+                        <p className="font-medium text-gray-200">${courseData.price}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-500">Language</p>
-                        <p className="font-medium">{courseData.language}</p>
+                        <p className="text-sm text-gray-400">Language</p>
+                        <p className="font-medium text-gray-200">{courseData.language}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-500">Category</p>
-                        <p className="font-medium">{courseData.category}</p>
+                        <p className="text-sm text-gray-400">Category</p>
+                        <p className="font-medium text-gray-200">{courseData.category}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-500">Level</p>
-                        <p className="font-medium capitalize">{courseData.level}</p>
+                        <p className="text-sm text-gray-400">Level</p>
+                        <p className="font-medium text-gray-200 capitalize">{courseData.level}</p>
                       </div>
                     </div>
                   )}
@@ -664,9 +683,9 @@ const UpdateCourse: React.FC = () => {
               </div>
 
               {/* Course Description */}
-              <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
-                <div className="flex justify-between items-center p-4 bg-gray-50 border-b">
-                  <h3 className="font-medium text-gray-800">Course Description</h3>
+              <div className="bg-gray-800 rounded-lg border border-gray-700 shadow-sm overflow-hidden">
+                <div className="flex justify-between items-center p-4 bg-gray-700 border-b border-gray-600">
+                  <h3 className="font-medium text-gray-200">Course Description</h3>
                   {editingSection === 'description' ? (
                     <div className="flex gap-2">
                       <Button 
@@ -674,6 +693,7 @@ const UpdateCourse: React.FC = () => {
                         variant="outline" 
                         onClick={() => setEditingSection(null)}
                         disabled={isLoading}
+                        className="bg-gray-600 text-gray-200 hover:bg-gray-600 hover:text-white"
                       >
                         Cancel
                       </Button>
@@ -691,7 +711,7 @@ const UpdateCourse: React.FC = () => {
                       size="sm" 
                       variant="outline" 
                       onClick={() => setEditingSection('description')}
-                      className="flex items-center gap-1"
+                      className="flex items-center gap-1 bg-gray-600 text-gray-200 hover:bg-gray-600 hover:text-white"
                     >
                       <Edit2 className="h-4 w-4" /> Edit
                     </Button>
@@ -703,24 +723,29 @@ const UpdateCourse: React.FC = () => {
                       <Textarea
                         value={courseData.description}
                         onChange={(e) => handleInputChange('description', e.target.value)}
-                        className={`min-h-32 ${errors.description ? 'border-red-500' : ''}`}
+                        className={`min-h-32 ${errors.description ? 'border-red-500 focus-visible:ring-red-500' : ''} bg-gray-700 text-gray-200 border-gray-600`}
                       />
                       {errors.description && (
-                        <div className="text-red-500 text-sm flex items-center gap-1">
+                        <div className="text-red-400 text-sm flex items-center gap-1">
                           <AlertCircle className="h-3 w-3" /> {errors.description}
+                        </div>
+                      )}
+                      {!errors.description && courseData.description && (
+                        <div className="text-green-400 text-sm flex items-center gap-1">
+                          <Check className="h-3 w-3" /> Looks good
                         </div>
                       )}
                     </div>
                   ) : (
-                    <p className="text-gray-700">{courseData.description}</p>
+                    <p className="text-gray-300">{courseData.description}</p>
                   )}
                 </div>
               </div>
 
               {/* Course Thumbnail */}
-              <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
-                <div className="flex justify-between items-center p-4 bg-gray-50 border-b">
-                  <h3 className="font-medium text-gray-800">Course Thumbnail</h3>
+              <div className="bg-gray-800 rounded-lg border border-gray-700 shadow-sm overflow-hidden">
+                <div className="flex justify-between items-center p-4 bg-gray-700 border-b border-gray-600">
+                  <h3 className="font-medium text-gray-200">Course Thumbnail</h3>
                   {editingSection === 'thumbnail' ? (
                     <div className="flex gap-2">
                       <Button 
@@ -733,6 +758,7 @@ const UpdateCourse: React.FC = () => {
                           }
                         }}
                         disabled={isLoading}
+                        className="bg-gray-600 text-gray-200 hover:bg-gray-600 hover:text-white"
                       >
                         Cancel
                       </Button>
@@ -750,7 +776,7 @@ const UpdateCourse: React.FC = () => {
                       size="sm" 
                       variant="outline" 
                       onClick={() => setEditingSection('thumbnail')}
-                      className="flex items-center gap-1"
+                      className="flex items-center gap-1 bg-gray-600 text-gray-200 hover:bg-gray-600 hover:text-white"
                     >
                       <Edit2 className="h-4 w-4" /> Edit
                     </Button>
@@ -759,7 +785,7 @@ const UpdateCourse: React.FC = () => {
                 <div className="p-4">
                   <div className="flex items-center justify-center">
                     {editingSection === 'thumbnail' ? (
-                      <div className="border-2 border-dashed rounded-lg p-6 w-full max-w-md flex flex-col items-center space-y-4">
+                      <div className="border-2 border-dashed border-gray-600 rounded-lg p-6 w-full max-w-md flex flex-col items-center space-y-4">
                         {thumbnailPreview ? (
                           <div className="relative">
                             <img
@@ -778,7 +804,7 @@ const UpdateCourse: React.FC = () => {
                         ) : (
                           <div className="text-center space-y-2">
                             <Upload className="h-8 w-8 text-gray-400" />
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-gray-400">
                               Upload a thumbnail image (JPEG, PNG)
                             </p>
                           </div>
@@ -794,7 +820,7 @@ const UpdateCourse: React.FC = () => {
                           type="button"
                           variant="outline"
                           onClick={() => thumbnailInputRef.current?.click()}
-                          className="bg-white"
+                          className="bg-gray-700 text-gray-200 hover:bg-gray-600 hover:text-white"
                         >
                           {thumbnailPreview ? 'Change Thumbnail' : 'Upload Thumbnail'}
                         </Button>
@@ -814,11 +840,11 @@ const UpdateCourse: React.FC = () => {
             </TabsContent>
 
             {/* Videos Tab */}
-            <TabsContent value="videos" className="p-6 space-y-8 mt-0">
+            <TabsContent value="videos" className="p-6 space-y-8 mt-0 bg-gray-900">
               {/* Video List */}
-              <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
-                <div className="flex justify-between items-center p-4 bg-gray-50 border-b">
-                  <h3 className="font-medium text-gray-800">Course Videos</h3>
+              <div className="bg-gray-800 rounded-lg border border-gray-700 shadow-sm overflow-hidden">
+                <div className="flex justify-between items-center p-4 bg-gray-700 border-b border-gray-600">
+                  <h3 className="font-medium text-gray-200">Course Videos</h3>
                   <Button
                     size="sm"
                     onClick={() => videoInputRef.current?.click()}
@@ -839,54 +865,58 @@ const UpdateCourse: React.FC = () => {
                   {courseData.videos.length === 0 ? (
                     <div className="text-center py-8">
                       <FileVideo className="h-10 w-10 text-gray-400 mx-auto" />
-                      <p className="text-sm text-gray-500 mt-2">
+                      <p className="text-sm text-gray-400 mt-2">
                         No videos uploaded yet. Click the button above to upload videos.
                       </p>
                     </div>
                   ) : (
-                    <Accordion type="single" collapsible className="w-full">
+                    <Accordion 
+                      type="single" 
+                      collapsible 
+                      className="w-full"
+                      value={expandedVideo || undefined}
+                      onValueChange={setExpandedVideo}
+                    >
                       {courseData.videos.map((video, index) => (
-                        <AccordionItem key={index} value={`video-${index}`}>
-                          <AccordionTrigger
-                            onClick={() => setExpandedVideo(expandedVideo === index ? null : index)}
-                            className="hover:no-underline"
-                          >
-                            <div className="flex items-center space-x-4">
+                        <AccordionItem key={index} value={`video-${index}`} className="border-b border-gray-700">
+                          <AccordionTrigger className="hover:no-underline py-4">
+                            <div className="flex items-center space-x-4 w-full">
                               <div className="flex-1 text-left">
-                                <p className="font-medium">
+                                <p className="font-medium text-gray-200">
                                   {video.title || `Video ${index + 1}`}
                                 </p>
-                                <p className="text-sm text-gray-500">
+                                <p className="text-sm text-gray-400">
                                   {video.file ? truncateFileName(video.file.name) : video.url}
                                 </p>
                               </div>
-                              {expandedVideo === index ? (
-                                <ChevronUp className="h-4 w-4" />
-                              ) : (
-                                <ChevronDown className="h-4 w-4" />
-                              )}
+                             
                             </div>
                           </AccordionTrigger>
-                          <AccordionContent>
+                          <AccordionContent className="pt-4">
                             <div className="space-y-4">
                               <div className="grid md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                  <label className="text-sm font-medium">
+                                  <label className="text-sm font-medium text-gray-300">
                                     Video Title <span className="text-red-500">*</span>
                                   </label>
                                   <Input
                                     value={video.title}
                                     onChange={(e) => handleVideoTitleChange(index, e.target.value)}
-                                    className={errors[`videoTitle${index}`] ? 'border-red-500' : ''}
+                                    className={`${errors[`videoTitle${index}`] ? 'border-red-500 focus-visible:ring-red-500' : ''} bg-gray-700 text-gray-200 border-gray-600`}
                                   />
                                   {errors[`videoTitle${index}`] && (
-                                    <div className="text-red-500 text-sm flex items-center gap-1">
+                                    <div className="text-red-400 text-sm flex items-center gap-1">
                                       <AlertCircle className="h-3 w-3" /> {errors[`videoTitle${index}`]}
+                                    </div>
+                                  )}
+                                  {!errors[`videoTitle${index}`] && video.title && (
+                                    <div className="text-green-400 text-sm flex items-center gap-1">
+                                      <Check className="h-3 w-3" /> Looks good
                                     </div>
                                   )}
                                 </div>
                                 <div className="space-y-2">
-                                  <label className="text-sm font-medium">
+                                  <label className="text-sm font-medium text-gray-300">
                                     Video File
                                   </label>
                                   <div className="flex items-center gap-2">
@@ -894,7 +924,7 @@ const UpdateCourse: React.FC = () => {
                                       type="button"
                                       variant="outline"
                                       onClick={() => videoFileInputRefs.current[index]?.click()}
-                                      className="w-full"
+                                      className="w-full bg-gray-700 text-gray-200 hover:bg-gray-600 hover:text-white"
                                     >
                                       {video.file ? 'Replace Video' : 'Upload Video'}
                                     </Button>
@@ -909,20 +939,35 @@ const UpdateCourse: React.FC = () => {
                                 </div>
                               </div>
                               <div className="space-y-2">
-                                <label className="text-sm font-medium">
+                                <label className="text-sm font-medium text-gray-300">
                                   Video Description <span className="text-red-500">*</span>
                                 </label>
                                 <Textarea
                                   value={video.description}
                                   onChange={(e) => handleVideoDescriptionChange(index, e.target.value)}
-                                  className={errors[`videoDescription${index}`] ? 'border-red-500' : ''}
+                                  className={`${errors[`videoDescription${index}`] ? 'border-red-500 focus-visible:ring-red-500' : ''} bg-gray-700 text-gray-200 border-gray-600`}
                                 />
                                 {errors[`videoDescription${index}`] && (
-                                  <div className="text-red-500 text-sm flex items-center gap-1">
+                                  <div className="text-red-400 text-sm flex items-center gap-1">
                                     <AlertCircle className="h-3 w-3" /> {errors[`videoDescription${index}`]}
                                   </div>
                                 )}
+                                {!errors[`videoDescription${index}`] && video.description && (
+                                  <div className="text-green-400 text-sm flex items-center gap-1">
+                                    <Check className="h-3 w-3" /> Looks good
+                                  </div>
+                                )}
                               </div>
+                              {/* <div className="flex justify-end">
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => removeVideo(index)}
+                                  className="mt-2"
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" /> Remove Video
+                                </Button>
+                              </div> */}
                             </div>
                           </AccordionContent>
                         </AccordionItem>
@@ -936,7 +981,7 @@ const UpdateCourse: React.FC = () => {
         </CardContent>
 
         {/* Footer with Save All Button */}
-        <div className="p-6 border-t bg-gray-50">
+        <div className="p-6 border-t border-gray-700 bg-gray-800">
           <div className="flex justify-end">
             <Button
               onClick={saveAllChanges}
@@ -953,3 +998,6 @@ const UpdateCourse: React.FC = () => {
 };
 
 export default UpdateCourse;
+
+
+

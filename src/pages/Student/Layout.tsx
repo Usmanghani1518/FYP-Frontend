@@ -10,6 +10,7 @@ import { clearCart } from "@/redux/slices/cart.slice";
 
 function StudentLayout() {
   const navigate = useNavigate();
+  const [search,setSearch] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null); // Ref for dropdown
    const { totalItems } = useCart();
@@ -55,6 +56,13 @@ function StudentLayout() {
         <div className="relative w-1/3 max-w-md">
           <input
             type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                navigate(`/student/courses?search=${search}`);
+              }
+            }}
             placeholder="Search..."
             className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />

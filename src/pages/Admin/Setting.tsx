@@ -1,240 +1,356 @@
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Camera, Save, Lock, MailCheck } from 'lucide-react';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import React, { useEffect, useState } from 'react';
+import { Lock, User, Mail, Check, X, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { backendRequest } from '@/Helper/backendRequest';
 import { notifyResponse } from '@/Helper/notify';
 
-// Define User interface directly in the file
-interface User {
-  _id: string;
-  name: string;
-  email: string;
-  role: 'student' | 'teacher' | 'admin';
-  profilePicture?: string;
-  emailConfirmed: boolean;
-  activate: boolean;
-}
-
-// Form validation schema
-const userSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  profilePicture: z.string().optional(),
-  password: z.string().min(6, "Password must be at least 6 characters").optional(),
-  activate: z.boolean()
-});
-
-type UserFormData = z.infer<typeof userSchema>;
-
-export const UserSettings = ({ userData }: { userData: User }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
-  
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-    watch
-  } = useForm<UserFormData>({
-    resolver: zodResolver(userSchema),
-    defaultValues: {
-      name: userData.name,
-      email: userData.email,
-      profilePicture: userData.profilePicture,
-      activate: userData.activate
-    }
+const AdminSettings: React.FC = () => {
+  const [profile, setProfile] = useState({
+    name: 'John Doe',
+    email: 'john.doe@example.com',
   });
 
-  const activateStatus = watch('activate');
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+
+  const [errors, setErrors] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+
+  const [showPassword, setShowPassword] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  });
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (userData) {
-      reset({
-        name: userData.name,
-        email: userData.email,
-        profilePicture: userData.profilePicture,
-        activate: userData.activate
-      });
-      if (userData.profilePicture) {
-        setPreviewImage(userData.profilePicture);
-      }
-    }
-  }, [userData, reset]);
+    // Fetch user profile data from the backend
+    const fetchProfile = async () => {
+      try {
+        interface ProfileResponse {
+          success: boolean;
+          data?: {
+            name: string;
+            email: string;
+          };
+          detail?: string;
+        }
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+        const response: ProfileResponse = await backendRequest("GET", "/admin/profile");
+        if (response.success && response.data) {
+          setProfile({
+            name: response.data.name,
+            email: response.data.email,
+          });
+        } else {
+          notifyResponse({ success: false, detail: response.detail || "Failed to fetch profile" });
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+        notifyResponse({ success: false, detail: "Error fetching profile" });
+      }
+    };
+
+    fetchProfile();
+ 
+  }, []); 
+
+  const validatePassword = () => {
+    const newErrors = {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    };
+
+    let isValid = true;
+
+    if (!passwordData.currentPassword) {
+      newErrors.currentPassword = 'Current password is required';
+      isValid = false;
+    }
+
+    if (!passwordData.newPassword) {
+      newErrors.newPassword = 'New password is required';
+      isValid = false;
+    } else if (passwordData.newPassword.length < 8) {
+      newErrors.newPassword = 'Password must be at least 8 characters';
+      isValid = false;
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setProfile(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setPasswordData(prev => ({ ...prev, [name]: value }));
+    // Clear error when user types
+    if (errors[name as keyof typeof errors]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
-  const onSubmit = async (data: UserFormData) => {
+  const togglePasswordVisibility = (field: keyof typeof showPassword) => {
+    setShowPassword(prev => ({ ...prev, [field]: !prev[field] }));
+  };
+
+  const handleUpdateProfile = async () => {
     setIsLoading(true);
     try {
-      // Replace with your actual API call
-      const response = await fetch('/api/user/settings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
+      const response = await backendRequest("PUT", "/admin/profile", {
+        name: profile.name
       });
-      const result = await response.json();
-      notifyResponse(result, "Profile updated successfully", "Failed to update profile");
+
+      if (response.success) {
+        notifyResponse({ success: true, detail: "Profile updated successfully" });
+        setIsEditing(false);
+      } else {
+        notifyResponse({ success: false, detail: response.detail || "Failed to update profile" });
+      }
     } catch (error) {
-      notifyResponse({ 
-        success: false, 
-        detail: "Network error occurred. Please try again." 
+      console.error('Error updating profile:', error);
+      notifyResponse({ success: false, detail: "Error updating profile" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdatePassword = async () => {
+    if (!validatePassword()) return;
+
+    setIsLoading(true);
+    try {
+      const response = await backendRequest("PUT", "/admin/password", {
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
       });
+
+      if (response.success) {
+        notifyResponse({ success: true, detail: "Password updated successfully" });
+        setPasswordData({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        });
+        setIsUpdatingPassword(false);
+      } else {
+        notifyResponse({ success: false, detail: response.detail || "Failed to update password" });
+      }
+    } catch (error) {
+      console.error('Error updating password:', error);
+      notifyResponse({ success: false, detail: "Error updating password" });
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-lg shadow-lg">
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Profile Picture Section */}
-        <div className="w-full md:w-1/3 space-y-6">
-          <div className="flex flex-col items-center">
-            <div className="relative group">
-              <Avatar className="h-32 w-32 border-4 border-purple-100 dark:border-gray-700">
-                {previewImage ? (
-                  <AvatarImage src={previewImage} alt="Profile" />
-                ) : (
-                  <AvatarFallback className="bg-purple-500 text-white text-4xl">
-                    {userData.name.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                )}
-              </Avatar>
-              <label 
-                htmlFor="profilePicture"
-                className="absolute bottom-0 right-0 bg-purple-600 p-2 rounded-full cursor-pointer transition-all hover:bg-purple-700 group-hover:opacity-100 opacity-90"
-              >
-                <Camera className="h-5 w-5 text-white" />
-                <input
-                  id="profilePicture"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImageChange}
-                />
-              </label>
-            </div>
-            
-            <div className="mt-4 text-center">
-              <h2 className="text-xl font-bold text-gray-800 dark:text-white">{userData.name}</h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{userData.email}</p>
-              <p className="mt-1 px-3 py-1 text-xs font-medium rounded-full capitalize"
-                style={{
-                  backgroundColor: userData.role === 'admin' ? '#6B46C1' : 
-                                   userData.role === 'teacher' ? '#4299E1' : '#48BB78',
-                  color: 'white'
-                }}
-              >
-                {userData.role}
-              </p>
+    <div className="min-h-screen bg-gray-900 text-gray-100 p-4 md:p-8">
+      <div className="max-w-3xl mx-auto space-y-8">
+        <h1 className="text-3xl font-bold">Profile Settings</h1>
+
+        {/* Profile Information Card */}
+        <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
+          <div className="p-6 border-b border-gray-700">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold flex items-center gap-2">
+                <User className="h-5 w-5" />
+                Personal Information
+              </h2>
+              {isEditing ? (
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setIsEditing(false)}
+                    className="bg-gray-700 hover:bg-gray-600 border-gray-600"
+                  >
+                    <X className="h-4 w-4 mr-2" /> Cancel
+                  </Button>
+                  <Button 
+                    onClick={handleUpdateProfile}
+                    disabled={isLoading}
+                    className="bg-custom_primary hover:bg-custom_primary_hover "
+                  >
+                    {isLoading ? 'Saving...' : (
+                      <>
+                        <Check className="h-4 w-4 mr-2" /> Save
+                      </>
+                    )}
+                  </Button>
+                </div>
+              ) : (
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsEditing(true)}
+                  className="bg-gray-700 hover:bg-gray-600 border-gray-600"
+                >
+                  Edit Profile
+                </Button>
+              )}
             </div>
           </div>
 
-          <div className="space-y-2">
-            <div className="flex items-center justify-between p-3 bg-gray-100 dark:bg-gray-800 rounded-lg">
-              <div className="flex items-center space-x-2">
-                <MailCheck className="h-5 w-5 text-purple-600" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Email Verified
-                </span>
-              </div>
-              <span className={`px-2 py-1 text-xs rounded-full ${userData.emailConfirmed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                {userData.emailConfirmed ? 'Verified' : 'Pending'}
-              </span>
+          <div className="p-6 space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-300">Name</label>
+              {isEditing ? (
+                <Input
+                  name="name"
+                  value={profile.name}
+                  onChange={handleProfileChange}
+                  className="bg-gray-700 border-gray-600 text-gray-100"
+                />
+              ) : (
+                <p className="text-gray-100">{profile.name}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                <Mail className="h-4 w-4" /> Email
+              </label>
+              <p className="text-gray-400">{profile.email}</p>
             </div>
           </div>
         </div>
 
-        {/* Form Section */}
-        <div className="w-full md:w-2/3 space-y-6">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Full Name
-                </Label>
-                <Input
-                  id="name"
-                  {...register('name')}
-                  className="mt-1"
-                  error={errors.name?.message}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Email Address
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  {...register('email')}
-                  className="mt-1"
-                  error={errors.email?.message}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        {/* Password Update Card */}
+        <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
+          <div className="p-6 border-b border-gray-700">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold flex items-center gap-2">
+                <Lock className="h-5 w-5" />
+                Password
+              </h2>
+              {isUpdatingPassword ? (
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setIsUpdatingPassword(false)}
+                    className="bg-gray-700 hover:bg-gray-600 border-gray-600"
+                  >
+                    <X className="h-4 w-4 mr-2" /> Cancel
+                  </Button>
+                  <Button 
+                    onClick={handleUpdatePassword}
+                    disabled={isLoading}
+                    className="bg-custom_primary hover:bg-custom_primary_hover "
+                  >
+                    {isLoading ? 'Updating...' : (
+                      <>
+                        <Check className="h-4 w-4 mr-2" /> Update
+                      </>
+                    )}
+                  </Button>
+                </div>
+              ) : (
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsUpdatingPassword(true)}
+                  className="bg-gray-700 hover:bg-gray-600 border-gray-600"
+                >
                   Change Password
-                </Label>
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {isUpdatingPassword && (
+            <div className="p-6 space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">Current Password</label>
                 <div className="relative">
                   <Input
-                    id="password"
-                    type="password"
-                    {...register('password')}
-                    className="mt-1 pr-10"
-                    placeholder="Leave blank to keep current"
-                    error={errors.password?.message}
+                    name="currentPassword"
+                    type={showPassword.current ? "text" : "password"}
+                    value={passwordData.currentPassword}
+                    onChange={handlePasswordChange}
+                    className={`bg-gray-700 border-gray-600 text-gray-100 ${errors.currentPassword ? 'border-red-500' : ''}`}
                   />
-                  <Lock className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
+                  <button
+                    type="button"
+                    onClick={() => togglePasswordVisibility('current')}
+                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-200"
+                  >
+                    {showPassword.current ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
+                {errors.currentPassword && (
+                  <p className="text-red-400 text-sm">{errors.currentPassword}</p>
+                )}
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <div>
-                  <Label htmlFor="activate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Account Status
-                  </Label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {activateStatus ? 'Your account is active' : 'Your account is disabled'}
-                  </p>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">New Password</label>
+                <div className="relative">
+                  <Input
+                    name="newPassword"
+                    type={showPassword.new ? "text" : "password"}
+                    value={passwordData.newPassword}
+                    onChange={handlePasswordChange}
+                    className={`bg-gray-700 border-gray-600 text-gray-100 ${errors.newPassword ? 'border-red-500' : ''}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => togglePasswordVisibility('new')}
+                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-200"
+                  >
+                    {showPassword.new ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
-                <Switch
-                  id="activate"
-                  checked={activateStatus}
-                  onCheckedChange={(checked) => reset({ ...watch(), activate: checked })}
-                />
+                {errors.newPassword && (
+                  <p className="text-red-400 text-sm">{errors.newPassword}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">Confirm New Password</label>
+                <div className="relative">
+                  <Input
+                    name="confirmPassword"
+                    type={showPassword.confirm ? "text" : "password"}
+                    value={passwordData.confirmPassword}
+                    onChange={handlePasswordChange}
+                    className={`bg-gray-700 border-gray-600 text-gray-100 ${errors.confirmPassword ? 'border-red-500' : ''}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => togglePasswordVisibility('confirm')}
+                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-200"
+                  >
+                    {showPassword.confirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                {errors.confirmPassword && (
+                  <p className="text-red-400 text-sm">{errors.confirmPassword}</p>
+                )}
               </div>
             </div>
-
-            <div className="flex justify-end">
-              <Button type="submit" className="gap-2" loading={isLoading}>
-                <Save className="h-4 w-4" />
-                Save Changes
-              </Button>
-            </div>
-          </form>
+          )}
         </div>
       </div>
     </div>
   );
 };
+
+export default AdminSettings;

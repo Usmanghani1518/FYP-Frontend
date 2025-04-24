@@ -29,6 +29,7 @@ import {
   import ResumeCourse from "./pages/ResumeCourse";
 import CoursesPage from "./pages/Complete";
 import { TeacherSettings } from "./pages/Teacher/Settings";
+import AdminSettings from "./pages/Admin/Setting";
 // import { SocketProvider } from "./redux/SocketContext";
 // import { DiscussionBoard } from "./pages/Discussion";
   
@@ -193,10 +194,10 @@ import { TeacherSettings } from "./pages/Teacher/Settings";
           path: "purchases",
           element: <ViewPurchaseCourse />
         },
-        // {
-        //   path: "settings",
-        //   element: < />
-        // },
+        {
+          path: "settings",
+          element: <AdminSettings />
+        },
       ]
     },
     
