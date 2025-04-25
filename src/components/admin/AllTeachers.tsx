@@ -45,12 +45,11 @@ const AllTeachers = () => {
   // Activate a teacher
   const activateTeacher = async (teacherId: string) => {
     try {
-      await backendRequest("PATCH", `/admin/activate-teacher/${teacherId}`);
-      setTeachers(
-        teachers.map((teacher) =>
-          teacher._id === teacherId ? { ...teacher, isActive: true } : teacher
-        )
-      ); // Update the teacher's status
+     const responae =  await backendRequest("PATCH", `/admin/activate-teacher/${teacherId}`);
+     if (responae.success) {
+      await fetchTeacher()
+
+     }
     } catch (error) {
       console.error(error);
     }
@@ -59,12 +58,10 @@ const AllTeachers = () => {
   // Deactivate a teacher
   const deactivateTeacher = async (teacherId: string) => {
     try {
-      await backendRequest("PATCH", `/admin/deactivate-teacher/${teacherId}`);
-      setTeachers(
-        teachers.map((teacher) =>
-          teacher._id === teacherId ? { ...teacher, isActive: false } : teacher
-        )
-      ); // Update the teacher's status
+    const response =   await backendRequest("PATCH", `/admin/deactivate-teacher/${teacherId}`);
+      if (response.success) {
+        await fetchTeacher()
+      }
     } catch (error) {
       console.error(error);
     }
