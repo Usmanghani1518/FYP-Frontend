@@ -4,8 +4,9 @@ import { backendRequest } from '@/Helper/backendRequest';
 import { Clock, Star, Users, PlayCircle, BookOpen, Lock, Play, CheckCircle, Video, Edit, Send, ChevronLeft, ChevronRight } from 'lucide-react';
 import ReactPlayer from 'react-player';
 import { notifyResponse } from '@/Helper/notify';
-import { DiscussionBoard } from '@/pages/Discussion'; // Adjust path as needed
+import { DiscussionBoard } from '@/pages/Discussion'; 
 import { motion, AnimatePresence } from 'framer-motion';
+import QuizPage from './QuizPage';
 
 interface CourseData {
   title: string;
@@ -99,7 +100,7 @@ function ResumeCourse() {
   const reviewFormRef = useRef<HTMLDivElement>(null);
 
   // Discussion board states
-  const [activeTab, setActiveTab] = useState<'reviews' | 'discussion'>('reviews');
+  const [activeTab, setActiveTab] = useState<'reviews' | 'discussion' | 'quiz'>('reviews');
   const currentUser = {
     _id: localStorage.getItem('userId') || 'unknown',
     name: 'Current User' // Replace with actual user name from your auth system
@@ -352,6 +353,12 @@ function ResumeCourse() {
                 >
                   Discussion Board
                 </button>
+                <button
+                  className={`px-4 py-2 font-medium text-sm ${activeTab === 'quiz' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                  onClick={() => setActiveTab('quiz')}
+                >
+                  Quiz
+                </button>
               </div>
 
               <AnimatePresence mode="wait">
@@ -362,7 +369,7 @@ function ResumeCourse() {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
                 >
-                  {activeTab === 'reviews' ? (
+                  {activeTab === 'reviews' && (
                     <>
                       {/* Rating Summary */}
                       {ratingDetails && (
@@ -568,9 +575,15 @@ function ResumeCourse() {
                         )}
                       </div>
                     </>
-                  ) : (
+                  )}
+                    {activeTab === 'discussion' && (
                     <div className="h-[600px]">
                       <DiscussionBoard courseId={courseId || ''} currentUser={currentUser} />
+                    </div>
+                  )}
+                    {activeTab === 'quiz' && (
+                    <div className="h-[600px]">
+                      <QuizPage courseId={courseId || ''}  />
                     </div>
                   )}
                 </motion.div>
