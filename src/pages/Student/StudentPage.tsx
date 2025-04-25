@@ -203,7 +203,7 @@ function StudentPage() {
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                    <Button className="bg-white text-purple-900 hover:bg-gray-100">
+                    <Button onClick = {()=> handleResume(course._id)} className="bg-white text-purple-900 hover:bg-gray-100">
                       Continue
                     </Button>
                   </div>
@@ -345,7 +345,7 @@ function StudentPage() {
                       <p className="text-gray-700"></p>
                     </div>
                     
-                    <Button className="w-full mt-4">Continue Learning</Button>
+                    <Button  className="w-full mt-4">Continue Learning</Button>
                   </CardContent>
                 </Card>
               ))}

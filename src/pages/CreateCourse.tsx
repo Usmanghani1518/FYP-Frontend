@@ -333,7 +333,7 @@ const CreateCourse: React.FC = () => {
     const value = formData[name as keyof typeof formData] as string;
 
     return (
-      <div className="space-y-2">
+      <div className="space-y-2 bg-gray-600">
         <label className="text-sm font-medium text-gray-100 flex items-center">
           {label} <span className="text-red-500 ml-1">*</span>
           {type === 'number' && (
@@ -342,7 +342,7 @@ const CreateCourse: React.FC = () => {
         </label>
         <Input
           type={type}
-          className={`border-gray-300 focus:border-white ${isError ? 'border-red-500 focus-visible:ring-red-500' : value && !isError ? 'border-green-500' : ''} bg-gray-800 text-gray-100 placeholder-gray-400`}
+          className={`border-gray-500 focus:border-gray-400 ${isError ? 'border-red-500 focus-visible:ring-red-500' : value && !isError ? 'border-green-500' : ''} bg-gray-800 text-gray-100 placeholder-gray-400`}
           value={value}
           onChange={(e) => handleInputChange(name, e.target.value)}
           onBlur={() => handleBlur(name)}
@@ -385,7 +385,7 @@ const CreateCourse: React.FC = () => {
                 onValueChange={(value) => handleInputChange('language', value)}
                 onOpenChange={(open) => !open && handleBlur('language')}
               >
-                <SelectTrigger className={`border-gray-300 focus:border-white ${touched.language && errors.language ? 'border-red-500 focus-visible:ring-red-500' : formData.language ? 'border-green-500' : ''} bg-gray-800 text-gray-100`}>
+                <SelectTrigger className={`border-gray-500 focus:border-white ${touched.language && errors.language ? 'border-red-500 focus-visible:ring-red-500' : formData.language ? 'border-green-500' : ''} bg-gray-800 text-gray-100`}>
                   <SelectValue placeholder="Select language" className="text-gray-100" />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-800 border-gray-700 text-gray-100">
@@ -419,7 +419,7 @@ const CreateCourse: React.FC = () => {
                 onValueChange={(value) => handleInputChange('category', value)}
                 onOpenChange={(open) => !open && handleBlur('category')}
               >
-                <SelectTrigger className={`border-gray-300 focus:border-white ${touched.category && errors.category ? 'border-red-500 focus-visible:ring-red-500' : formData.category ? 'border-green-500' : ''} bg-gray-800 text-gray-100`}>
+                <SelectTrigger className={`border-gray-500 focus:border-white ${touched.category && errors.category ? 'border-red-500 focus-visible:ring-red-500' : formData.category ? 'border-green-500' : ''} bg-gray-800 text-gray-100`}>
                   <SelectValue placeholder="Select category" className="text-gray-100" />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-800 border-gray-700 text-gray-100">
@@ -451,7 +451,7 @@ const CreateCourse: React.FC = () => {
                 value={formData.level}
                 onValueChange={(value) => setFormData({ ...formData, level: value })}
               >
-                <SelectTrigger className={`border-gray-300 focus:border-white ${formData.level ? 'border-green-500' : ''} bg-gray-800 text-gray-100`}>
+                <SelectTrigger className={`border-gray-500 focus:border-white ${formData.level ? 'border-green-500' : ''} bg-gray-800 text-gray-100`}>
                   <SelectValue placeholder="Select level" className="text-gray-100" />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-800 border-gray-700 text-gray-100">
@@ -477,7 +477,7 @@ const CreateCourse: React.FC = () => {
               </span>
             </label>
             <Textarea
-              className={`min-h-32 border-gray-300 focus:border-white ${touched.description && errors.description ? 'border-red-500 focus-visible:ring-red-500' : formData.description.length >= 100 ? 'border-green-500' : ''} bg-gray-800 text-gray-100 placeholder-gray-400`}
+              className={`min-h-32 border-gray-500 focus:border-white ${touched.description && errors.description ? 'border-red-500 focus-visible:ring-red-500' : formData.description.length >= 100 ? 'border-green-500' : ''} bg-gray-800 text-gray-100 placeholder-gray-400`}
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
               onBlur={() => handleBlur('description')}
@@ -504,7 +504,7 @@ const CreateCourse: React.FC = () => {
                 <span className="text-xs text-gray-400 ml-auto">Max 2MB</span>
               </label>
               <div
-                className={`border-2 ${isDragging ? 'border-indigo-500' : touched.thumbnail && errors.thumbnail ? 'border-red-500' : thumbnailPreview ? 'border-green-500' : 'border-gray-300'} border-dashed rounded-lg p-4 text-center transition-colors cursor-pointer hover:bg-gray-800 relative flex-1 flex flex-col justify-center items-center`}
+                className={`border-2 ${isDragging ? 'border-indigo-500' : touched.thumbnail && errors.thumbnail ? 'border-red-500' : thumbnailPreview ? 'border-green-500' : 'border-gray-500'} border-dashed rounded-lg p-4 text-center transition-colors cursor-pointer hover:bg-gray-800 relative flex-1 flex flex-col justify-center items-center`}
                 onClick={() => thumbnailInputRef.current?.click()}
                 onDragOver={(e) => handleDragOver(e, 'thumbnail')}
                 onDragLeave={handleDragLeave}
@@ -569,7 +569,7 @@ const CreateCourse: React.FC = () => {
                 <span className="text-xs text-gray-400 ml-auto">Max 500MB each</span>
               </label>
               <div
-                className={`border-2 ${isDragging ? 'border-indigo-500' : touched.videos && errors.videos ? 'border-red-500' : formData.videos.length > 0 ? 'border-green-500' : 'border-gray-300'} border-dashed rounded-lg p-4 text-center transition-colors relative flex-1 flex flex-col`}
+                className={`border-2 ${isDragging ? 'border-indigo-500' : touched.videos && errors.videos ? 'border-red-500' : formData.videos.length > 0 ? 'border-green-500' : 'border-gray-500'} border-dashed rounded-lg p-4 text-center transition-colors relative flex-1 flex flex-col`}
                 onDragOver={(e) => handleDragOver(e, 'video')}
                 onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop(e, 'video')}
@@ -634,7 +634,7 @@ const CreateCourse: React.FC = () => {
                               placeholder="Enter video title"
                               value={formData.videoTitles[index] || ''}
                               onChange={(e) => handleVideoTitleChange(index, e.target.value)}
-                              className={`border-gray-300 focus:border-white ${errors[`videoTitle${index}`] ? 'border-red-500 focus-visible:ring-red-500' : formData.videoTitles[index] ? 'border-green-500' : ''} bg-gray-800 text-gray-100 placeholder-gray-400`}
+                              className={`border-gray-500 focus:border-white ${errors[`videoTitle${index}`] ? 'border-red-500 focus-visible:ring-red-500' : formData.videoTitles[index] ? 'border-green-500' : ''} bg-gray-800 text-gray-100 placeholder-gray-400`}
                               onBlur={() => handleBlur(`videoTitle${index}`)}
                             />
                             {errors[`videoTitle${index}`] ? (
@@ -653,7 +653,7 @@ const CreateCourse: React.FC = () => {
                               placeholder="Enter video description (min 40 characters)"
                               value={formData.videoDescriptions[index] || ''}
                               onChange={(e) => handleVideoDescriptionChange(index, e.target.value)}
-                              className={`border-gray-300 focus:border-white ${errors[`videoDescription${index}`] ? 'border-red-500 focus-visible:ring-red-500' : formData.videoDescriptions[index]?.length >= 40 ? 'border-green-500' : ''} bg-gray-800 text-gray-100 placeholder-gray-400`}
+                              className={`border-gray-500 focus:border-white ${errors[`videoDescription${index}`] ? 'border-red-500 focus-visible:ring-red-500' : formData.videoDescriptions[index]?.length >= 40 ? 'border-green-500' : ''} bg-gray-800 text-gray-100 placeholder-gray-400`}
                               onBlur={() => handleBlur(`videoDescription${index}`)}
                             />
                             <div className="flex justify-between items-center">

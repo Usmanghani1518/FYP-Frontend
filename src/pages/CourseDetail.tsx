@@ -401,7 +401,7 @@ function CourseDetailPage() {
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">Course Content</h2>
                 <div className="space-y-4">
                   {courseData.curriculum.length > 0 ? (
-                    courseData.curriculum.map((lecture) => (
+                    courseData.curriculum.map((lecture, index) => (
                       <div
                         key={lecture.id}
                         onClick={() => handleLectureClick(lecture)}
@@ -417,17 +417,7 @@ function CourseDetailPage() {
                       >
                         <div className="flex items-center gap-4">
                           <div className="flex-shrink-0">
-                            {lecture.thumbnail ? (
-                              <img
-                                src={lecture.thumbnail}
-                                alt=""
-                                className="w-16 h-12 object-cover rounded"
-                              />
-                            ) : (
-                              <div className="w-16 h-12 bg-gray-200 rounded flex items-center justify-center">
-                                <Video className="w-5 h-5 text-gray-400" />
-                              </div>
-                            )}
+                         <h3 className='bg-gray-200 p-4 rounded-xl text-2xl text-gray-400 font-bold'>{index + 1}</h3>
                           </div>
                           <div className="flex-grow">
                             <div className="flex items-center justify-between">

@@ -581,7 +581,7 @@ function ResumeCourse() {
           {/* Sidebar */}
           <div className="lg:col-span-1">
             {/* Course Progress Info */}
-            <div className="bg-white rounded-lg shadow-lg p-6 mb-8 sticky top-4">
+            {/* <div className="bg-white rounded-lg shadow-lg p-6 mb-8 sticky top-4">
               <h3 className="text-xl font-bold text-gray-900 mb-4">Your Progress</h3>
               <div className="flex items-center mb-6">
                 <div className="relative w-20 h-20">
@@ -616,7 +616,7 @@ function ResumeCourse() {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Course Curriculum */}
             <div className="bg-white rounded-lg shadow-lg overflow-hidden">

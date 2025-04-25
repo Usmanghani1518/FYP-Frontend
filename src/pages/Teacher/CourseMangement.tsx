@@ -39,6 +39,26 @@ interface CourseFormData {
   videos: VideoData[];
 }
 
+interface QuizQuestion {
+  question: string;
+  options: string[];
+  correctOption: number;
+}
+
+interface QuizData {
+  _id: string;
+  title: string;
+  description: string;
+  passingScore: number;
+  questions: QuizQuestion[];
+}
+
+interface QuizFormData {
+  title: string;
+  description: string;
+  passingScore: number;
+  questions: QuizQuestion[];
+}
 const UpdateCourse: React.FC = () => {
   const [originalData, setOriginalData] = useState<CourseFormData>({
     id: '',
@@ -73,12 +93,20 @@ const UpdateCourse: React.FC = () => {
   const [editingVideoIndex, setEditingVideoIndex] = useState<number | null>(null);
   const [expandedVideo, setExpandedVideo] = useState<string | null>(null);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
+  const [quizData, setQuizData] = useState<QuizData | null>(null);
+  const [isLoadingQuiz, setIsLoadingQuiz] = useState(false);
+  const [quizForm, setQuizForm] = useState<QuizFormData>({
+    title: '',
+    description: '',
+    passingScore: 70,
+    questions: []
+  });
+  
 
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const params = useParams()
   const navigate = useNavigate();
-
   useEffect(() => {
     const fetchCourseData = async () => {
       setIsLoading(true);
@@ -128,6 +156,177 @@ const UpdateCourse: React.FC = () => {
   
     fetchCourseData();
   }, []);
+
+
+
+
+// Quiz code ,
+
+useEffect(() => {
+  const fetchQuizData = async () => {
+    if (!params.courseId) return;
+    
+    setIsLoadingQuiz(true);
+    try {
+      const response = await backendRequest('GET', `/quiz/courses/${params.courseId}/quizzes`);
+      if (response.success) {
+        if(Array.isArray(response.data)) {
+
+        setQuizData(response.data[0]);
+        }
+      } else {
+        setQuizData(null);
+      }
+    } catch (error) {
+      console.error('Error fetching quiz:', error);
+      setQuizData(null);
+    } finally {
+      setIsLoadingQuiz(false);
+    }
+  };
+
+  fetchQuizData();
+}, [params.courseId, openDialog]);
+console.log("quiz data is ", quizData);
+
+const handleQuizFormChange = (field: keyof QuizFormData, value: any) => {
+  setQuizForm(prev => ({ ...prev, [field]: value }));
+};
+
+const handleQuestionChange = (index: number, field: keyof QuizQuestion, value: any) => {
+  const newQuestions = [...quizForm.questions];
+  newQuestions[index] = { ...newQuestions[index], [field]: value };
+  setQuizForm(prev => ({ ...prev, questions: newQuestions }));
+};
+
+const handleOptionChange = (questionIndex: number, optionIndex: number, value: string) => {
+  const newQuestions = [...quizForm.questions];
+  const newOptions = [...newQuestions[questionIndex].options];
+  newOptions[optionIndex] = value;
+  newQuestions[questionIndex].options = newOptions;
+  setQuizForm(prev => ({ ...prev, questions: newQuestions }));
+};
+
+const addQuestion = () => {
+  setQuizForm(prev => ({
+    ...prev,
+    questions: [
+      ...prev.questions,
+      { question: '', options: ['', '', '', ''], correctOption: 0 }
+    ]
+  }));
+};
+
+const removeQuestion = (index: number) => {
+  const newQuestions = [...quizForm.questions];
+  newQuestions.splice(index, 1);
+  setQuizForm(prev => ({ ...prev, questions: newQuestions }));
+};
+
+const validateQuizForm = (): boolean => {
+  if (!quizForm.title.trim()) {
+    notifyResponse({ success: false, message: 'Quiz title is required' });
+    return false;
+  }
+
+  if (quizForm.questions.length === 0) {
+    notifyResponse({ success: false, message: 'At least one question is required' });
+    return false;
+  }
+
+  for (const question of quizForm.questions) {
+    if (!question.question.trim()) {
+      notifyResponse({ success: false, message: 'All questions must have text' });
+      return false;
+    }
+
+    if (question.options.some(opt => !opt.trim())) {
+      notifyResponse({ success: false, message: 'All options must be filled' });
+      return false;
+    }
+  }
+
+  return true;
+};
+
+const handleCreateQuiz = async () => {
+  if (!validateQuizForm()) return;
+
+  setIsLoading(true);
+  try {
+    const response = await backendRequest('POST', '/quiz/create', {
+      courseId: params.courseId,
+      ...quizForm
+    });
+
+    if (response.success) {
+      notifyResponse({ success: true, message: 'Quiz created successfully' });
+      setQuizData(response.data);
+      setOpenDialog(null);
+      setQuizForm({
+        title: '',
+        description: '',
+        passingScore: 70,
+        questions: []
+      });
+    } else {
+      notifyResponse(response);
+    }
+  } catch (error) {
+    console.error('Error creating quiz:', error);
+    notifyResponse({ success: false, message: 'Failed to create quiz' });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+const handleUpdateQuiz = async () => {
+  if (!quizData || !validateQuizForm()) return;
+
+  setIsLoading(true);
+  try {
+    const response = await backendRequest('PUT', `/quizzes/${quizData.id}`, {
+      ...quizForm
+    });
+
+    if (response.success) {
+      notifyResponse({ success: true, message: 'Quiz updated successfully' });
+      setQuizData(response.data);
+      setOpenDialog(null);
+    } else {
+      notifyResponse(response);
+    }
+  } catch (error) {
+    console.error('Error updating quiz:', error);
+    notifyResponse({ success: false, message: 'Failed to update quiz' });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+const handleDeleteQuiz = async () => {
+  if (!quizData) return;
+
+  setIsLoading(true);
+  try {
+    const response = await backendRequest('DELETE', `/quiz/quizzes/${quizData._id}`);
+    if (response.success) {
+      notifyResponse({ success: true, message: 'Quiz deleted successfully' });
+      setQuizData(null);
+      setOpenDialog(null);
+    } else {
+      notifyResponse(response);
+    }
+  } catch (error) {
+    console.error('Error deleting quiz:', error);
+    notifyResponse({ success: false, message: 'Failed to delete quiz' });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+
+
 
   const validateField = (field: string, value: any): string => {
     switch(field) {
@@ -502,6 +701,12 @@ const UpdateCourse: React.FC = () => {
                   className="data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-custom_primary data-[state=active]:text-custom_primary rounded-none text-gray-200 hover:text-white"
                 >
                   Videos
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="quiz" 
+                  className="data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-custom_primary data-[state=active]:text-custom_primary rounded-none text-gray-200 hover:text-white"
+                >
+                  Quiz
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -977,6 +1182,294 @@ const UpdateCourse: React.FC = () => {
                 </div>
               </div>
             </TabsContent>
+            <TabsContent value="quiz" className="p-6 space-y-8 mt-0 bg-gray-900">
+  {/* Quiz Management Card */}
+  <div className="bg-gray-800 rounded-lg border border-gray-700 shadow-sm overflow-hidden">
+    <div className="flex justify-between items-center p-4 bg-gray-700 border-b border-gray-600">
+      <h3 className="font-medium text-gray-200">Course Quiz</h3>
+      {isLoadingQuiz ? (
+        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-custom_primary"></div>
+      ) : quizData ? (
+        <div className="flex gap-2">
+          <Button 
+            size="sm" 
+            variant="outline" 
+            onClick={() => {
+              setQuizForm({
+                title: quizData.title,
+                description: quizData.description || '',
+                passingScore: quizData.passingScore,
+                questions: quizData.questions || []
+              });
+              setOpenDialog('edit-quiz');
+            }}
+            className="flex items-center gap-1 bg-gray-600 text-gray-200 hover:bg-gray-600 hover:text-white"
+          >
+            <Edit2 className="h-4 w-4" /> Edit Quiz
+          </Button>
+          <Button 
+            size="sm" 
+            variant="destructive"
+            onClick={() => setOpenDialog('delete-quiz')}
+            className="flex items-center gap-1"
+          >
+            <X className="h-4 w-4" /> Delete Quiz
+          </Button>
+        </div>
+      ) : (
+        <Button 
+          size="sm" 
+          onClick={() => {
+            setQuizForm({
+              title: '',
+              description: '',
+              passingScore: 70,
+              questions: []
+            });
+            setOpenDialog('create-quiz');
+          }}
+          className="bg-custom_primary hover:bg-custom_primary_hover"
+        >
+          Create Quiz
+        </Button>
+      )}
+    </div>
+    
+    {/* Quiz Content */}
+    <div className="p-4">
+      {isLoadingQuiz ? (
+        <div className="flex justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-custom_primary"></div>
+        </div>
+      ) : quizData ? (
+        <div className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-400">Quiz Title</p>
+              <p className="font-medium text-gray-200">{quizData.title}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-400">Passing Score</p>
+              <p className="font-medium text-gray-200">{quizData.passingScore}%</p>
+            </div>
+          </div>
+          
+          {quizData.description && (
+            <div>
+              <p className="text-sm text-gray-400">Description</p>
+              <p className="text-gray-300">{quizData.description}</p>
+            </div>
+          )}
+          
+          <div className="pt-4">
+            <h4 className="font-medium text-gray-200 mb-2">
+              Questions ({quizData.questions?.length || 0})
+            </h4>
+            {quizData.questions?.length ? (
+              <div className="space-y-4">
+                {quizData.questions.map((question, index) => (
+                  <div key={index} className="bg-gray-700 p-4 rounded-lg">
+                    <p className="font-medium text-gray-200">{index + 1}. {question.question}</p>
+                    <div className="mt-2 space-y-1">
+                      {question.options?.map((option, optIndex) => (
+                        <div 
+                          key={optIndex} 
+                          className={`px-3 py-2 rounded ${question.correctOption === optIndex ? 'bg-green-900 text-green-200' : 'bg-gray-600 text-gray-300'}`}
+                        >
+                          {String.fromCharCode(65 + optIndex)}. {option}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-400">No questions found in this quiz</p>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="text-center py-8">
+          <p className="text-sm text-gray-400">
+            No quiz created yet for this course. Click the button above to create one.
+          </p>
+        </div>
+      )}
+    </div>
+  </div>
+
+  {/* Create/Edit Quiz Dialog */}
+  {(openDialog === 'create-quiz' || openDialog === 'edit-quiz') && (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-gray-800 rounded-lg border border-gray-700 w-full max-w-2xl max-h-[90vh] flex flex-col">
+        <div className="p-4 border-b border-gray-700 flex justify-between items-center">
+          <h3 className="font-medium text-gray-200">
+            {openDialog === 'create-quiz' ? 'Create New Quiz' : 'Edit Quiz'}
+          </h3>
+          <button onClick={() => setOpenDialog(null)} className="text-gray-400 hover:text-gray-200">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        
+        <div className="p-4 space-y-4 overflow-y-auto flex-1">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-300">Quiz Title <span className="text-red-500">*</span></label>
+            <Input
+              value={quizForm.title}
+              onChange={(e) => setQuizForm({...quizForm, title: e.target.value})}
+              className="bg-gray-700 text-gray-200 border-gray-600"
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-300">Description (Optional)</label>
+            <Textarea
+              value={quizForm.description}
+              onChange={(e) => setQuizForm({...quizForm, description: e.target.value})}
+              className="bg-gray-700 text-gray-200 border-gray-600"
+            />
+          </div>
+          
+          <div className="space-y-2">
+  <label className="text-sm font-medium text-gray-300">Passing Score (%) <span className="text-red-500">*</span></label>
+  <Input
+    type="number"
+    value={quizForm.passingScore}
+    onChange={(e) => setQuizForm({
+      ...quizForm, 
+      passingScore: Math.min(100, Math.max(0, parseInt(e.target.value) || 0))
+    })}
+    className="bg-gray-700 text-gray-200 border-gray-600"
+    min="0"
+    max="100"
+  />
+</div>
+          
+          <div className="pt-4">
+            <div className="flex justify-between items-center mb-2">
+              <h4 className="font-medium text-gray-200">
+                Questions <span className="text-red-500">*</span>
+              </h4>
+              <Button
+                onClick={addQuestion}
+                variant="outline"
+                size="sm"
+                className="bg-gray-700 text-gray-200 hover:bg-gray-600 hover:text-white"
+              >
+                Add Question
+              </Button>
+            </div>
+            
+            {quizForm.questions?.length ? (
+              <div className="space-y-6">
+                {quizForm.questions.map((question, index) => (
+                  <div key={index} className="bg-gray-700 p-4 rounded-lg">
+                    <div className="flex justify-between items-start mb-2">
+                      <h5 className="font-medium text-gray-200">Question {index + 1}</h5>
+                      <button 
+                        onClick={() => removeQuestion(index)}
+                        className="text-red-400 hover:text-red-300"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                    
+                    <div className="space-y-2 mb-4">
+                      <label className="text-sm font-medium text-gray-300">Question Text <span className="text-red-500">*</span></label>
+                      <Input
+                        value={question.question}
+                        onChange={(e) => handleQuestionChange(index, 'question', e.target.value)}
+                        className="bg-gray-700 text-gray-200 border-gray-600"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-300">Options <span className="text-red-500">*</span></label>
+                      {[0, 1, 2, 3].map((optIndex) => (
+                        <div key={optIndex} className="flex items-center gap-2">
+                          <input
+                            type="radio"
+                            name={`question-${index}`}
+                            checked={question.correctOption === optIndex}
+                            onChange={() => handleQuestionChange(index, 'correctOption', optIndex)}
+                            className="h-4 w-4 text-custom_primary focus:ring-custom_primary border-gray-600 bg-gray-700"
+                          />
+                          <Input
+                            value={question.options[optIndex] || ''}
+                            onChange={(e) => handleOptionChange(index, optIndex, e.target.value)}
+                            className="bg-gray-700 text-gray-200 border-gray-600"
+                            placeholder={`Option ${String.fromCharCode(65 + optIndex)}`}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-400 text-center py-4">No questions added yet</p>
+            )}
+          </div>
+        </div>
+        
+        <div className="p-4 border-t border-gray-700 flex justify-end gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setOpenDialog(null)}
+            className="bg-gray-600 text-gray-200 hover:bg-gray-600 hover:text-white"
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={openDialog === 'create-quiz' ? handleCreateQuiz : handleUpdateQuiz}
+            disabled={isLoading || !quizForm.title || !quizForm.questions?.length}
+            className="bg-custom_primary hover:bg-custom_primary_hover"
+          >
+            {isLoading 
+              ? openDialog === 'create-quiz' ? 'Creating...' : 'Updating...' 
+              : openDialog === 'create-quiz' ? 'Create Quiz' : 'Update Quiz'}
+          </Button>
+        </div>
+      </div>
+    </div>
+  )}
+
+  {openDialog === 'delete-quiz' && quizData && (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-gray-800 rounded-lg border border-gray-700 w-full max-w-md">
+        <div className="p-4 border-b border-gray-700 flex justify-between items-center">
+          <h3 className="font-medium text-gray-200">Delete Quiz</h3>
+          <button onClick={() => setOpenDialog(null)} className="text-gray-400 hover:text-gray-200">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        
+        <div className="p-4">
+          <p className="text-gray-300">Are you sure you want to delete this quiz? This action cannot be undone.</p>
+        </div>
+        
+        <div className="p-4 border-t border-gray-700 flex justify-end gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setOpenDialog(null)}
+            className="bg-gray-600 text-gray-200 hover:bg-gray-600 hover:text-white"
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleDeleteQuiz}
+            disabled={isLoading}
+            variant="destructive"
+          >
+            {isLoading ? 'Deleting...' : 'Delete Quiz'}
+          </Button>
+        </div>
+      </div>
+    </div>
+  )}
+  
+</TabsContent>
+
           </Tabs>
         </CardContent>
 
